@@ -37,6 +37,9 @@
 Time Series/Slides/**/*.pdf
 Time Series/Problem Sets/**/*.pdf
 
+# Exception: track our own TA recitation compiled slides
+!Time Series/Slides/Recitation Slides/Lecture 01/lecture_01_time_series_fundamentals.pdf
+
 # If you later add Panel Data slides/psets as PDFs, keep them untracked by default
 Panel Data/Slides/**/*.pdf
 Panel Data/Problem Sets/**/*.pdf
