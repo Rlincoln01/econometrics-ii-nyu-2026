@@ -51,37 +51,42 @@ A tentative schedule is below. Note: The Time Series syllabus is from **Spring 2
 | Week 11 | Large-T Asymptotics: Incidental parameters, bias reduction |
 | Week 12 | Beyond Panel Data: Bipartite networks, matched datasets, macro+micro |
 
-## Books and Slides
+## Books and Readings
 
 Lecture slides will be posted to this repository. All books and papers can be accessed through the **NYU Library online**.
 
-### Time Series
+### Time Series — Textbooks
 
-**Main Textbook:**
-- Hamilton, J. (1994): *Time Series Analysis*. Princeton University Press.
+| Book | Reference |
+|------|-----------|
+| **Main** | Hamilton, J. (1994): *Time Series Analysis*. Princeton University Press. |
+| **Supplementary** | Harvey, A. (1993): *Time Series Models* (2nd ed.). MIT Press. *(Out of print; used copies available.)* |
 
-**Supplementary:**
-- Harvey, A. (1993): *Time Series Models* (2nd ed.). MIT Press. *(Out of print; used copies available online.)*
+### Time Series — Readings by Topic
 
-**Selected Papers:**
-- Campbell & Shiller (1987): Cointegration and Tests of Present-Value Models
-- Cochrane (1994): Permanent and transitory components of GNP and Stock Prices
-- Blanchard & Quah (1989): Dynamic Effects of Aggregate Supply and Demand Shocks
-- Hansen & Singleton (1982): Generalized instrumental variables estimation of nonlinear rational expectations models
-- Hansen (1982): Large Sample Properties of GMM Estimators
+Required readings are marked with **(\*)**.
 
-### Panel Data
+| Topic | Textbook Chapters | Papers |
+|-------|-------------------|--------|
+| **Time Domain Representations** | **(\*)** Hamilton, chs. 2–3, 10.1–10.3 | Harvey, ch. 2 |
+| **Maximum Likelihood Estimation** | **(\*)** Hamilton, chs. 5, 7, 13 | Harvey, chs. 4–5 |
+| **Reduced-form VARs** | **(\*)** Hamilton, ch. 11 | Campbell & Shiller (1987), *Cointegration and Tests of Present-Value Models*; Cochrane (1991), *Explaining the variance of price-dividend ratios*; Cochrane (1994), *Permanent and transitory components of GNP and Stock Prices*; Rotemberg & Woodford (1996), *Real-Business-Cycle Models and Forecastable Movements*; Cochrane (2022), *The Fiscal Roots of Inflation* |
+| **DSGE Models** | **(\*)** Hamilton, ch. 12 | — |
+| **Identified VARs** | — | Blanchard & Quah (1989), *Dynamic Effects of Aggregate Supply and Demand Shocks*; Cogley & Nason (1995), *Output Dynamics in Real-Business-Cycle Models*; Kehoe (2006), *How to Advance Theory with Structural VARs* |
+| **Unit Roots & Cointegration** | **(\*)** Hamilton, chs. 15, 17, 19, 20 | Nelson & Plosser (1982), *Trends and Random Walks in Macroeconomic Time Series*; Stock (1991), *Confidence Intervals for the Largest Autoregressive Root*; King, Plosser, Stock & Watson (1991), *Stochastic trends and economic fluctuations* |
+| **GMM** | **(\*)** Hamilton, ch. 14 | **(\*)** Hansen & Singleton (1982), *Generalized instrumental variables estimation of nonlinear rational expectations models*; **(\*)** Hansen (1982), *Large Sample Properties of GMM Estimators*; Hansen & Jagannathan (1997), *Assessing specification errors in stochastic discount factor models* |
+| **Frequency Domain** *(time permitting)* | **(\*)** Hamilton, chs. 6, 10.4–10.5 | Harvey, ch. 3; Baxter & King (1999), *Measuring Business Cycles: Approximate Bandpass Filters*; Cogley (2006), *Data Filters*; Hamilton (2018), *Why You Should Never Use the Hodrick-Prescott Filter* |
 
-**Recommended Textbooks:**
-- Arellano, M. (2003): *Panel Data Econometrics*. Oxford University Press.
-- Wooldridge, J. (2010): *Econometric Analysis of Cross Section and Panel Data*. MIT Press.
+---
 
-**Selected Papers:**
-- Arellano & Bond (1991): Some Tests of Specification for Panel Data
-- Bonhomme, Lamadon & Manresa (2019): A distributional framework for matched employer-employee data
-- Bonhomme & Manresa (2015): Grouped patterns of heterogeneity in panel data
-- Chamberlain (1984): Panel Data (Handbook of Econometrics)
-- Abowd, Kramarz & Margolis (1999): High wage workers and high wage firms
+### Panel Data — Textbooks
+
+| Book | Reference |
+|------|-----------|
+| **Recommended** | Arellano, M. (2003): *Panel Data Econometrics*. Oxford University Press. |
+| **Recommended** | Wooldridge, J. (2010): *Econometric Analysis of Cross Section and Panel Data*. MIT Press. |
+
+*(A detailed topic-by-topic reading list for Panel Data will be added when the 2026 syllabus is finalized.)*
 
 ## Administrative Stuff
 
