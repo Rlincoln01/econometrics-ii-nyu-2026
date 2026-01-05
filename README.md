@@ -86,7 +86,51 @@ Required readings are marked with **(\*)**.
 | **Recommended** | Arellano, M. (2003): *Panel Data Econometrics*. Oxford University Press. |
 | **Recommended** | Wooldridge, J. (2010): *Econometric Analysis of Cross Section and Panel Data*. MIT Press. |
 
-*(A detailed topic-by-topic reading list for Panel Data will be added when the 2026 syllabus is finalized.)*
+### Panel Data — Readings by Topic
+
+All readings are optional but useful for deeper understanding.
+
+#### 1. Introduction
+
+| Subtopic | Papers |
+|----------|--------|
+| **Foundations** | Chamberlain (1984), *Panel Data* (Handbook of Econometrics) |
+| **GMM & Simulated Methods** | Gourieroux, Phillips & Yu (2010), *Indirect inference for dynamic panel models* |
+
+#### 2. Linear Panel Data Models
+
+| Subtopic | Papers |
+|----------|--------|
+| **Static: FE vs RE** | Chamberlain (1984), *Panel Data* |
+| **Random Coefficients** | Browning, Ejrnaes & Alvarez (2010), *Modelling income processes with lots of heterogeneity* |
+| **Dynamic Models / Fixed-T Bias** | Arellano & Bond (1991), *Some Tests of Specification for Panel Data*; Hahn & Kuersteiner (2002), *Asymptotically unbiased inference for a dynamic panel model* |
+| **Large-T** | Hansen (2007), *Asymptotic properties of a robust variance matrix estimator for panel data when T is large*; Moon & Weidner (2015), *Linear regression for panel with unknown number of factors as interactive fixed effects* |
+
+#### 3. Nonlinear Panel Data Models
+
+| Subtopic | Papers |
+|----------|--------|
+| **Fixed-T: Logits** | Honoré & Kyriazidou (2000), *Panel data discrete choice models with lagged dependent variables*; Honoré & Lewbel (2002), *Semiparametric binary choice panel data models*; Chamberlain (2010), *Binary response models for panel data* |
+| **Fixed-T: Mixtures & Quantiles** | Arellano, Blundell & Bonhomme (2017), *Earnings and consumption dynamics: a nonlinear panel data framework*; Belloni et al. (2019), *Conditional quantile processes*; Gu & Volgushev (2019), *Panel data quantile regression with grouped fixed effects* |
+| **Large-T: Incidental Parameters & Bias Reduction** | Hahn & Newey (2004), *Jackknife and analytical bias reduction for nonlinear panel models*; Arellano & Bonhomme (2009), *Robust priors in nonlinear panel data models*; Arellano & Bonhomme (2011), *Nonlinear panel data analysis*; Fernández-Val & Lee (2013), *Panel data models with nonadditive unobserved heterogeneity*; Fernández-Val & Weidner (2016, 2018), *Individual and time effects in nonlinear panel models* |
+| **Grouped/Discretized Heterogeneity** | Bonhomme & Manresa (2015), *Grouped patterns of heterogeneity in panel data*; Bonhomme, Lamadon & Manresa (2022), *Discretizing unobserved heterogeneity*; Ando & Bai (2016), *Panel data models with grouped factor structure*; Su, Shi & Phillips, *Identifying Latent Structures in Panel Data*; Hahn & Moon (2010), *Panel data models with finite number of multiple equilibria* |
+
+#### 4. Beyond Panel Data
+
+| Subtopic | Papers |
+|----------|--------|
+| **Bipartite Networks & Matched Data** | Abowd, Kramarz & Margolis (1999), *High wage workers and high wage firms*; Abowd, McKinney & Schmutte (2019), *Modeling endogenous mobility*; Andrews et al. (2008), *High wage workers and low wage firms*; Bonhomme, Lamadon & Manresa (2019), *A distributional framework for matched employer-employee data*; Jochmans & Weidner (2019), *Fixed-Effect Regressions on Network Data*; Kline, Saggio & Sølvsten (2020), *Leave-out estimation of variance components*; Woodcock (2008), *Wage differentials in the presence of unobserved worker, firm, and match heterogeneity*; Lachowska et al. (2022), *Do firm effects drift?* |
+| **Network Theory** | Bonhomme (2020), *Econometric analysis of bipartite networks*; Kranton & Minehart (2001), *A theory of buyer-seller networks*; Gao, Lu & Zhou (2015), *Rate-optimal graphon estimation*; Lei & Rinaldo (2015), *Consistency of spectral clustering in stochastic block models* |
+| **Combining Macro & Micro** | Finkelstein, Gentzkow & Williams (2016), *Sources of geographic variation in health care*; Freyaldenhoven, Hansen & Shapiro (2019), *Pre-event trends in the panel event-study design*; Rambachan & Roth (2019), *An honest approach to parallel trends* |
+
+#### Additional References
+
+| Topic | Papers |
+|-------|--------|
+| **High-Dimensional Panels** | Belloni et al. (2016), *Inference in high-dimensional panel models* |
+| **Dynamic Models with Unobservables** | Hu & Shum (2012), *Nonparametric identification of dynamic models with unobserved state variables* |
+| **Production Functions** | Levinsohn & Petrin (2003), *Estimating production functions using inputs to control for unobservables*; Doraszelski & Jaumandreu (2013), *R&D and productivity: Estimating endogenous productivity* |
+| **Clustering Methods** | Vogt & Linton (2020), *Multiscale clustering of nonparametric regression curves*; Pollard (1982), *A central limit theorem for k-means clustering* |
 
 ## Administrative Stuff
 
