@@ -1,0 +1,859 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% Theme and color setup
+\usetheme{default}
+\usecolortheme{default}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Custom colors (MIT-inspired)
+\definecolor{mitred}{RGB}{163,31,52}
+\definecolor{darkblue}{RGB}{0,40,85}
+\definecolor{lightgray}{RGB}{245,245,245}
+
+% Set main colors
+\setbeamercolor{frametitle}{fg=darkblue,bg=white}
+\setbeamercolor{title}{fg=darkblue}
+\setbeamercolor{author}{fg=black}
+\setbeamercolor{institute}{fg=black}
+\setbeamercolor{date}{fg=black}
+\setbeamercolor{structure}{fg=darkblue}
+\setbeamercolor{normal text}{fg=black}
+\setbeamercolor{itemize item}{fg=mitred}
+\setbeamercolor{itemize subitem}{fg=darkblue}
+\setbeamercolor{enumerate item}{fg=darkblue}
+
+% --- Title band behind frametitle ---
+% Choose the band color here:
+\setbeamercolor{frametitle}{fg=white,bg=darkblue} % or bg=darkblue
+
+% Height/depth of the band and padding:
+\newlength{\titlebandht}
+\setlength{\titlebandht}{4ex} % band thickness (increase for a taller bar)
+
+\setbeamertemplate{frametitle}{
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,ht=\titlebandht,dp=1.1ex,leftskip=1.2em,rightskip=1.2em]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+    \ifx\insertframesubtitle\@empty\relax\else\\[-0.2ex]
+      \usebeamerfont{framesubtitle}\insertframesubtitle
+    \fi
+  \end{beamercolorbox}
+  \vspace{0.6em}
+}
+
+
+% Font settings
+\usefonttheme{professionalfonts}
+\usefonttheme{serif}
+
+% % Frame title formatting
+% \setbeamertemplate{frametitle}{
+%     \vspace{0.5em}
+%     \insertframetitle
+%     \vspace{0.3em}
+% }
+
+% Footline with page numbers
+\setbeamertemplate{footline}{
+    \hfill\insertframenumber\hspace{2em}\vspace{0.5em}
+}
+
+% Packages
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{mathtools}
+\usepackage{dirtytalk}
+
+% Custom commands for math
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Corr}{\text{Corr}}
+\newcommand{\ve}{\text{Vec}}
+\newcommand{\Vech}{\text{Vech}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+
+% Theorem environments
+\setbeamertemplate{theorems}[numbered]
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\newtheorem{assumption}{Assumption}
+\theoremstyle{definition}
+
+% Block colors
+\setbeamercolor{block title}{bg=lightgray,fg=darkblue}
+\setbeamercolor{block body}{bg=lightgray!50}
+
+% Title page
+\title{Dynamic Identification in VARs}
+\author{Paul Beaudry, Fabrice Collard, Patrick Fève, \\ Alain Guay, Franck Portier}
+\institute{\textbf{Presented by}: Rafael Lincoln \\ Macro Reading Group}
+\date{October $1^{st}$, 2025}
+
+\begin{document}
+
+% Title slide
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+% ================================= Introduction ================================= %
+
+\begin{frame}{Motivation}
+    \begin{itemize}
+        \item Macroeconomists want to understand how economy responds to structural shocks
+        \vspace{1em}
+        \item Two main approaches, each with limitations:
+        \begin{itemize}
+            \item[(a)] \textbf{DSGE Models}: Many restrictions $\to$ prone to misspecification
+            \item[(b)] \textbf{SVARs}: Fewer restrictions $\to$ controversial identification assumptions
+        \end{itemize}
+        \vspace{1em}
+        \item \alert{Two Critical Questions}: 
+        \begin{enumerate}
+            % \item Can we achieve identification using restrictions that are already standard in macroeconomic theory?
+            \item Can we achieve identification with more parsimonious assumptions?
+            \vspace{0.5em}
+            \item Can we test the validity of traditional SVAR restrictions?
+        \end{enumerate}
+        
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{This Paper}
+\textbf{This Paper's Innovation}:
+    \begin{itemize}
+        \item Middle ground: Use DSGE's dynamic structure instead of SVAR usual identification restrictions
+        \vspace{0.5em}
+        \item \alert{Key insight}: If shocks follow independent AR(1) processes (standard in DSGE), this "dynamic fingerprint" is sufficient for identification
+    \end{itemize}
+\vspace{0.5em}    
+\pause
+\textbf{Preview of Results}:    
+        \begin{itemize}
+            \item Identification of structural shocks without the usual restrictions/instruments
+            \item Method to test common SVAR restrictions
+            \item Applications show some classic identifications hold, others don't
+        \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Related Literature}
+    \textbf{Builds on Foundational Work}
+    \begin{itemize}
+        \item Komunjer \& Ng (2011): Identification in linearized DSGE models
+        \item McGrattan (2010): State-space identification in specific RBC models
+        \item Pagan \& Robinson (2019): Statistical restrictions in DSGE vs SVAR
+    \end{itemize}
+    \vspace{1em}
+    \textbf{Key Contributions Beyond Existing Work}
+    \begin{itemize}
+        \item Broader class of models than McGrattan (2010)
+        \item Opposite approach to Bai \& Wang (2015): loadings $\times$ dynamics
+        \item Extends Gourieroux \& Jasiak (2022)
+    \end{itemize}
+    \vspace{1em}
+    \textbf{Related SVAR literature}: {\small Sims (1980), CEE (1999), Blanchard-Perotti (2003), Blanchard-Quah (1989), Shapiro-Watson (1988), Uhlig (2005), Stock-Watson (2012), Gertler-Karadi (2015) }
+    % just a note: This paper can be seen as a form of \say{companion paper} to Komujner and Ng (2011,ECMA)
+\end{frame}
+
+\begin{frame}{Roadmap}
+    \begin{enumerate}
+        \item \textbf{Introduction}
+        \vspace{0.5em}
+        \item \textbf{Establishing Dynamic Identification}
+        \begin{itemize}
+            \item Identification Challenge
+            \item Example: NK model and Identification with D-SVAR
+            \item Proving local identification
+        \end{itemize}
+        \vspace{0.5em}
+        \item \textbf{Evaluating DSGE and SVAR Models}
+        \begin{itemize}
+            \item Estimation and Inference 
+            \item Example: CEE (1999) 
+        \end{itemize}
+        \vspace{0.5em}
+        \item \textbf{Conclusion}
+    \end{enumerate}
+\end{frame}
+
+
+\begin{frame}[plain]{}
+\textbf{\Large Establishing Dynamic Identification}
+\end{frame}
+
+\begin{frame}{Mapping$\colon$DSGE $\to$ State-Space}
+    \begin{itemize}
+        \item DGP $\mathbb{D}(\cdot \mid \theta)$ is a Linear Rational Expectations Model:
+        \begin{align}
+        \begin{split} \label{sys:LREM}
+            X_t & = M_1(\theta) X_{t-1} + M_2(\theta) \E_t [X_{t+1}] + M_3(\theta) Z_t \\
+            Z_t & = R(\theta)Z_{t-1} + \varepsilon_t; \quad \varepsilon_t \sim \mathcal{N}(0,\mathbf{I}_{n_z})
+        \end{split}
+        \end{align}
+        $X_t = \begin{bmatrix}
+            Y_t & K_t
+        \end{bmatrix}^\prime$ Observables / Endogenous; $Z_t = $ Exogenous
+        \vspace{0.5em}
+        \pause
+        \item Under Saddle Path, State-Space representation $\mathcal{S}$ follows:
+        \begin{align}
+        \begin{split} \label{sys:state_space_representation}
+            K_{t+1} & = GK_t + F Z_t; \\
+            Y_t & = \Pi_{yk} K_t + \Pi_{yz}Z_t;  \\
+            Z_t & = RZ_{t-1} + \varepsilon_t; 
+        \end{split}
+        \end{align}
+        \item Establish a mapping $\psi = \mathcal{G}(\theta)$, {\small $\psi = (\ve(G),\ve(F),\ve(\Pi_{yk}),\ve(\Pi_{yz}),\ve(R))$}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Mapping$\colon$State-Space $\to$ Reduced Form}
+    \begin{itemize}
+        \item \textit{Simplification}: Assume $X_t = Y_t$ (all variables are observed) \hyperlink{slide:general_mapping}{\beamerbutton{General Form}} 
+            \begin{align}
+            \begin{split}
+                Y_t & = G Y_{t-1} + FZ_t \\
+                Z_t & = RZ_{t-1} + \varepsilon_t \label{eq:simplified_state_space}
+            \end{split}
+            \end{align}
+        \item Under invertibility, recover VAR(2) form:
+            \begin{align}
+                Y_t = \underbrace{(G + FRF)^{-1}}_{\equiv \Gamma_1} Y_{t-1}  +\underbrace{(-FRF^{-1})}_{\Gamma_2} Y_{t-2} + \underbrace{F \varepsilon_t}_{a_t}
+            \end{align}
+        \item Estimate Reduced-form VAR(2), mapping $(\Gamma_1,\Gamma_2,\Sigma_a) = \Psi(\psi)$ where:
+            \begin{align*}
+                \Sigma_a = FF^\prime
+            \end{align*}
+    \end{itemize} 
+\end{frame}
+
+\begin{frame}{(Local) Identification Challenge}
+\begin{itemize}
+    \item \textbf{Issue}: $\Psi$ has $3n^2 $ unknowns $\times$ $3n^2 - \frac{n(n-1)}{2}$ independent equations
+    \vspace{0.5em}
+    \item \textit{Usual Approach}: restrictions on the loading matrix $F$:
+    \begin{itemize}
+        \item Short-run Restrictions {\scriptsize(Sims, Christiano-Eichenbaum-Evans, Blanchard-Perotti, \dots)}
+        \vspace{0.5em}
+        \item Long-run Restrictions {\scriptsize(Shapiro-Watson, Blanchard-Quah, \dots)}
+        \vspace{0.5em}
+        \item Sign Restrictions {\scriptsize (Uhlig, \dots)}
+    \end{itemize}
+    \vspace{0.5em}
+    \item \alert{This paper}: Identification through dynamic structure of shocks, $R$ (D-SVAR)
+    \begin{itemize}
+        \item \textit{Intuition}: Structure of shocks $Z_t$ leaves \say{Dynamic Fingerprint} on IRFs/Covariances useful for identification
+    \end{itemize}
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Example: Identification of Supply \& Demand shocks }
+    \begin{itemize}
+        \item Consider the Following 3-eq. NK model ( $Y_t = \begin{bmatrix}
+            y_t & \pi_t
+        \end{bmatrix}^\prime$ and $Z_t = \begin{bmatrix}
+            z_{1,t} & z_{2,t}
+        \end{bmatrix}^\prime$):
+        \begin{align}
+        \begin{cases}
+        y_t = \E_t y_{t+1} - (i_t - \E_t \pi_{t+1}) + z_{1,t},\\
+        \pi_t = \beta \E_t \pi_{t+1} + \kappa y_t + z_{2,t},\\
+        i_t = \phi_\pi \pi_t,
+        \end{cases}
+         \implies 
+        \begin{cases}
+        Y_t = \Pi_{yz} Z_t,\\
+        Z_t = R Z_{t-1} + \varepsilon_t .
+        \end{cases}
+        \end{align}
+       \pause
+            \item Under invertibility, model admits reduced form, mapping $(\Gamma, \Sigma_u) = \Psi(\psi)$
+            \begin{align}
+                Y_t = \underbrace{(\Pi_{yz}R\Pi_{yz}^{-1})}_{\Gamma}Y_{t-1} + \underbrace{\Pi_{yz}\varepsilon_t}_{u_t}
+            \end{align}
+        % \item Model admits SVMA($\infty$) form
+        % \begin{align}
+        %     Y_t = \sum^\infty_{j=0} \Theta_j \varepsilon_{t-j}, \quad \Theta_j = \Psi_j(R,\Pi_{yz})
+        % \end{align}
+        \pause
+        \item \textbf{Goal}: Recover $\psi = (r_{11},r_{12},r_{21},r_{22};\pi_{11},\pi_{12},\pi_{21},\pi_{22})$ from \hyperlink{slide:ACGF}{\beamerbutton{ACGF}} . Cases:
+        \begin{enumerate}
+            \item R is a Diagonal matrix
+            \item R is a Lower (identically upper) triangular matrix
+            \item R is a Symmetric Matrix
+            \item R is a Block Diagonal Matrix with blocks corresponding to cases 1 and 2
+        \end{enumerate}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Dynamic Identification in the NK model}
+\label{slide:case_one_dsvar_nk}
+    \begin{itemize}
+        \item \textbf{Case 1}: $r_{12} = r_{21} = 0$. Recover $\psi$ through ACGF iff $r_{11} \neq r_{22}$,
+        % \begin{align*}
+        %     y_t & = \pi_{11} \sum^\infty_{i=0} r_{11}^i \varepsilon_{1,t-i} + \pi_{12} \sum^\infty_{i=0} r_{22}^i \varepsilon_{2,t-i} \\
+        %     \pi_t & = \pi_{21} \sum^\infty_{i=0} r_{11}^i \varepsilon_{1,t-i} + \pi_{22} \sum^\infty_{i=0} r_{22}^i \varepsilon_{2,t-i}
+        % \end{align*}
+        \begin{align*}
+            \begin{bmatrix} y_t \\ \pi_t \end{bmatrix}
+=
+\begin{bmatrix}
+\pi_{11} & \pi_{12} \\
+\pi_{21} & \pi_{22}
+\end{bmatrix}
+\sum_{i=0}^{\infty}
+\begin{bmatrix}
+r_{11}^i & 0 \\
+0 & r_{22}^i
+\end{bmatrix}
+\begin{bmatrix} \varepsilon_{1,t-i} \\ \varepsilon_{2,t-i} \end{bmatrix}.
+        \end{align*}
+        {\small \textit{Intuition}: As long as $r_{11} \neq r_{22}$, $y_t,\pi_t$ have different dynamic properties} \hyperlink{slide:details_example}{\beamerbutton{see more}}
+    \vspace{0.5em}
+    \pause
+    \item \textbf{Case 2}: $r_{12} = 0$ (or $r_{21} = 0$). Recover $\psi$ through ACGF iff $r_{21} \neq 0$ \hyperlink{slide:details_other_cases_example}{\beamerbutton{see more}}
+%     \begin{align*}        
+%             \begin{bmatrix} y_t \\ \pi_t \end{bmatrix}
+% =
+% \begin{bmatrix}
+% \pi_{11} & \pi_{12} \\
+% \pi_{21} & \pi_{22}
+% \end{bmatrix}
+% \sum_{i=0}^{\infty}
+% \begin{bmatrix}
+%     r_{11}^i & 0\\
+%     r_{21} S(i)& r_{22}^i
+% \end{bmatrix}
+% \begin{bmatrix} \varepsilon_{1,t-i} \\ \varepsilon_{2,t-i} \end{bmatrix}, \qquad S(i) = \begin{cases}
+%     \frac{r^i_{11} - r_{22}^i}{r_{11}-r_{22}}, & r_{11} \neq r_{22} \\
+%     ir_{11}^{i-1}, & r_{11} = r_{22}
+% \end{cases}
+%     \end{align*}
+%     {\small\textit{Intuition}: Distinguish dynamics of $\pi_t,y_t$ through effect $r_{21}$ }
+\pause 
+    \item \textbf{Case 3}: Consider $r_{12} = r_{21}  \neq 0$. Recover $\psi$ by ACGF iif $r \neq 0, r_{11} = r_{22} = \rho$ \hyperlink{slide:details_other_cases_example}{\beamerbutton{see more}}
+    \pause
+    \item \textbf{Case 4}: Add Monetary Shock $z_{3,t}$ to the Taylor Rule, assume {\scriptsize$R = \begin{bmatrix}
+    0 & 0 & 0 \\
+    0 & 0 & 0 \\
+    0 & 0 & \rho
+\end{bmatrix}$}
+    \begin{itemize}
+        \item \alert{Partial Identification}: Recover $\{\pi_{13},\pi_{23},\pi_{33}\}$ from ACGF, but effects of $\varepsilon_{1,t}; \varepsilon_{2,t}$ cannot be identified \hyperlink{slide:details_other_cases_example}{\beamerbutton{see more}}
+    \end{itemize}
+    \end{itemize}   
+\end{frame}
+
+% \begin{frame}{Dynamic Identification: Cases 3 \& 4}
+% \begin{itemize}
+%     \item \textbf{Case 3}: Consider $r_{12} = r_{21}  \neq 0$. Recover $\psi$ by ACGF iif $r \neq 0, r_{11} = r_{22} = \rho$
+%     \begin{align*}        
+%             \begin{bmatrix} y_t \\ \pi_t \end{bmatrix} 
+% = \frac{1}{2}
+% \begin{bmatrix}
+% \pi_{11} & \pi_{12} \\
+% \pi_{21} & \pi_{22}
+% \end{bmatrix}
+% \sum_{i=0}^{\infty}
+% \begin{bmatrix}
+%      \lambda^i_+ + \lambda^i_{-} & \lambda^i_+ - \lambda^i_{-} \\
+%      \lambda^i_+ - \lambda^i_{-} & \lambda^i_+ + \lambda^i_{-}
+% \end{bmatrix}
+% \begin{bmatrix} \varepsilon_{1,t-i} \\ \varepsilon_{2,t-i} \end{bmatrix}, 
+% \quad \lambda_\pm = \rho \pm r
+% \end{align*}
+% {\small\textit{Intuition}: Different decay rates $\lambda_{\pm}$ will generate distinct dynamic properties}
+% \pause
+% \item \textbf{Case 4}: Add Monetary Shock $z_{3,t}$ to the Taylor Rule, assume {\scriptsize$R = \begin{bmatrix}
+%     0 & 0 & 0 \\
+%     0 & 0 & 0 \\
+%     0 & 0 & \rho
+% \end{bmatrix}$}
+% \begin{align*}
+%     y_t = \pi_{11} \varepsilon_{1,t} + \pi_{12} \varepsilon_{2,t} + \pi_{13} \sum^\infty_{i=0} \rho^i \varepsilon_{3,t-i} \underset{ACGF}{\implies}\begin{cases}
+%         \gamma_y(0) & = \pi_{11}^2 + \pi_{12}^2 + \frac{\pi_{13}^2}{1-\rho^2} \\
+%         \gamma_y(h) & = \rho^h\frac{\pi_{13}^2}{1-\rho^2}, \quad h > 0
+%     \end{cases}
+% \end{align*}
+% \alert{Partial Identification}: Recover $\{\pi_{13},\pi_{23},\pi_{33}\}$ from ACGF, but effects of $\varepsilon_{1,t}; \varepsilon_{2,t}$ cannot be identified
+% \end{itemize}
+% \end{frame}
+
+\begin{frame}{In a Nutshell: \textit{Why does it work?}}
+\begin{itemize}
+    \item Recast $\mathcal{S}(\psi)$ \eqref{sys:state_space_representation} as ABCD form, with state $S_t = \begin{bmatrix}
+            K_t & Z_t 
+        \end{bmatrix}^\prime$
+        \begin{align}
+        \begin{split}
+            S_{t+1} & = A S_t + B \varepsilon_{t+1}  \\
+            Y_{t+1} & = CS_t + D \varepsilon_{t+1}  
+        \end{split}
+        \end{align}
+    % {\small where $\psi = (\ve(A)^\prime,\ve(B)^\prime,\ve(C)^\prime,\ve(D)^\prime,\Vech(\Sigma_\varepsilon)^\prime)$, and $\psi \in \Psi$}        
+    {\scriptsize
+$\psi=(\ve(A)^\prime,\ve(B)^\prime,\ve(C)^\prime,\ve(D)^\prime,\Vech(\Sigma_\varepsilon)^\prime)\in\Psi,$ 
+with $A=\begin{bmatrix}G & F\\[2pt] 0 & R\end{bmatrix},\;
+B=\begin{bmatrix}0\\[2pt] I_{n_z}\end{bmatrix},\;
+\Pi=\begin{bmatrix}\Pi_{yk}\ \ \Pi_{yz}\end{bmatrix},\;
+C=\Pi A,\; D=\Pi B.$
+}
+ \pause   
+    \vspace{0.5em}
+    % \item For multivariate covariance-stationary $\{Y_t\}\mid\psi$, observational equivalence (OE) follows from ACGF properties
+    % \vspace{0.5em}
+    % \item \textbf{Local Identification}: No other $\widetilde{\psi}$ is OE to $\mathcal{S}(\psi)$ locally 
+    \item \textbf{Local Identification}: $\mathcal{S}(\psi)$ is uniquely determined by ACGF for multivariate covariance-stationary $\{Y_t\}\mid\psi$, \emph{i.e.}, no observational equivalence (OE).
+    \hyperlink{slide:oe_def}{\beamerbutton{Formal Definition}} 
+    \vspace{0.5em}
+    \item To rule out OE in $\mathcal{S}(\psi)$, prevent rotation ambiguity (OE via state/shock relabeling)
+    
+    
+    % must rule out $\mathcal{S}(\widetilde{\psi})$ that consists of rotations of state variables and shocks that conserve spectral properties
+\end{itemize}    
+     \end{frame}
+
+\begin{frame}{In a Nutshell: \textit{Why does it work?}}
+    \begin{itemize}
+        \item A class of OE $\mathcal{S}$ processes is defined by $T,U$ full-rank matrices such that 
+        % $\widetilde{A} = TAT^{-1}, \widetilde{B} = TBU, \widetilde{C} = CT^{-1}, \widetilde{D} = DU, \Sigma_{\widetilde{\varepsilon}} = U^{-1}\Sigma_\varepsilon U^{-1\prime}$ 
+\begin{align*}
+    \tilde A=TAT^{-1},\quad \tilde B=TBU,\quad \tilde C=CT^{-1},\quad \tilde D=DU,\quad
+    \tilde\Sigma_\varepsilon = U^{-1}\Sigma_\varepsilon U^{-1'}
+\end{align*}    
+\vspace{-1.5em}
+        \begin{itemize}
+            \item $T$ is similarity transform, $\widetilde{S}_t = T^{-1} S_t$ (i.e. rotation of the state)
+            \item $U$ reparametrizes shocks, $\widetilde{Z}_t = UZ_t$ (keeping scale, $\Sigma_\varepsilon = \Sigma_{\widetilde{\varepsilon}}$)
+        \end{itemize}
+
+        \vspace{0.5em}
+        \pause
+        \item \textbf{Goal}: Ensure local uniqueness in this class (identify $\psi$) 
+        
+        \begin{enumerate}
+            \item Under \textit{Stability \& Separation} + \textit{non-redundancy} + assumption $\Sigma_\varepsilon = I$, 
+            \hyperlink{slide:assumptions_uniqueness}{\beamerbutton{Assumptions}}
+
+            \begin{itemize}
+                \item Recover $\{G,\Pi_{yk}\}$ (Prop. 1)
+                \item Reduce OE to an \textbf{orthonormal} $U$ (Prop. 2)
+            \end{itemize}
+
+            % {\scriptsize \textbf{Issue}: $F$ still not identifiable, as $\widetilde{Z}_t = UZ_t$ is OE to process $Z_t$. }
+            {\scriptsize \textbf{Issue}: $F$ still not identified since $\tilde Z_t=UZ_t$ (right-rotation) is OE to $Z_t$.}
+            \vspace{0.5em}
+            \item Place restrictions on $R$ to ensure $U = I \implies$ pin down $\{F,\Pi_{yz}\}$
+        \end{enumerate}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[plain]{}
+\textbf{\Large Evaluating DSGE and VAR Models}
+\end{frame}
+
+\begin{frame}{Estimation of D-SVAR}
+    \begin{itemize}
+        \item \textbf{Mapping Reduced-form to SS}: Recall SS \eqref{eq:simplified_state_space} with mapping $\psi = \Psi(\eta)$, where $\eta = (\ve(\Gamma_1),\ve(\Gamma_2),\ve(\Sigma_a))$. Estimate via ML or (2-step) ALS:
+        \begin{align}
+            \widehat{\psi}_T = \argmin_{\{\psi \mid R \in \mathcal{R}\}} \, [\widehat{\eta}_T - \Psi^{-1}(\psi)]^\prime S_T [\widehat{\eta}_T - \Psi^{-1}(\psi)]^\prime \label{eq:DSVAR_psi_estimator}
+        \end{align}
+        {\small $\widehat{\eta}_T$ from OLS; $S_T = \Var^A(\widehat{\eta}_T)$}
+        \pause
+        \vspace{0.5em}
+        \item \textbf{Mapping SS to DSGE}: Eqs. \eqref{sys:LREM} and \eqref{sys:state_space_representation} define map $\psi = \mathcal{G}
+        (\theta)$. Estimate $\widetilde{\theta}_T$ via 2-step ALS
+        \begin{align}
+            \widetilde{\theta}_T = \argmin_{\theta} \, [\widehat{\psi}_T - \mathcal{G}^{-1}(\theta)]^\prime S_T [\widehat{\psi}_T - \mathcal{G}^{-1}(\theta)]^\prime
+        \end{align}
+        {\small $\widehat{\psi}_T$ estimated via ML or ALS (with $R$ restrictions), $S_T = \Var^A(\widehat{\psi}_T)$}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Inference: \textit{What can we do?}}
+    \begin{itemize}
+        % \item D-SVAR offers possibility of conducting inference in VAR and DSGE models. We can test:
+        \item D-SVAR enables inference in SVAR and DSGE models. We can test:
+        \begin{enumerate}
+            \item Can my DSGE model replicate dynamics of the estimated SS?
+            \begin{align}
+                \begin{cases}
+                    \mathbb{H}_0: \psi = \mathcal{G}(\theta)\\
+                    \mathbb{H}_a: \psi \neq \mathcal{G}(\theta)\\ 
+                \end{cases} \implies W_T  \sim \chi^2_{\dim(\psi) - \dim(\theta)}
+            \end{align}
+            {\small Can also test in a subset, e.g. loading matrix $F$}
+            \pause
+            \vspace{0.5em}
+            \item How solid is the Identification assumption in my SVAR?
+            \begin{align}
+                \begin{cases}
+                    \mathbb{H}_0: H \ve(\Pi_{yz}) = 0\\
+                    \mathbb{H}_a: H \ve(\Pi_{yz}) \neq 0\\ 
+                \end{cases} \implies W_T  \sim \chi^2_{r} \label{eq:wald_test_SVAR_assumptions}
+            \end{align}
+        \end{enumerate}
+        \item How reasonable are the assumptions on dynamics of shocks, $R$?
+        \begin{itemize}
+            \item If $\dim(\eta) > \dim(\psi)$, run $J$-test on \eqref{eq:DSVAR_psi_estimator}
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Example: Christiano et al. (1999) - Impact Restrictions SVAR}
+
+\textbf{CEE (1999)}:
+    \begin{itemize}
+        \item VAR(4) with real GDP; unemployment rate; CPI; commodity price inflation; and federal funds rate. Sample 1965Q1-2007Q4
+        \vspace{0.5em}
+        \item \textbf{Identification assumption}: Recursive, in this ordering
+        \vspace{0.5em}
+        \item If recursive identification is valid, D-SVAR should recover monetary shock
+        % \begin{itemize}
+        %     \item Conditional on the assumption that structural shocks are AR(1)
+        % \end{itemize}
+    \end{itemize}
+    \vspace{0.5em}
+    \pause
+\textbf{Procedure:}    
+    \begin{enumerate}
+        \item Replicate CEE, obtain IRFs of monetary shock + estimated shock $\varepsilon^{CEE}_t$
+
+        \item Estimate D-SVAR given restrictions on $R$, obtain shocks $\widetilde{\varepsilon}_{1,t},\dots,\widetilde{\varepsilon}_{5,t}$
+
+        \item Check D-SVAR validity: run $J$-test
+
+        \item Compare shocks $\widetilde{\varepsilon}_{1,t},\dots,\widetilde{\varepsilon}_{5,t}$ with $\varepsilon^{CEE}_t$: is the monetary shock one of them?
+        
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Correlation between CEE (1999) Monetary and D-SVAR shocks}
+    \begin{figure}[H]
+        \includegraphics[width=\textwidth]{cee_shocks.png}
+\end{figure}    
+\vspace{-2mm}
+\scriptsize
+\textbf{Notes}: $\varepsilon_1,\dots,\varepsilon_5$ are the structural shocks as obtained with the D-SVAR, Sample is 1965Q1-2007Q4
+\end{frame}
+
+\begin{frame}{IRFs to CEE (1999) Monetary and D-SVAR shock}
+\vspace{-4mm}
+    \begin{figure}[H]
+        \includegraphics[width=0.9\textwidth]{IRFs_CEE.png}
+\end{figure}    
+\vspace{-2mm}
+\scriptsize
+\textbf{Notes}: Black lines are IRFs to monetary policy shock as identified by CEE(1999), whereas grey lines IRFs to $\varepsilon_1$ shock. Shaded area represents $\pm 1$ standard deviation around average D-SVAR response obtained from 1000 bootstrap replications.
+\end{frame}
+
+\begin{frame}{Testing Recursive Identification}
+    \begin{itemize}
+        \item Does $\varepsilon_1$ satisfy the zero-impact restrictions in CEE (1999)?
+        \vspace{0.5em}
+        \item Wald test \eqref{eq:wald_test_SVAR_assumptions} does not reject recursive restrictions 
+    \end{itemize}
+
+    \begin{table}[H]
+\centering
+\caption{Test of Zero Impact Restriction (p-values)}
+\begin{tabular}{lcccc}
+\hline\hline
+        & Output & CPI    & Unemp. & Com. Price \\
+\hline
+$\varepsilon_1$ & 0.2470 & 0.6587 & 0.3890 & 0.8169 \\
+\hline\hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}[plain]{}
+\textbf{\Large Conclusion}
+\end{frame}
+
+\begin{frame}{Conclusion}
+
+\begin{itemize}
+    \item \textbf{Key Takeaway}: Standard DSGE assumptions (independent AR(1) shocks) are \textit{sufficient} for identification
+    \begin{itemize}
+        \item[(a)] No additional restrictions needed on loading matrix $F$
+        \item[(b)] Identification comes from "dynamic fingerprints" in autocovariance structure
+    \end{itemize}
+    \vspace{1em}
+    \item \textbf{Practical Implication}:
+    \begin{itemize}
+        \item[(a)] Test DSGE cross-equation restrictions
+        \item[(b)] Evaluate SVAR identification strategies
+    \end{itemize}
+    \vspace{1em}
+    \item \textbf{Empirical Examples}: Testing identification strategies of canonical papers in empirical macroeconomics
+    \begin{itemize}
+        \item[(a)] CEE (1999): Monetary shock recovered, restrictions validated
+        \item[(b)] Other examples in paper: Blanchard-Quah (1999); Gertler-Karadi (2015)
+    \end{itemize}
+\end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}[plain]{}
+\textbf{\Large Appendix}
+\end{frame}
+
+\appendix
+
+\begin{frame}{Mapping$\colon$SS $\to$ Reduced Form (General Version)} \label{slide:general_mapping}
+    \begin{itemize}
+        \item Recast \eqref{sys:state_space_representation} as ABCD form, with state $S_t = \begin{bmatrix}
+            K_t & Z_t 
+        \end{bmatrix}^\prime$
+        \begin{align}
+        \begin{split}
+            S_{t+1} & = A S_t + B \varepsilon_{t+1} \\
+            Y_{t+1} & = CS_t + D \varepsilon_{t+1}
+        \end{split}
+        \end{align}
+        \item Under invertibility, recover VAR($\infty$) form:
+        \begin{align}
+            Y_{t+1} = C \sum^\infty_{j=0} (A + BD^{-1}C)^j BD^{-1} Y_{t-j} + D \varepsilon_{t+1}
+        \end{align}
+        \item Estimate Reduced-form VAR with innovations $a_t$:
+        \begin{align}
+            Y_t = \sum_{\ell = 0}^p \Gamma_\ell Y_{t-1-\ell} + a_t
+        \end{align}
+        \item \textit{Mapping innovations to shocks}: $(\Gamma_1,\dots,\Gamma_p,\Sigma_a) = \mathcal{H}(\psi)$, where
+        \begin{align}
+            \Sigma_a = D D^\prime
+        \end{align}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Definitions - Spectral Properties}
+\label{slide:ACGF}
+% \begin{definition}[Transfer Function]
+% \begin{align*}
+%     H(z,\psi) = \sum^\infty_{j=0} h(j,z) z^j
+% \end{align*}
+% \end{definition}
+
+\begin{definition}[Auto-covariance Generating Function (ACGF)]
+Let $\E[Y_tY_s^\prime] \equiv \Gamma(j; \psi)$ be the autocovariance between $j = s-t$. The ACGF is:
+\begin{align*}
+    \Omega(z,\psi) = \sum^\infty_{j = -\infty} \Gamma(j; \psi) z^j
+\end{align*}    
+set $z = \exp(i \omega)$ an reescale by $(2\pi)^{-1}$ to obtain the spectral density
+\end{definition}
+    
+\end{frame}
+
+\begin{frame}{Definitions - Identification}
+Let $\mathbf{Y^T} = \{y_t\}_{t=1}^T$ be a sample from a distribution $\mathbb{D}(\mathbf{Y^T}\mid \theta)$ with structural parameters $\theta \in \Theta$:
+\begin{definition}[Global Identification]
+$\theta_0 \in \Theta$ is \textit{Globally Identified} if $\forall \, \theta \in \Theta; \text{ if } \mathbb{D}(\mathbf{Y^T}\mid \theta) = \mathbb{D}(\mathbf{Y^T}\mid \theta_0) \implies \theta = \theta_0$    
+\end{definition}
+
+\begin{definition}[Local Identification]
+$\theta_0 \in \Theta$ is \textit{Locally Identified} if there exists a neighborhood $U_{\theta_0}$ of $\theta_0$ such that $\forall \, \theta \in U_{{\theta_0}}; \text{ if } \mathbb{D}(\mathbf{Y^T}\mid \theta) = \mathbb{D}(\mathbf{Y^T}\mid \theta_0) \implies \theta = \theta_0$ 
+\end{definition}
+Usually, Rank conditions are enough to check local identification
+\end{frame}
+
+\begin{frame}{Definitions - Identification in State Space}
+\label{slide:oe_def}
+\begin{definition}[Observationally Equivalent Processes]
+Two state-space representations $\psi, \widetilde{\psi} \in \Psi$ are \textit{observationally equivalent} if they have the same auto-covariance properties, $\Omega(z;\psi) = \Omega(z;\widetilde{\psi})$
+\end{definition}
+
+\begin{definition}[Local Identification in State-Space Representation]
+A State-Space system $\mathcal{S}$ is \textit{locally identified} at $\psi \in \Psi$ if there exists $U_{\psi}$ such that $\forall \, \widetilde{\psi} \in U_{\psi}$, $\psi$ and $\widetilde{\psi}$ are observational equivalent iff $\psi = \widetilde{\psi}$
+\end{definition}
+    
+\end{frame}
+
+
+\begin{frame}{Assumptions - Local Uniqueness}
+\label{slide:assumptions_uniqueness}
+\begin{assumption}
+    In presence of endogenous state variables $(n_k > 0)$, for any $z \in \mathbb{C}$, $\det(I-Az) = 0$ implies $|z|> 1$ and matrices $G$ and $R$ have no eigenvalues in common
+\end{assumption}    
+This assumption is necessary to disentangle the dynamics of endogenous from the exogenous variables
+\vspace{1em}
+\begin{assumption}
+(i) $n_k \leq n_z = n_y$; (ii) when $n_k = 0$, $\Pi = \Pi_{yz}$ is of full rank; (iii) when $n_k > 0$, matrices $G,F,\Pi_{yk}$ and $(F^\prime,\Pi_{yz}^\prime)^\prime$ are of full rank and linearly independent of $(G^\prime,\Pi_{yk}^\prime)^\prime$
+\end{assumption}
+This assumption guarantees that there are no redundant endogenous state variables
+\end{frame}
+
+\begin{frame}{Dynamic Identification NK model: Case 1 details}
+\label{slide:details_example}
+From the linear combination of shocks, we obtain the following autocovariances for $Y_t$:
+\begin{align*}
+    \gamma_y(0) & = \pi_{11}^2 + \frac{\pi_{12}^2}{1-r_{11}^2}\\
+    \gamma_y(h) & = r_{11}^h \frac{\pi_{12}}{1-r_{11}^2}\\
+    \gamma_\pi(0) & = \pi_{21}^2 + \frac{\pi_{22}^2}{1-r_{22}^2}\\
+    \gamma_\pi(h) & = r_{22}^h \frac{\pi_{22}}{1-r_{22}^2}
+\end{align*}
+hence, computing the ratio $\gamma_j(h+1)/\gamma_j(h)$ for any $h> 0$ will obtain $r_{11},r_{22}$, and for the rest follows \hyperlink{slide:case_one_dsvar_nk}{\beamerbutton{back}}
+\end{frame}
+
+\begin{frame}{Dynamic Identification NK model: Cases 2, 3 \& 4 details}
+\label{slide:details_other_cases_example}
+\begin{itemize}
+\item \textbf{Case 2}:    
+    \begin{align*}        
+            \begin{bmatrix} y_t \\ \pi_t \end{bmatrix}
+=
+\begin{bmatrix}
+\pi_{11} & \pi_{12} \\
+\pi_{21} & \pi_{22}
+\end{bmatrix}
+\sum_{i=0}^{\infty}
+\begin{bmatrix}
+    r_{11}^i & 0\\
+    r_{21} S(i)& r_{22}^i
+\end{bmatrix}
+\begin{bmatrix} \varepsilon_{1,t-i} \\ \varepsilon_{2,t-i} \end{bmatrix}, \qquad S(i) = \begin{cases}
+    \frac{r^i_{11} - r_{22}^i}{r_{11}-r_{22}}, & r_{11} \neq r_{22} \\
+    ir_{11}^{i-1}, & r_{11} = r_{22}
+\end{cases}
+    \end{align*}
+    {\small\textit{Intuition}: Distinguish dynamics of $\pi_t,y_t$ through effect $r_{21}$ }
+\item \textbf{Case 3}:
+    \begin{align*}        
+            \begin{bmatrix} y_t \\ \pi_t \end{bmatrix} 
+= \frac{1}{2}
+\begin{bmatrix}
+\pi_{11} & \pi_{12} \\
+\pi_{21} & \pi_{22}
+\end{bmatrix}
+\sum_{i=0}^{\infty}
+\begin{bmatrix}
+     \lambda^i_+ + \lambda^i_{-} & \lambda^i_+ - \lambda^i_{-} \\
+     \lambda^i_+ - \lambda^i_{-} & \lambda^i_+ + \lambda^i_{-}
+\end{bmatrix}
+\begin{bmatrix} \varepsilon_{1,t-i} \\ \varepsilon_{2,t-i} \end{bmatrix}, 
+\quad \lambda_\pm = \rho \pm r
+\end{align*}
+{\small\textit{Intuition}: Different decay rates $\lambda_{\pm}$ will generate distinct dynamic properties}
+\item \textbf{Case 4}:
+\begin{align*}
+    y_t = \pi_{11} \varepsilon_{1,t} + \pi_{12} \varepsilon_{2,t} + \pi_{13} \sum^\infty_{i=0} \rho^i \varepsilon_{3,t-i} \underset{ACGF}{\implies}\begin{cases}
+        \gamma_y(0) & = \pi_{11}^2 + \pi_{12}^2 + \frac{\pi_{13}^2}{1-\rho^2} \\
+        \gamma_y(h) & = \rho^h\frac{\pi_{13}^2}{1-\rho^2}, \quad h > 0
+    \end{cases}
+\end{align*}
+\hyperlink{slide:case_one_dsvar_nk}{\beamerbutton{back}}
+\end{itemize}    
+\end{frame}
+
+
+% Today's lecture slide
+% \begin{frame}{Today's lecture}
+%     \begin{itemize}
+%         \item Last time: linearized structural macro models induce SVMA representations
+%         \[
+%         y_t = \sum_{\ell=0}^{\infty} \Theta_\ell \varepsilon_{t-\ell}
+%         \]
+        
+%         \item Next couple of lectures: how can we use time series data to learn about the $\Theta_\ell$'s?
+        
+%         \item Today: crash course on time series fundamentals
+%         \begin{itemize}
+%             \item Basic concepts: autocovariances, spectra, projections
+%             \item Linear models: VMA, VAR, VARMA
+%             \item Wold decomposition
+%         \end{itemize}
+%     \end{itemize}
+    
+%     \vspace{1em}
+%     \small{See syllabus for textbook treatments. This will be a highly selective review, and very far from any research frontier. Much more detailed coverage in 14.384.}
+% \end{frame}
+
+% % Outline slide
+% \begin{frame}{Outline}
+%     \begin{enumerate}
+%         \item \textbf{General Time Series Preliminaries}
+%         \begin{itemize}
+%             \item Autocovariances
+%             \item Spectra
+%             \item Projections
+%         \end{itemize}
+        
+%         \vspace{0.5em}
+        
+%         \item \textbf{Linear Models}
+%         \begin{itemize}
+%             \item VMA, VAR, VARMA, Filters
+%             \item Wold Decomposition
+%         \end{itemize}
+%     \end{enumerate}
+% \end{frame}
+
+% % Definition environment example
+% \begin{frame}{Time series analysis}
+%     \begin{itemize}
+%         \item Time series: data with a time ordering
+%         \begin{itemize}
+%             \item Series have trends and are correlated over time. We see one realization (``history'')
+%             \item Inference requires us to make assumptions ensuring that ``the present is like the past'', in some loose sense
+%         \end{itemize}
+%     \end{itemize}
+    
+%     \begin{definition}
+%         An $n$-dimensional \textbf{stochastic process} is a collection $\{y_t\}_{t \in T}$ of $n$-dimensional vectors defined on a probability space $(\Omega, \mathcal{F}, P)$.
+%     \end{definition}
+    
+%     \begin{itemize}
+%         \item The distribution of a stochastic process is summarized by distribution functions:
+%         \[
+%         F_{t_1,\ldots,t_k}(y_1, \ldots, y_k) \equiv P(y_{t_1} \leq y_1, \ldots, y_{t_k} \leq y_k)
+%         \]
+%         for all finite collections of time points $t_1, t_2, \ldots, t_k \in T$
+        
+%         \item Randomness is across different histories of $y$. We only see one.
+%     \end{itemize}
+% \end{frame}
+
+% % Math-heavy slide example
+% \begin{frame}{Autocovariance function}
+%     \begin{itemize}
+%         \item Write the autocovariance function as
+%         \[
+%         \Gamma_y(\ell) \equiv 
+%         \begin{bmatrix}
+%             \Cov(y_{1t}, y_{1t-\ell}) & \cdots & \Cov(y_{1t}, y_{nt-\ell}) \\
+%             \vdots & \ddots & \vdots \\
+%             \Cov(y_{nt}, y_{1t-\ell}) & \cdots & \Cov(y_{nt}, y_{nt-\ell})
+%         \end{bmatrix}
+%         \]
+        
+%         I.e., for each $\ell$, $\Gamma_y(\ell)$ is an $n \times n$ matrix
+        
+%         \item It has the following properties:
+%         \begin{enumerate}[a)]
+%             \item $\Gamma_y(\ell) = \Gamma_y(-\ell)'$
+%             \item $|\Gamma_{y,ij}(\ell)| \leq \sqrt{\Gamma_{y,ii}(0)\Gamma_{y,jj}(0)}$
+%         \end{enumerate}
+        
+%         \item The autocovariance function is our first of three fundamental representations: it fully summarizes all second-moment properties of a covariance-stationary time series process
+%     \end{itemize}
+    
+%     \small{As said above, note that this representation is in principle estimable—for a covariance-stationary process we can get all covariances from long enough time series.}
+% \end{frame}
+
+
+
+
+\end{document}

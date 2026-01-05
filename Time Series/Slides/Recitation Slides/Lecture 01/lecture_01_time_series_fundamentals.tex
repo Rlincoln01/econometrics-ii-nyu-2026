@@ -1,0 +1,1532 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% Theme and color setup
+\usetheme{default}
+\usecolortheme{default}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Custom colors (MIT-inspired)
+\definecolor{mitred}{RGB}{163,31,52}
+\definecolor{darkblue}{RGB}{0,40,85}
+\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{darkgray}{RGB}{64,64,64}
+
+% Set main colors
+\setbeamercolor{frametitle}{fg=white,bg=darkblue}
+\setbeamercolor{title}{fg=darkblue}
+\setbeamercolor{author}{fg=black}
+\setbeamercolor{institute}{fg=black}
+\setbeamercolor{date}{fg=black}
+\setbeamercolor{structure}{fg=darkblue}
+\setbeamercolor{normal text}{fg=black}
+\setbeamercolor{itemize item}{fg=mitred}
+\setbeamercolor{itemize subitem}{fg=darkblue}
+\setbeamercolor{enumerate item}{fg=darkblue}
+
+% Frame title band
+\newlength{\titlebandht}
+\setlength{\titlebandht}{4ex}
+
+\setbeamertemplate{frametitle}{
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,ht=\titlebandht,dp=1.1ex,leftskip=1.2em,rightskip=1.2em]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+    \ifx\insertframesubtitle\@empty\relax\else\\[-0.2ex]
+      \usebeamerfont{framesubtitle}\insertframesubtitle
+    \fi
+  \end{beamercolorbox}
+  \vspace{0.6em}
+}
+
+% Font settings
+\usefonttheme{professionalfonts}
+\usefonttheme{serif}
+
+% Footline with page numbers
+\setbeamertemplate{footline}{
+    \hfill\insertframenumber\hspace{2em}\vspace{0.5em}
+}
+
+% Packages
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{bbm}
+
+% Custom commands for math
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Corr}{\text{Corr}}
+\newcommand{\xbf}{\mathbf{x}}
+\newcommand{\ybf}{\mathbf{y}}
+\newcommand{\zbf}{\mathbf{z}}
+\newcommand{\ubf}{\mathbf{u}}
+\newcommand{\vbf}{\mathbf{v}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\plim}{plim}
+
+% Theorem environments
+\setbeamertemplate{theorems}[numbered]
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\newtheorem{assumption}{Assumption}
+\theoremstyle{definition}
+
+% Block colors
+\setbeamercolor{block title}{bg=lightgray,fg=darkblue}
+\setbeamercolor{block body}{bg=lightgray!50}
+
+% Alert block colors
+\setbeamercolor{block title alerted}{bg=mitred!15,fg=mitred}
+\setbeamercolor{block body alerted}{bg=mitred!5}
+
+% Title information
+\title{Time Series Fundamentals}
+\subtitle{TA Session 1: Introduction to Stochastic Processes}
+\author{Rafael Lincoln}
+\institute{Econometrics II -- NYU PhD Program}
+\date{Spring 2026}
+
+\begin{document}
+
+% ============================================================================
+% TITLE SLIDE
+% ============================================================================
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+% ============================================================================
+% OUTLINE
+% ============================================================================
+\begin{frame}{Today's Roadmap}
+    \begin{enumerate}
+        \item \textbf{Introduction: Why Time Series?}
+        \begin{itemize}
+            \item Objectives: Dynamic relationships \& Forecasting
+            \item Structural vs. Reduced-form models
+            \item Stylized facts
+        \end{itemize}
+        \vspace{0.5em}
+        \item \textbf{Introduction to Stochastic Processes}
+        \begin{itemize}
+            \item Formal definitions: Filtrations, measurability
+            \item Models: DGP, correct specification
+            \item Key restrictions: Stationarity
+            \item Linear operators (lag \& difference)
+        \end{itemize}
+        \vspace{0.5em}
+        \item \textbf{Examples from Macroeconomics}
+        \begin{itemize}
+            \item Monetary policy transmission
+            \item Samuelson's multiplier-accelerator
+            \item Euler equations
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+% ============================================================================
+% PART I: INTRODUCTION
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part I: Introduction}}\\[1em]
+        {\large Why Time Series?}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{What is a Time Series?}
+    \begin{definition}
+        A \textbf{time series} is a sequence of data points indexed in time order, taken at successive equally spaced points in time.
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{How does it differ from other data structures?}
+    \begin{itemize}
+        \item \textbf{Cross-sectional data}: No natural ordering of observations
+        \item \textbf{Spatial data}: Ordering based on geographic location
+        \item \textbf{Time series}: Natural temporal ordering with dependence structure
+    \end{itemize}
+    
+    \vspace{1em}
+    
+    \begin{alertblock}{Key Challenge}
+        We observe only \textit{one realization} of history. Inference requires assumptions ensuring ``the present is like the past.''
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Why Should We Care About Time Series?}
+    \textbf{Two Main Objectives:}
+    
+    \vspace{0.5em}
+    
+    \begin{enumerate}
+        \item \textbf{Dynamic Relationships} (Correlation and/or Causality)
+        \begin{itemize}
+            \item \textit{Causality}: Impact evaluation, policy analysis, price optimization
+            \item \textit{Correlation}: Comovement between variables (balanced growth, asset pricing)
+        \end{itemize}
+        
+        \vspace{1em}
+        
+        \item \textbf{Forecasting} future values based on scenarios
+        \begin{itemize}
+            \item Macroeconomic forecasting (GDP, inflation, unemployment)
+            \item Asset allocation and risk quantification
+            \item \textit{Nowcasting}: High-frequency monitoring of low-frequency variables
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example: Estimating a Phillips Curve}
+    Consider the reduced-form Phillips curve:
+    \[
+    \pi_t = \beta_0 + \beta_1 y_t + \beta_2 \pi_{t-1} + u_t
+    \]
+    where $\pi_t$ is inflation and $y_t$ is the output gap.
+    
+    \vspace{1em}
+    
+    \textbf{Questions of Interest:}
+    \begin{itemize}
+        \item What is the sign and size of $\beta_1$? (Inflation-output tradeoff)
+        \item Is $\beta_2 \approx 1$? (Testing \textit{adaptive expectations}: $\E_{t-1}[\pi_t] = \pi_{t-1}$)
+    \end{itemize}
+    
+    \vspace{1em}
+    
+    \begin{block}{Key Insight}
+        The presence of $\pi_{t-1}$ creates \textit{serial dependence} --- standard cross-sectional methods don't apply directly!
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Two Types of Models}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Structural Models}
+            \begin{itemize}
+                \item Behavioral functions with economic interpretation
+                \item Causal relationships between variables
+                \item Parameters have economic meaning
+                \item Shocks are ``structural'' (e.g., monetary, fiscal)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Reduced-Form Models}
+            \begin{itemize}
+                \item Correlations between variables
+                \item Descriptive analysis
+                \item No direct economic interpretation
+                \item Useful for \textit{forecasting}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{1em}
+    
+    \begin{alertblock}{Trade-off}
+        Structural models answer ``why?'' but require stronger assumptions.\\
+        Reduced-form models answer ``what?'' and are useful for prediction.
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Univariate vs. Multivariate Models}
+    \textbf{Univariate}: Series explained by its own past only
+    \[
+    \pi_t = \beta_0 + \beta_2 \pi_{t-1} + u_t
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{Multivariate}: Other variables also play a role
+    \[
+    \begin{pmatrix} 1 & -\beta_1 \\ 0 & 1 \end{pmatrix}
+    \begin{pmatrix} \pi_t \\ y_t \end{pmatrix}
+    = 
+    \begin{pmatrix} \beta_0 \\ \alpha_0 \end{pmatrix}
+    +
+    \begin{pmatrix} \beta_2 & 0 \\ \alpha_1 & \alpha_2 \end{pmatrix}
+    \begin{pmatrix} \pi_{t-1} \\ y_{t-1} \end{pmatrix}
+    +
+    \begin{pmatrix} u_{1,t} \\ u_{2,t} \end{pmatrix}
+    \]
+    
+    \vspace{0.5em}
+    
+    \begin{itemize}
+        \item Adding the output gap equation transforms it into a \textbf{Vector Autoregression (VAR)}
+        \item Choice depends on the research question and data availability
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Stylized Facts of Time Series}
+    Time series data typically exhibit:
+    
+    \begin{enumerate}
+        \item \textbf{Trend}: Long-term movement (growth, decline)
+        \item \textbf{Seasonality}: Periodic and regular fluctuations (quarterly, monthly)
+        \item \textbf{Cycles}: Cyclical variation with period $>$ 1 year (business cycles)
+        \item \textbf{Irregularity}: Erratic fluctuations (noise)
+    \end{enumerate}
+    
+    \vspace{0.5em}
+    
+    \textbf{Additional Features:}
+    \begin{itemize}
+        \item \textbf{Heteroskedasticity}: Time-varying volatility (ARCH/GARCH effects)
+        \item \textbf{Outliers}: Extreme observations
+        \item \textbf{Structural breaks}: Changes in parameters over time
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Implication}
+        Models must account for these features to properly represent the DGP.
+    \end{block}
+\end{frame}
+
+% ============================================================================
+% PART II: STOCHASTIC PROCESSES
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part II: Stochastic Processes}}\\[1em]
+        {\large Section 7.2.1: Formal Definitions}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Why Formal Definitions?}
+    \textbf{Goal}: Provide rigorous foundations for time series analysis
+    
+    \vspace{1em}
+    
+    \textbf{Key Questions:}
+    \begin{itemize}
+        \item What is a stochastic process mathematically?
+        \item How do we relate the \textit{observed} time series to the \textit{underlying} process?
+        \item Under what conditions can we learn from a single realization?
+    \end{itemize}
+    
+    \vspace{1em}
+    
+    \textbf{Building Blocks:}
+    \begin{enumerate}
+        \item Probability spaces and measurability
+        \item Filtrations (information evolving over time)
+        \item Stochastic processes and their realizations
+    \end{enumerate}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Measurable Functions}
+    \begin{definition}[Measurable Function]
+        A function $f: \Omega \to \widetilde{\Omega}$ between measure spaces $(\Omega, \F)$ and $(\widetilde{\Omega}, \widetilde{\F})$ is $\F/\widetilde{\F}$-\textbf{measurable} if it preserves measurability:
+        \[
+        \forall B \in \widetilde{\F}, \quad f^{-1}(B) \in \F
+        \]
+        where $f^{-1}(B) = \{\omega \in \Omega : f(\omega) \in B\}$.
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Intuition}: A measurable function ``respects'' the information structure. We can compute probabilities of events defined through $f$.
+    
+    \vspace{0.5em}
+    
+    \textbf{Why it matters}: Random variables must be measurable functions for probabilities to be well-defined.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Filtered Probability Space}
+    \begin{definition}[Filtered Probability Space]
+        Let $(\Omega, \F, \P)$ be a probability space. A \textbf{filtration} is an increasing sequence of $\sigma$-algebras:
+        \[
+        \mathbb{F} := \{\F_t\}_{t \geq 0} \quad \text{with} \quad \F_0 \subseteq \F_1 \subseteq \F_2 \subseteq \cdots \subseteq \F
+        \]
+        The quadruple $(\Omega, \F, \mathbb{F}, \P)$ is a \textbf{filtered probability space}.
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Intuition}: 
+    \begin{itemize}
+        \item $\F_t$ represents information available at time $t$
+        \item The sequence is \textit{increasing}: questions answerable at time $t$ remain answerable at $t+1$
+        \item Information grows over time (we don't forget!)
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Measurability of Stochastic Processes}
+    \begin{definition}[Adapted \& Predictable Processes]
+        Let $(\Omega, \F, \mathbb{F}, \P)$ be a filtered probability space. A stochastic process $\{X_t\}_{t \geq 0}$ is:
+        \begin{itemize}
+            \item $\mathbb{F}$-\textbf{adapted} if $X_t$ is $\F_t$-measurable for every $t$
+            \item $\mathbb{F}$-\textbf{predictable} if $X_t$ is $\F_{t-1}$-measurable for every $t$
+        \end{itemize}
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Interpretation}:
+    \begin{itemize}
+        \item \textbf{Adapted}: $X_t$ is known given information up to and including time $t$ (past \textit{or} present)
+        \item \textbf{Predictable}: $X_t$ is known given information strictly before time $t$ (past only)
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Example}
+        Stock price $S_t$ is adapted (known at $t$), but not predictable (unknown at $t-1$).
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The Natural Filtration}
+    \begin{definition}[$X$-adapted Filtration]
+        Let $(\Omega, \F, \P)$ be a probability space and $\{X_t\}_{t \geq 0}$ a stochastic process. The \textbf{natural filtration} generated by $X$ is:
+        \[
+        \F_t^X = \sigma(X_0, X_1, \ldots, X_t)
+        \]
+        The process $X_t$ is $\F_t^X$-adapted by construction.
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Intuition}: $\F_t^X$ is the information we can extract from observing the process up to time $t$.
+    
+    \vspace{0.5em}
+    
+    \textbf{Common notation}: $\F_{t-1}^X = \{X_{t-1}, X_{t-2}, \ldots\}$ is the ``information set'' at $t-1$.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Stochastic Process: Definition}
+    \begin{definition}[Stochastic Process]
+        A \textbf{stochastic process} $\{X_t\}_{t \geq 0}$ on a filtered probability space $(\Omega, \F, \mathbb{F}, \P)$, which is $\mathbb{F}$-adapted, is an ordered sequence of random vectors:
+        \[
+        \{X_t\}_{t \geq 0} = \{\xbf_t(\omega) : \omega \in \Omega, \, t \in \mathcal{T}\}
+        \]
+        where $\xbf_t(\omega) \in \R^n$ for all $t \in \mathcal{T}$.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Two perspectives}:
+    \begin{enumerate}
+        \item \textbf{Fix $t$}: $\xbf_t(\cdot)$ is a random variable mapping $\Omega \to \R^n$
+        \item \textbf{Fix $\omega$}: $\xbf_\cdot(\omega)$ is a deterministic function of time --- a \textbf{path} (or \textbf{realization})
+    \end{enumerate}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Time Series and Ensemble}
+    \begin{definition}[Time Series]
+        A \textbf{time series} $\{\xbf_t\}_{t=1}^T$ is a particular \textit{path} (realization) of the stochastic process $\{X_t\}_{t \geq 0}$, which is its \textbf{generating mechanism}.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \begin{definition}[Ensemble]
+        The set of all possible realizations of a stochastic process:
+        \[
+        \{\{\xbf_t(\omega) : t \in \mathcal{T}\} : \omega \in \Omega\}
+        \]
+        is called the \textbf{ensemble}.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Key Insight}
+        In macroeconometrics, we observe \textbf{one} realization from the ensemble. We cannot observe alternative histories!
+    \end{alertblock}
+\end{frame}
+
+% ============================================================================
+% PART II.2: MODELS FOR STOCHASTIC PROCESSES
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part II: Stochastic Processes}}\\[1em]
+        {\large Section 7.2.2: Models for Stochastic Processes}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Data-Generating Process (DGP)}
+    \begin{definition}[Data-Generating Process]
+        The \textbf{DGP} is the probability law describing the stochastic process $\{X_t\}_{t \geq 0}$ conditional on available information:
+        \[
+        F_t(\{X_t\}_{t \geq 0} | \F_{t-1}^X)
+        \]
+        --- the true joint distribution of the process.
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Problem}: This is an \textit{infinite-dimensional} distribution!
+    \begin{itemize}
+        \item Analytically intractable
+        \item Cannot estimate infinitely many parameters
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{Question}: Can we represent it by something finite-dimensional?
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Finite-Dimensional Distributions}
+    \begin{definition}[Finite-Dimensional Distribution]
+        Let $\{t_1, t_2, \ldots, t_s\} \subset \mathcal{T}$ be a finite set. The joint distribution:
+        \[
+        F_{t_1, \ldots, t_s}(b_1, \ldots, b_s) = \P(\xbf_{t_1} \leq b_1, \ldots, \xbf_{t_s} \leq b_s)
+        \]
+        The family of all such distributions is the \textbf{finite-dimensional distribution} of the process.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \begin{theorem}
+        Under general conditions, the probabilistic structure of $\{X_t\}_{t \geq 0}$ is \textbf{completely specified} by its finite-dimensional distributions for all $s$ and all choices of $\{t_1, \ldots, t_s\}$.
+    \end{theorem}
+    
+    \vspace{0.5em}
+    
+    \textbf{Implication}: We can work with finite-dimensional objects!
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Time Series Model}
+    \begin{definition}[Time Series Model]
+        An econometric time series model is a family of functions:
+        \[
+        \{\mathcal{M}(\xbf_t, \xbf_{t-1}, \ldots, d_t; \psi) : \psi \in \Psi \subseteq \R^p\}
+        \]
+        that aims to represent the true DGP, where:
+        \begin{itemize}
+            \item $\psi$ is a $p$-dimensional parameter vector
+            \item $d_t$ represents possible structural breaks
+        \end{itemize}
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Goal}: Estimate $\hat{\psi}$ based on assumptions about $\mathcal{M}$.
+    
+    \vspace{0.5em}
+    
+    \textbf{Two flavors}:
+    \begin{itemize}
+        \item Model for the \textit{distribution}: $\mathcal{M}_D$
+        \item Model for the \textit{conditional expectation}: $\mathcal{M}_E$ (most common)
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Correct Specification Axioms}
+    \begin{block}{Axiom: Correct Specification for Distribution}
+        \[
+        \mathcal{M}_D(\xbf_t, \xbf_{t-1}, \ldots, d_t; \psi) = F_t(\{X_t\}_{t \geq 0} | \F_{t-1}^X)
+        \]
+    \end{block}
+    
+    \begin{block}{Axiom: Correct Specification for Expectation}
+        \[
+        \mathcal{M}_E(\xbf_t, \xbf_{t-1}, \ldots, d_t; \psi) = \E[\xbf_t | \F_{t-1}^X]
+        \]
+    \end{block}
+    
+    \vspace{0.5em}
+    
+    \textbf{In practice}: We usually model only the conditional expectation
+    \begin{itemize}
+        \item Similar to CEF approach in cross-sectional econometrics
+        \item Reduces dimensionality dramatically
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Structural Model}
+    \begin{definition}[Structural Model]
+        Given data $\zbf = (\ybf, \xbf)$ from the joint process $\{Y_t, X_t\}_{t \geq 0}$, a \textbf{structural model} for the conditional expectation is:
+        \[
+        g(\ybf, \xbf, \mathbf{d}, \ubf; \psi_0) = 0
+        \]
+        where $\ubf$ are \textbf{structural shocks} and $\mathbf{d}$ are structural breaks.
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Key Features}:
+    \begin{itemize}
+        \item Shocks $\ubf$ have \textit{economic interpretation} (monetary, fiscal, technology, \ldots)
+        \item Parameters $\psi_0$ have \textit{economic meaning} (elasticities, policy parameters, \ldots)
+        \item Implies \textit{causal} relationships
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Reduced-Form Model}
+    \begin{definition}[Reduced-Form Model]
+        If $\{Y_t\}_{t \geq 0}$ has a unique solution as a function of past values and exogenous variables:
+        \[
+        \ybf_t = h(\ybf_{t-1}, \ybf_{t-2}, \ldots, \xbf_t, \vbf_t, \mathbf{d}_t; \theta_0)
+        \]
+        where $\theta_0 = m(\psi_0)$ and $\vbf_t = f(\ubf_t)$ are \textbf{reduced-form} parameters and shocks.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Key Features}:
+    \begin{itemize}
+        \item Parameters and shocks \textit{lose} economic interpretation
+        \item Useful for \textbf{forecasting}: $\E[\ybf_t | \xbf_t, \F_{t-1}]$ is the best MSE predictor
+        \item Easier to estimate (no simultaneity issues)
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Trade-off}
+        Reduced form: good for prediction, bad for policy analysis (Lucas critique!)
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The Incidental Parameter Problem}
+    \textbf{Without restrictions}: Suppose $Y_t \sim \mathcal{N}(\mu_t, \Gamma_{ts})$
+    
+    \vspace{0.5em}
+    
+    We need to estimate:
+    \[
+    \E(Y^T) = \begin{bmatrix} \mu_1' & \mu_2' & \cdots & \mu_T' \end{bmatrix}'
+    \]
+    \[
+    \Var(Y^T) = \begin{bmatrix}
+        \Gamma_{11} & \Gamma_{12} & \cdots & \Gamma_{1T} \\
+        \Gamma_{21} & \Gamma_{22} & \cdots & \Gamma_{2T} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        \Gamma_{T1} & \Gamma_{T2} & \cdots & \Gamma_{TT}
+    \end{bmatrix}
+    \]
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Problem}
+        Number of parameters grows with $T$ $\Rightarrow$ LLN and CLT fail!
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Solution: Restrictions on the Process}
+    \textbf{Two types of restrictions}:
+    
+    \vspace{0.5em}
+    
+    \begin{enumerate}
+        \item \textbf{Time-homogeneity} (Stationarity)
+        \begin{itemize}
+            \item All observations come from distributions with time-invariant features
+            \item Reduces: $\mu_t \to \mu$, $\Gamma_{ts} \to \Gamma_{|t-s|}$
+        \end{itemize}
+        
+        \vspace{1em}
+        
+        \item \textbf{Memory restrictions} (Ergodicity/Mixing)
+        \begin{itemize}
+            \item Each new observation contains ``new information''
+            \item Enables consistent estimation from a single realization
+        \end{itemize}
+    \end{enumerate}
+    
+    \vspace{1em}
+    
+    \textbf{With stationarity}:
+    \[
+    \E(Y^T) = \begin{bmatrix} \mu' & \mu' & \cdots & \mu' \end{bmatrix}', \quad
+    \Var(Y^T) = \begin{bmatrix}
+        \Gamma_0 & \Gamma_1 & \cdots & \Gamma_{T-1} \\
+        \Gamma_{-1} & \Gamma_0 & \cdots & \Gamma_{T-2} \\
+        \vdots & \vdots & \ddots & \vdots
+    \end{bmatrix}
+    \]
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Weak Stationarity}
+    \begin{definition}[Weak Stationarity]
+        A stochastic process $\{Y_t\}$ is \textbf{weakly stationary} (covariance stationary, second-order stationary) if:
+        \begin{enumerate}
+            \item $\E[Y_t] = \mu$ for all $t \in \mathcal{T}$, where $|\mu| < \infty$
+            \item $\E[(Y_t - \mu)(Y_{t-h} - \mu)'] = \Gamma_h$ for all $t, h$, where $\|\Gamma_h\| < \infty$
+        \end{enumerate}
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Key Properties}:
+    \begin{itemize}
+        \item Mean is constant over time
+        \item Autocovariance depends only on the \textit{lag} $h$, not on $t$
+        \item Variance $\Gamma_0$ is constant
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \begin{lemma}
+        For weakly stationary processes: $\Gamma_h = \Gamma_{-h}'$
+    \end{lemma}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example: Autocovariance Matrices}
+    For a bivariate process $Y_t = (Y_{1t}, Y_{2t})'$:
+    
+    \[
+    \Gamma_0 = \Var(Y_t) = \begin{bmatrix}
+        \Var(Y_{1t}) & \Cov(Y_{1t}, Y_{2t}) \\
+        \Cov(Y_{1t}, Y_{2t}) & \Var(Y_{2t})
+    \end{bmatrix}
+    \]
+    
+    \[
+    \Gamma_1 = \Cov(Y_t, Y_{t-1}) = \begin{bmatrix}
+        \Cov(Y_{1t}, Y_{1,t-1}) & \Cov(Y_{1t}, Y_{2,t-1}) \\
+        \Cov(Y_{2t}, Y_{1,t-1}) & \Cov(Y_{2t}, Y_{2,t-1})
+    \end{bmatrix}
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{Interpretation}:
+    \begin{itemize}
+        \item Diagonal: \textit{auto}covariances of each component
+        \item Off-diagonal: \textit{cross}-covariances between components
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Strong Stationarity}
+    \begin{definition}[Strong Stationarity]
+        A stochastic process $\{Y_t\}$ is \textbf{strongly stationary} (strictly stationary) if the joint distribution is invariant to time shifts:
+        \[
+        F(y_1, \ldots, y_T) = F(y_{1+h}, \ldots, y_{T+h}) \quad \forall h = \pm 1, \pm 2, \ldots
+        \]
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Relationship to Weak Stationarity}:
+    \begin{itemize}
+        \item Strong stationarity $\Rightarrow$ Weak stationarity \textit{if moments exist}
+        \item Weak stationarity $\not\Rightarrow$ Strong stationarity (in general)
+        \item For \textbf{Gaussian} processes: Weak $\Leftrightarrow$ Strong
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Cauchy Counterexample}
+        A Cauchy-distributed process can be strongly stationary but \textit{not} weakly stationary (moments undefined!).
+    \end{alertblock}
+\end{frame}
+
+% ============================================================================
+% PART II.4: LINEAR OPERATORS
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part II: Stochastic Processes}}\\[1em]
+        {\large Section 7.2.3: Linear Operators}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Linear Operators}
+    \begin{definition}[Linear Operator]
+        Let $X$ and $Y$ be vector spaces over field $F$. The operator $T: X \to Y$ is \textbf{linear} if:
+        \[
+        T(\alpha x_1 + \beta x_2) = \alpha T(x_1) + \beta T(x_2)
+        \]
+        for all $x_1, x_2 \in X$ and $\alpha, \beta \in F$.
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Context}: Time series form a vector space. We can define useful linear operators on this space.
+    
+    \vspace{0.5em}
+    
+    \textbf{Key operators}:
+    \begin{itemize}
+        \item Lag operator $L$
+        \item Difference operator $\Delta$
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The Lag Operator}
+    % \vspace{-2em}
+    \begin{definition}[Lag Operator]
+        For a stochastic process $\{\zbf_t\}$, the \textbf{lag operator} $L$ is defined by:
+        \begin{align*}
+            % L\zbf_t &= \zbf_{t-1} \\
+            L^j \zbf_t &= \zbf_{t-j} \quad \forall j \in \N
+        \end{align*}
+    \end{definition}
+    
+    % \vspace{0.5em}
+    
+    \textbf{Properties}:
+    \begin{itemize}
+        \item $L$ is a linear operator
+        \item $L^0 = I$ (identity)
+        \item Powers compose: $L^j L^k = L^{j+k}$
+    \end{itemize}
+    
+    % \vspace{0.5em}
+    
+    \begin{proposition}
+        For $|\alpha| < 1$:
+        \[
+        (1 - \alpha L)^{-1} = 1 + \alpha L + \alpha^2 L^2 + \cdots = \sum_{j=0}^{\infty} \alpha^j L^j
+        \]
+    \end{proposition}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The Difference Operator}
+    \begin{definition}[Difference Operator]
+        The \textbf{difference operator} $\Delta$ is defined by:
+        \begin{align*}
+            \Delta \zbf_t &= (I - L)\zbf_t = \zbf_t - \zbf_{t-1} \\
+            \Delta^j \zbf_t &= (I - L)^j \zbf_t \quad \forall j \in \N_+ \\
+            \Delta_j \zbf_t &= (I - L^j)\zbf_t = \zbf_t - \zbf_{t-j}
+        \end{align*}
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Common uses}:
+    \begin{itemize}
+        \item $\Delta y_t$: First difference (removes linear trend)
+        \item $\Delta^2 y_t$: Second difference (removes quadratic trend)
+        \item $\Delta_{12} y_t = y_t - y_{t-12}$: Seasonal difference (monthly data)
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{Key insight}: Differencing can transform non-stationary series into stationary ones (unit root processes).
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Lag Polynomials}
+    \textbf{Notation}: We can write models compactly using \textbf{lag polynomials}:
+    
+    \[
+    \Phi(L) = 1 - \phi_1 L - \phi_2 L^2 - \cdots - \phi_p L^p
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{Example}: AR($p$) model
+    \[
+    y_t = \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + u_t
+    \]
+    becomes
+    \[
+    \Phi(L) y_t = u_t
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{Inversion}: If roots of $\Phi(z) = 0$ are outside the unit circle:
+    \[
+    y_t = \Phi(L)^{-1} u_t = \sum_{j=0}^{\infty} \psi_j u_{t-j}
+    \]
+    This is the \textbf{MA($\infty$) representation}.
+\end{frame}
+
+% ============================================================================
+% PART III: EXAMPLES
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part III: Examples}}\\[1em]
+        {\large Section 7.3: Applications to Macroeconomics}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Why Examples Matter}
+    \textbf{Goal}: Connect abstract definitions to concrete economic models
+    
+    \vspace{1em}
+    
+    \textbf{Key insight}: Many structural macro models admit reduced-form time series representations
+    
+    \vspace{1em}
+    
+    \textbf{Examples we'll cover}:
+    \begin{enumerate}
+        \item Monetary policy transmission (Phillips curve + Taylor rule)
+        \item Samuelson's multiplier-accelerator (1939)
+        \item Intertemporal optimization (Euler equations)
+    \end{enumerate}
+    
+    \vspace{1em}
+    
+    Each shows: \textbf{Structural model} $\to$ \textbf{Reduced form} (AR, VAR, ARMA)
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example 1: Monetary Policy Transmission}
+    \textbf{Structural model}:
+    \begin{align*}
+        \pi_t &= \lambda y_t + \pi_t^e + u_{1t} & \text{(Phillips curve)} \\
+        y_t &= \gamma(i_{t-1} - \pi_t^e) + u_{2t} & \text{(IS curve)} \\
+        \pi_t^e &= \pi_{t-1} & \text{(Adaptive expectations)} \\
+        i_t &= i^* + \rho(\pi_t - \pi^*) & \text{(Taylor rule)}
+    \end{align*}
+    where:
+    \begin{itemize}
+        \item $\pi_t$: inflation, $y_t$: output gap, $i_t$: interest rate
+        \item $\lambda \in (0,1)$, $\gamma \in (-1, 0)$, $\rho \geq 0$
+        \item $\ubf_t = (u_{1t}, u_{2t})' \sim \text{NID}(\mathbf{0}, \Omega)$
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Monetary Policy: Reduced Form}
+    \textbf{Substituting} the Taylor rule and expectations:
+    \begin{align*}
+        \pi_t &= \lambda y_t + \pi_{t-1} + u_{1t} \\
+        y_t &= \gamma(i^* - \rho\pi^*) + \gamma(\rho - 1)\pi_{t-1} + u_{2t}
+    \end{align*}
+    
+    \textbf{In matrix form} (VAR(1)):
+    \[
+    \underbrace{\begin{bmatrix} 1 & -\lambda \\ 0 & 1 \end{bmatrix}}_{B}
+    \begin{bmatrix} \pi_t \\ y_t \end{bmatrix}
+    = 
+    \begin{bmatrix} 0 \\ \gamma(i^* - \rho\pi^*) \end{bmatrix}
+    +
+    \begin{bmatrix} 1 & 0 \\ \gamma(\rho-1) & 0 \end{bmatrix}
+    \begin{bmatrix} \pi_{t-1} \\ y_{t-1} \end{bmatrix}
+    +
+    \begin{bmatrix} u_{1t} \\ u_{2t} \end{bmatrix}
+    \]
+    
+    Since $B$ is invertible, multiply by $B^{-1}$:
+    \[
+    \mathbf{w}_t = \mathbf{c}_0 + C_1 \mathbf{w}_{t-1} + \mathbf{v}_t
+    \]
+    where $\mathbf{v}_t = B^{-1}\ubf_t$ are \textit{reduced-form} shocks.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Monetary Policy: Univariate Representation}
+    \textbf{Isolating inflation} (since $y_{t-1}$ doesn't appear in $\pi_t$ equation):
+    \[
+    \pi_t = \lambda\gamma(i^* - \rho\pi^*) + [1 + \lambda\gamma(\rho - 1)]\pi_{t-1} + u_{1t} + \lambda u_{2t}
+    \]
+    
+    This is an \textbf{AR(1)} for inflation:
+    \[
+    \pi_t = \phi_0 + \phi_1 \pi_{t-1} + v_{1t}
+    \]
+    
+    \vspace{1em}
+    
+    \textbf{Key observations}:
+    \begin{itemize}
+        \item Same DGP, different information sets
+        \item VAR uses $({\pi_{t-1}, y_{t-1}})$; AR(1) uses only $\pi_{t-1}$
+        \item Structural shocks $\ubf_t$ become reduced-form shocks $\mathbf{v}_t$
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example 2: Samuelson's Multiplier-Accelerator (1939)}
+    \textbf{Historical context}: First mathematical model after Keynes' \textit{General Theory}
+    
+    \vspace{0.5em}
+    
+    \textbf{Structural model}:
+    \begin{align*}
+        y_t &= c_t + i_t + g & \text{(National income identity)} \\
+        c_t &= \alpha y_{t-1} + \varepsilon_t & \text{(Consumption function)} \\
+        i_t &= \beta(c_t - c_{t-1}) & \text{(Accelerator)}
+    \end{align*}
+    
+    \vspace{0.5em}
+    
+    \textbf{Reduced form}: Substitute to get
+    \begin{align*}
+        y_t &= g + \alpha(1+\beta)y_{t-1} - \beta\alpha y_{t-2} - \beta\varepsilon_{t-1} + (1+\beta)\varepsilon_t
+    \end{align*}
+    
+    This is an \textbf{ARMA(2,1)}:
+    \[
+    y_t = \phi_0 + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \theta u_{t-1} + u_t
+    \]
+    where $u_t = (1+\beta)\varepsilon_t$ and $\theta = -\beta/(1+\beta)$.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example 3: Euler Equation from Optimization}
+    \textbf{Consumer's problem}:
+    \[
+    \max_{c_{t+i}, A_{t+i}} \E\left[\sum_{i=0}^{\infty} (1+\delta)^{-i} U(c_{t+i}) \Big| \F_t\right]
+    \]
+    subject to budget constraint and transversality condition.
+    
+    \vspace{0.5em}
+    
+    \textbf{With CRRA utility} $U(c) = \frac{c^{1-\gamma}}{1-\gamma}$:
+    
+    \vspace{0.5em}
+    
+    \textbf{Euler equation}:
+    \[
+    \E\left[\frac{1+r}{1+\delta} c_{t+1}^{-\gamma} - c_t^{-\gamma} \Big| \F_t\right] = 0
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{Parameters of interest}:
+    \begin{itemize}
+        \item $\delta$: Discount rate (patience)
+        \item $\gamma$: Risk aversion (intertemporal substitution)
+    \end{itemize}
+    
+    This is a \textit{conditional moment restriction} --- basis for GMM estimation!
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Common Patterns}
+    \textbf{What we've seen}:
+    
+    \vspace{0.5em}
+    
+    \begin{center}
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Example} & \textbf{Structural} & \textbf{Reduced Form} \\
+        \midrule
+        Monetary policy & 4 equations & VAR(1) or AR(1) \\
+        Samuelson & 3 equations & ARMA(2,1) \\
+        Euler equation & FOC & Moment restriction \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    
+    \vspace{1em}
+    
+    \textbf{Key insight}: Economic models often have \textit{autoregressive} reduced forms
+    \begin{itemize}
+        \item AR/MA/ARMA capture stylized facts: persistence, mean reversion, cycles
+        \item VARs capture multivariate dynamics
+        \item Euler equations lead to GMM/rational expectations estimation
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Summary}
+    \textbf{Today we covered}:
+    
+    \vspace{0.5em}
+    
+    \begin{enumerate}
+        \item \textbf{Introduction}
+        \begin{itemize}
+            \item Time series: dynamic relationships + forecasting
+            \item Structural vs. reduced-form models
+            \item Stylized facts
+        \end{itemize}
+        
+        \vspace{0.3em}
+        
+        \item \textbf{Stochastic Processes}
+        \begin{itemize}
+            \item Filtrations, measurability, DGP
+            \item Stationarity (weak, strong) --- reduces parameters
+            \item Lag and difference operators
+        \end{itemize}
+        
+        \vspace{0.3em}
+        
+        \item \textbf{Examples}
+        \begin{itemize}
+            \item Monetary transmission $\to$ VAR
+            \item Samuelson $\to$ ARMA
+            \item Euler equation $\to$ GMM
+        \end{itemize}
+    \end{enumerate}
+    
+    \vspace{0.5em}
+    
+    \textit{Appendix: Ergodicity \& Mixing, Martingales}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Preview: What's Next}
+    \textbf{Section 7.4}: Reduced-Form Models in Detail
+    \begin{itemize}
+        \item AR($p$): Definition, stationarity, estimation
+        \item MA($q$): Definition, invertibility
+        \item ARMA($p,q$): Combining both
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{Section 7.5}: Vector Autoregressions
+    \begin{itemize}
+        \item VAR($p$) estimation and inference
+        \item Impulse response functions
+        \item Structural identification
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{Section 7.6}: Estimation Methods
+    \begin{itemize}
+        \item OLS for AR models
+        \item Maximum likelihood
+        \item GMM for Euler equations
+    \end{itemize}
+\end{frame}
+
+% ============================================================================
+% APPENDIX
+% ============================================================================
+\appendix
+
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Appendix}}
+    \end{center}
+\end{frame}
+
+% ============================================================================
+% APPENDIX: ERGODICITY AND MIXING (moved from main presentation)
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Appendix: Ergodicity \& Mixing}}\\[1em]
+        {\large Section 7.2.2 (cont.)}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{$\alpha$-Mixing Coefficient}
+    \begin{definition}[$\alpha$-Mixing Coefficient]
+        Let $\mathcal{G}$ and $\mathcal{H}$ be $\sigma$-subfields of $\F$. The $\alpha$-\textbf{mixing coefficient} is:
+        \[
+        \alpha(\mathcal{G}, \mathcal{H}) = \sup_{G \in \mathcal{G}, H \in \mathcal{H}} |\P(G \cap H) - \P(G)\P(H)|
+        \]
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Intuition}: Measures how ``far from independent'' two $\sigma$-algebras are.
+    \begin{itemize}
+        \item $\alpha = 0$: $\mathcal{G}$ and $\mathcal{H}$ are independent
+        \item $\alpha > 0$: Some dependence exists
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{In time series context}:
+    \[
+    \mathcal{G} = \F_{-\infty}^0 = \sigma(\ldots, X_{-1}, X_0), \quad
+    \mathcal{H} = \F_m^{+\infty} = \sigma(X_m, X_{m+1}, \ldots)
+    \]
+    $\mathcal{G}$ = ``past'', $\mathcal{H}$ = ``distant future''
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{$\alpha$-Mixing Condition}
+    \begin{definition}[$\alpha$-Mixing Condition]
+        A sequence $\{X_t\}_{t=-\infty}^{\infty}$ is $\alpha$-\textbf{mixing} (strong mixing) if:
+        \[
+        \lim_{m \to \infty} \alpha_m = 0
+        \]
+        where
+        \[
+        \alpha_m = \sup_t \alpha(\F_{-\infty}^t, \F_{t+m}^{\infty})
+        \]
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Intuition}: As the gap $m$ increases, past and future become \textit{asymptotically independent}.
+    
+    \vspace{0.5em}
+    
+    \begin{corollary}[For Gaussian Random Variables]
+        A useful mixing condition is \textbf{absolute summability}:
+        \[
+        \sum_{k=-\infty}^{\infty} |\Gamma_k^{ij}| < \infty \quad \forall\, i, j
+        \]
+        Autocovariances must decay to zero fast enough.
+    \end{corollary}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Transformations and Invariant Events}
+    \begin{definition}[Transformation]
+        A \textbf{transformation} $T: \Omega \to \Omega$ is a 1-1 measurable mapping of outcomes.
+    \end{definition}
+    
+    \begin{definition}[Measure-Preserving Transformation]
+        $T$ is \textbf{measure-preserving} if $\P(TE) = \P(E)$ for all $E \in \F$.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Example: Shift Transformation}
+    
+    The \textbf{back-shift operator} $T$: $X_t(T\omega) = X_{t+1}(\omega)$
+    
+    \vspace{0.5em}
+    
+    \begin{center}
+    \begin{tabular}{l}
+        $\omega = (\ldots, x_1, x_2, x_3, \ldots)$ \\
+        $T\omega = (\ldots, x_2, x_3, x_4, \ldots)$ \\
+        $T^2\omega = (\ldots, x_3, x_4, x_5, \ldots)$
+    \end{tabular}
+    \end{center}
+    
+    Under strict stationarity, the shift transformation is measure-preserving.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Ergodicity}
+    \begin{definition}[Ergodicity]
+        A strictly stationary sequence $\{X_t(\omega)\}$ is \textbf{ergodic} if the probability of every invariant event is either 0 or 1.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Invariant event}: $E$ such that $TE = E$ (unchanged by time shift).
+    
+    \vspace{0.5em}
+    
+    \textbf{Intuition}: If an invariant event has probability strictly between 0 and 1, there exist ``parallel universes'' that never communicate with each other.
+    
+    \vspace{1em}
+    
+    \begin{theorem}[Ergodic Theorem]
+        Let $\{X_t\}$ be weakly stationary and ergodic with $\E[|X_t|] < \infty$. Then:
+        \[
+        \frac{1}{T} \sum_{t=1}^T X_t(\omega) \xrightarrow{a.s.} \E[X_t]
+        \]
+    \end{theorem}
+    
+    \textbf{This is a Strong LLN for dependent processes!}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example: Ergodicity Failure (I)}
+    \textbf{Example}: Simple two-sequence universe
+    
+    \vspace{0.5em}
+    
+    Let $\Omega = \{\omega_1, \omega_2\}$ where:
+    \[
+    \omega_1 = (\ldots, 1, 1, 1, \ldots), \quad \omega_2 = (\ldots, 0, 0, 0, \ldots)
+    \]
+    with $\P(\omega_1) = p \in (0, 1)$ and $\P(\omega_2) = 1 - p$.
+    
+    \vspace{0.5em}
+    
+    Define $X_t(\omega_1) = 1$ and $X_t(\omega_2) = 0$ for all $t$.
+    
+    \vspace{1em}
+    
+    \textbf{Analysis}:
+    \begin{itemize}
+        \item Both $\omega_1$ and $\omega_2$ are invariant under the shift $T$
+        \item $\P(\omega_1) = p \in (0, 1)$ --- not 0 or 1!
+        \item $\Rightarrow$ The process is \textbf{not ergodic}
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    If we happen to draw $\omega_1$, we see only 1's forever and learn nothing about $\omega_2$.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example: Ergodicity Failure (II)}
+    \textbf{Example}: Random intercept
+    \[
+    X_t = U_t + Z, \quad t \in \Z
+    \]
+    where $\{U_t\} \sim \text{i.i.d. Uniform}[0,1]$ and $Z \sim N(0,1)$, independent of $U_t$.
+    
+    \vspace{0.5em}
+    
+    \textbf{What happens?}
+    \[
+    \bar{X}_n = \frac{1}{n}\sum_{t=1}^n X_t = \bar{U}_n + Z \xrightarrow{a.s.} \frac{1}{2} + Z
+    \]
+    
+    The sample mean converges to a \textit{random variable}, not a constant!
+    
+    \vspace{0.5em}
+    
+    \textbf{Why?} The autocovariance:
+    \[
+    \Cov(X_t, X_{t+h}) = \Var(Z) = 1 \quad \forall h \neq 0
+    \]
+    Dependence is \textit{too strong} --- it never dies out!
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Lesson}
+        Without ergodicity, time averages $\neq$ population averages.
+    \end{alertblock}
+\end{frame}
+
+% ============================================================================
+% APPENDIX: MARTINGALES (moved from main presentation)
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Appendix: Martingales}}\\[1em]
+        {\large Section 7.2.4}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Doob-Dynkin Lemma}
+    \begin{lemma}[Doob-Dynkin]
+        Let $X: \Omega \to \R^n$ and $Y: \Omega \to \R^m$ be random vectors. Then $Y$ is $\F^X$-measurable if and only if there exists a measurable function $g: \R^n \to \R^m$ such that:
+        \[
+        Y = g \circ X
+        \]
+    \end{lemma}
+    
+    \vspace{1em}
+    
+    \begin{corollary}
+        We always have:
+        \[
+        \E[Y | \F^X] = \E[Y | X] = g \circ X
+        \]
+        for some measurable $g$.
+    \end{corollary}
+    
+    \vspace{0.5em}
+    
+    \textbf{Intuition}: Conditional expectations are functions of the conditioning variables.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Martingale Process}
+    \begin{definition}[Martingale]
+        A sequence $\{Y_t\}_{t \in \N}$ is a \textbf{martingale} w.r.t. $\{\F_t\}$ if:
+        \begin{enumerate}
+            \item $\E[\|Y_t\|] < \infty$ for all $t$
+            \item $Y_t$ is $\F_t$-measurable
+            \item $\E[Y_t | \F_{t-1}] = Y_{t-1}$ for all $t$
+        \end{enumerate}
+    \end{definition}
+    
+    \vspace{1em}
+    
+    \textbf{Intuition}: The best forecast of tomorrow's value is today's value.
+    
+    \vspace{0.5em}
+    
+    \textbf{Examples}:
+    \begin{itemize}
+        \item Random walk: $S_t = S_{t-1} + \varepsilon_t$ with $\E[\varepsilon_t | \F_{t-1}] = 0$
+        \item Stock prices (under risk-neutral measure)
+        \item Cumulative sum of fair bets
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Martingale Difference Sequence}
+    \begin{definition}[Martingale Difference Sequence (MDS)]
+        A sequence $\{Y_t\}_{t \in \N}$ is a \textbf{martingale difference sequence} w.r.t. $\{\F_t\}$ if:
+        \begin{enumerate}
+            \item $\E[\|Y_t\|] < \infty$ for all $t$
+            \item $Y_t$ is $\F_t$-measurable
+            \item $\E[Y_t | \F_{t-1}] = 0$ for all $t$
+        \end{enumerate}
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Key property}: MDS are \textbf{uncorrelated} over time!
+    
+    \begin{corollary}
+        If $\{Y_t\}$ is MDS, then $\E[Y_t Y_{t-j}] = 0$ for all $j \neq 0$.
+    \end{corollary}
+    
+    \vspace{0.5em}
+    
+    \textbf{Proof}: $\E[Y_t Y_{t-j}] = \E[\E[Y_t | \F_{t-1}] Y_{t-j}] = \E[0 \cdot Y_{t-j}] = 0$
+    
+    \vspace{0.5em}
+    
+    \textbf{Note}: MDS is \textit{weaker} than i.i.d. --- allows for conditional heteroskedasticity!
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{MDS Properties}
+    \begin{theorem}
+        Let $\{Y_t\}$ be MDS w.r.t. $\{\F_t\}$, and let $g_{t-1} = g(Y_{t-1}, Y_{t-2}, \ldots)$ be measurable and integrable. Then:
+        \begin{enumerate}
+            \item $\{Y_t g_{t-1}\}$ is also MDS
+            \item $Y_t$ and $g_{t-1}$ are uncorrelated
+        \end{enumerate}
+    \end{theorem}
+    
+    \vspace{0.5em}
+    
+    \textbf{Proof sketch}:
+    \[
+    \E[Y_t g_{t-1} | \F_{t-1}] = g_{t-1} \E[Y_t | \F_{t-1}] = g_{t-1} \cdot 0 = 0
+    \]
+    
+    \vspace{1em}
+    
+    \textbf{Implication}: Products of MDS with past functions remain MDS.
+    
+    This is crucial for:
+    \begin{itemize}
+        \item Deriving variance formulas
+        \item Establishing CLTs for time series
+        \item Analyzing ARCH/GARCH models
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Proof: Autocovariance Symmetry}
+    \begin{lemma}
+        For a weakly stationary process: $\Gamma_k = \Gamma_{-k}'$
+    \end{lemma}
+    
+    \begin{proof}
+        Since the process is weakly stationary:
+        \[
+        \E[Y_t] = \E[Y_{t-k}] = \mu \quad \forall k
+        \]
+        
+        Therefore:
+        \begin{align*}
+            \Gamma_k &= \E[(Y_t - \mu)(Y_{t-k} - \mu)'] \\
+            &= \E[(Y_{t-k} - \mu)(Y_t - \mu)']' \\
+            &= \Gamma_{-k}'
+        \end{align*}
+    \end{proof}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Detailed Derivation: Monetary Transmission VAR}
+    Starting from:
+    \[
+    B\mathbf{w}_t = \mathbf{a}_0 + A_1 \mathbf{w}_{t-1} + \ubf_t
+    \]
+    
+    With $B = \begin{bmatrix} 1 & -\lambda \\ 0 & 1 \end{bmatrix}$, we have $B^{-1} = \begin{bmatrix} 1 & \lambda \\ 0 & 1 \end{bmatrix}$
+    
+    \vspace{0.5em}
+    
+    Multiplying through:
+    \[
+    \mathbf{w}_t = B^{-1}\mathbf{a}_0 + B^{-1}A_1 \mathbf{w}_{t-1} + B^{-1}\ubf_t
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{Reduced-form parameters}:
+    \begin{align*}
+        \mathbf{c}_0 &= \begin{bmatrix} \lambda\gamma(i^* - \rho\pi^*) \\ \gamma(i^* - \rho\pi^*) \end{bmatrix} \\
+        C_1 &= \begin{bmatrix} 1 + \lambda\gamma(\rho-1) & 0 \\ \gamma(\rho-1) & 0 \end{bmatrix} \\
+        \mathbf{v}_t &= \begin{bmatrix} u_{1t} + \lambda u_{2t} \\ u_{2t} \end{bmatrix}
+    \end{align*}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Additional Mixing Conditions}
+    Beyond $\alpha$-mixing, other conditions exist:
+    
+    \vspace{0.5em}
+    
+    \textbf{$\beta$-mixing} (absolute regularity):
+    \[
+    \beta_m = \sup_t \E\left[\sup_{H \in \F_{t+m}^{\infty}} |\P(H | \F_{-\infty}^t) - \P(H)|\right]
+    \]
+    
+    \textbf{$\rho$-mixing} (maximal correlation):
+    \[
+    \rho_m = \sup_t \sup_{\substack{f \in L^2(\F_{-\infty}^t) \\ g \in L^2(\F_{t+m}^{\infty})}} |\text{Corr}(f, g)|
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{Hierarchy}:
+    \[
+    \text{i.i.d.} \Rightarrow \beta\text{-mixing} \Rightarrow \alpha\text{-mixing}
+    \]
+    \[
+    \beta\text{-mixing} \Rightarrow \rho\text{-mixing}
+    \]
+    
+    Each has different implications for CLTs and moment inequalities.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{References}
+    \textbf{Textbooks}:
+    \begin{itemize}
+        \item Hamilton (1994): \textit{Time Series Analysis}
+        \item Brockwell \& Davis (1991): \textit{Time Series: Theory and Methods}
+        \item Lütkepohl (2005): \textit{New Introduction to Multiple Time Series Analysis}
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{Course Materials}:
+    \begin{itemize}
+        \item Lecture Notes: Sections 7.1--7.3
+        \item Cochrane (2005): \textit{Time Series for Macroeconomics and Finance}
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{Classic Papers}:
+    \begin{itemize}
+        \item Samuelson (1939): ``Interactions between the multiplier analysis and the principle of acceleration''
+        \item Sims (1980): ``Macroeconomics and Reality''
+    \end{itemize}
+\end{frame}
+
+\end{document}
+
