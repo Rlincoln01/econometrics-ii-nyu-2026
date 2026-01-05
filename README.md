@@ -198,7 +198,7 @@ Problem sets are **mandatory** and count toward your grade (50%). Key rules:
     └── Books/                       # Reference materials (not tracked publicly)
 ```
 
-**Note**: To avoid redistributing copyrighted material, most PDFs (slides, books, problem sets) are excluded from the public repository. Enrolled students can access these through NYU course channels.
+**Note**: To avoid redistributing copyrighted material, most PDFs (slides, books, problem sets) are excluded from the public repository. Enrolled students can access these through NYU brightspace.
 
 ## Feedback
 
