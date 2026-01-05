@@ -1,0 +1,43 @@
+# OS / editor
+.DS_Store
+**/.DS_Store
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Data / outputs
+*.zip
+
+# --- Public repo safety ---
+# Avoid accidentally redistributing copyrighted PDFs (textbooks, instructor slides, handouts).
+# Keep syllabi tracked.
+
+# Textbooks / reference PDFs
+**/Books/**/*.pdf
+
+# Instructor slides / handouts / problem sets (PDF)
+Time Series/Slides/**/*.pdf
+Time Series/Problem Sets/**/*.pdf
+
+# If you later add Panel Data slides/psets as PDFs, keep them untracked by default
+Panel Data/Slides/**/*.pdf
+Panel Data/Problem Sets/**/*.pdf
+
+# But DO track syllabi
+!**/*syllabus*.pdf
+!**/*Syllabus*.pdf
