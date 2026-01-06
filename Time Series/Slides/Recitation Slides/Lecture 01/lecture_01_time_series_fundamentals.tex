@@ -194,9 +194,33 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Example: Prediction from a Time Series}
+\begin{frame}{Example: Generate HD with structural model}
+    \vspace{-0.2em}
+    \begin{block}{Smets \& Wouters (2007)}
+        Structural model $\Rightarrow$ identified shocks $\Rightarrow$ historical decomposition of inflation and output growth over time.
+    \end{block}
+    \begin{columns}[T]
+        \begin{column}{0.49\textwidth}
+            \centering
+            % TODO: provide actual figure file (e.g., figures/sw_inflation.png)
+            \includegraphics[width=\textwidth]{figures/SM_CPI_HD.png}
+        \end{column}
+        \begin{column}{0.49\textwidth}
+            \centering
+            % TODO: provide actual figure file (e.g., figures/sw_gdp_growth.png)
+            \includegraphics[width=\textwidth]{figures/SM_GDP_HD.png}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example: Weekly Nowcasting}
+    \vspace{-0.2em}
+    \begin{block}{OECD Weekly Economic Tracker}
+        A high-frequency ``weekly tracker'' uses weekly indicators to nowcast quarterly GDP growth in real time.
+    \end{block}
     \begin{center}
-        \includegraphics[width=0.92\textwidth]{figures/prediction_ex.png}
+        \includegraphics[width=0.92\textwidth]{figures/nowcasting_gdp.png}
     \end{center}
 \end{frame}
 
@@ -213,7 +237,7 @@
     \textbf{Questions of Interest:}
     \begin{itemize}
         \item What is the sign and size of $\beta_1$? (Inflation-output tradeoff)
-        \item Is $\beta_2 \approx 1$? (Testing \textit{adaptive expectations}: $\E_{t-1}[\pi_t] = \pi_{t-1}$)
+        \item Is $\beta_2 \approx 1$? (Testing \textit{adaptive expectations}: $\E[\pi_t \mid \F_{t-1}] = \pi_{t-1}$)
     \end{itemize}
     
     \vspace{1em}
@@ -291,7 +315,7 @@
     \begin{enumerate}
         \item \textbf{Trend}: Long-term movement (growth, decline)
         \item \textbf{Seasonality}: Periodic and regular fluctuations (quarterly, monthly)
-        \item \textbf{Cycles}: Cyclical variation with period $>$ 1 year (business cycles)
+        \item \textbf{Cycles}: Medium-run fluctuations (business cycles) that are not strictly periodic (unlike seasonality)
         \item \textbf{Irregularity}: Erratic fluctuations (noise)
     \end{enumerate}
     
@@ -316,8 +340,8 @@
 % ============================================================================
 \begin{frame}[plain]
     \begin{center}
-        {\Large \textbf{Part II: Stochastic Processes}}\\[1em]
-        {\large Section 7.2.1: Formal Definitions}
+        {\Large \textbf{Part II (a): Stochastic Processes}}\\[1em]
+        {\large  Formal Definitions}
     \end{center}
 \end{frame}
 
@@ -474,31 +498,38 @@
     \begin{center}
         \includegraphics[width=0.92\textwidth]{figures/realizations_sp.png}
     \end{center}
+
+
+The five time series in the figure are realizations of the same stochastic process!
+
 \end{frame}
+
 
 % ============================================================================
 % PART II.2: MODELS FOR STOCHASTIC PROCESSES
 % ============================================================================
 \begin{frame}[plain]
     \begin{center}
-        {\Large \textbf{Part II: Stochastic Processes}}\\[1em]
-        {\large Section 7.2.2: Models for Stochastic Processes}
+        {\Large \textbf{Part II (b): Models for Stochastic Processes}}\\[1em]
+        {\large DGP, Stationarity, and Structural/Reduced-Form Models}
     \end{center}
 \end{frame}
 
 % ----------------------------------------------------------------------------
 \begin{frame}{Data-Generating Process (DGP)}
     \begin{definition}[Data-Generating Process]
-        The \textbf{DGP} is the probability law describing the stochastic process $\{X_t\}_{t \geq 0}$ conditional on available information:
+        The \textbf{DGP} of $\{X_t\}_{t \geq 0}$ is the probabilistic rule that generates the process over time. A convenient characterization is given by:
         \[
-        F_t(\{X_t\}_{t \geq 0} | \F_{t-1}^X)
+        F(X_0)
+        \quad \text{and} \quad
+        \{\,F(X_t \mid \F_{t-1}^X)\,\}_{t \geq 1},
         \]
-        --- the true joint distribution of the process.
+        i.e., the initial distribution and the collection of one-step-ahead conditional distributions given the information set.
     \end{definition}
     
     \vspace{1em}
     
-    \textbf{Problem}: This is an \textit{infinite-dimensional} distribution!
+    \textbf{Problem}: This is an \textit{infinite-dimensional} object!
     \begin{itemize}
         \item Analytically intractable
         \item Cannot estimate infinitely many parameters
@@ -507,13 +538,6 @@
     \vspace{0.5em}
     
     \textbf{Question}: Can we represent it by something finite-dimensional?
-\end{frame}
-
-% ----------------------------------------------------------------------------
-\begin{frame}{Example: Weekly Nowcasting}
-    \begin{center}
-        \includegraphics[width=0.92\textwidth]{figures/nowcasting_gdp.png}
-    \end{center}
 \end{frame}
 
 % ----------------------------------------------------------------------------
@@ -568,7 +592,7 @@
 \begin{frame}{Correct Specification Axioms}
     \begin{block}{Axiom: Correct Specification for Distribution}
         \[
-        \mathcal{M}_D(\xbf_t, \xbf_{t-1}, \ldots, d_t; \psi) = F_t(\{X_t\}_{t \geq 0} | \F_{t-1}^X)
+        \mathcal{M}_D(\xbf_t, \xbf_{t-1}, \ldots, d_t; \psi) = F(X_t \mid \F_{t-1}^X)
         \]
     \end{block}
     
@@ -699,7 +723,7 @@
     \begin{definition}[Weak Stationarity]
         A stochastic process $\{Y_t\}$ is \textbf{weakly stationary} (covariance stationary, second-order stationary) if:
         \begin{enumerate}
-            \item $\E[Y_t] = \mu$ for all $t \in \mathcal{T}$, where $|\mu| < \infty$
+            \item $\E[Y_t] = \mu$ for all $t \in \mathcal{T}$, where $\|\mu\| < \infty$
             \item $\E[(Y_t - \mu)(Y_{t-h} - \mu)'] = \Gamma_h$ for all $t, h$, where $\|\Gamma_h\| < \infty$
         \end{enumerate}
     \end{definition}
@@ -750,13 +774,13 @@
 % ----------------------------------------------------------------------------
 \begin{frame}{Strong Stationarity}
     \begin{definition}[Strong Stationarity]
-        A stochastic process $\{Y_t\}$ is \textbf{strongly stationary} (strictly stationary) if the joint distribution is invariant to time shifts:
+        A stochastic process $\{Y_t\}$ is \textbf{strongly stationary} (strictly stationary) if all finite-dimensional distributions are invariant to time shifts: for any $n \in \N$, any times $t_1,\ldots,t_n$, any shift $h \in \Z$, and any $y_1,\ldots,y_n$,
         \[
-        F(y_1, \ldots, y_T) = F(y_{1+h}, \ldots, y_{T+h}) \quad \forall h = \pm 1, \pm 2, \ldots
+        F_{t_1,\ldots,t_n}(y_1,\ldots,y_n) = F_{t_1+h,\ldots,t_n+h}(y_1,\ldots,y_n).
         \]
     \end{definition}
     
-    \vspace{1em}
+    % \vspace{1em}
     
     \textbf{Relationship to Weak Stationarity}:
     \begin{itemize}
@@ -765,7 +789,7 @@
         \item For \textbf{Gaussian} processes: Weak $\Leftrightarrow$ Strong
     \end{itemize}
     
-    \vspace{0.5em}
+    % \vspace{0.5em}
     
     \begin{alertblock}{Cauchy Counterexample}
         A Cauchy-distributed process can be strongly stationary but \textit{not} weakly stationary (moments undefined!).
@@ -777,8 +801,8 @@
 % ============================================================================
 \begin{frame}[plain]
     \begin{center}
-        {\Large \textbf{Part II: Stochastic Processes}}\\[1em]
-        {\large Section 7.2.3: Linear Operators}
+        {\Large \textbf{Part II (c): Operations on Stochastic Processes}}\\[1em]
+        {\large Linear Operators}
     \end{center}
 \end{frame}
 
@@ -894,7 +918,7 @@
 \begin{frame}[plain]
     \begin{center}
         {\Large \textbf{Part III: Examples}}\\[1em]
-        {\large Section 7.3: Applications to Macroeconomics}
+        {\large Applications to Macroeconomics}
     \end{center}
 \end{frame}
 
@@ -1044,6 +1068,22 @@
     This is a \textit{conditional moment restriction} --- basis for GMM estimation!
 \end{frame}
 
+\begin{frame}{Example 3: Structural to Reduced Form}
+    \begin{itemize}
+    \item We can map the structural to a reduced form model under assumptions:
+    \begin{enumerate}
+        \item \textbf{Assumption (1)}: $\delta  = r $
+        \item \textbf{Assumption (2)}: $y_t = \alpha y_{t-1} + \varepsilon_t$
+    \end{enumerate}
+    \vspace{0.5em}
+    \item Under Assumption (1) and (2),
+    \begin{align*}
+        c_t = r(1+r) A_{t-1} + r \frac{1+r}{1+r - \alpha}y_t + \varepsilon_t
+    \end{align*}
+    where $A_{t-1}$ is beginning of period assets, and $\varepsilon_t$ is an autocorrelated error
+    \item The above equation is a reduced form model for consumption
+    \end{itemize}
+\end{frame}
 % ----------------------------------------------------------------------------
 \begin{frame}{Common Patterns}
     \textbf{What we've seen}:
