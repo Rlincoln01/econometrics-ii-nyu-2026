@@ -1004,74 +1004,148 @@
 % ----------------------------------------------------------------------------
 % TIM'S EXERCISES
 % ----------------------------------------------------------------------------
-\begin{frame}{Tim's Practice Problems: Exercise 2}
-    \begin{block}{Problem Statement}
-        \textit{[Exercise 2 from practice\_problems\_week2.pdf]}
-        
-        \vspace{0.5em}
-        
-        % PLACEHOLDER: Insert the actual problem statement here
-        Problem to be inserted from the problem set.
+\begin{frame}{Tim's Practice Problems: Exercise 2 (MA($q$) properties)}
+    \footnotesize
+    \begin{block}{Problem}
+        A finite-order MA($q$) process can be expressed as
+        \[
+        y_t = \sum_{j=0}^{q}\theta_j \varepsilon_{t-j}, \qquad \varepsilon_t \text{ is white noise, } \theta_0 = 1.
+        \]
+        Show that all finite-order moving-average processes:
+        \begin{enumerate}[(a)]
+            \item are covariance stationary;
+            \item have autocovariances that truncate at lag $q$ (i.e., $\gamma_k \neq 0$ for $k\le q$ and $\gamma_k=0$ for $k>q$);
+            \item have absolutely summable autocovariances/autocorrelations.
+        \end{enumerate}
     \end{block}
     
-    \vspace{1em}
-    
-    \textbf{Solution Approach}:
-    \begin{enumerate}
-        \item Step 1: [To be completed]
-        \item Step 2: [To be completed]
-        \item Step 3: [To be completed]
-    \end{enumerate}
+    \vspace{0.3em}
+    \textbf{Idea}: expand products using WN orthogonality ($\E[\varepsilon_t\varepsilon_s]=0$ for $t\neq s$).
 \end{frame}
 
-\begin{frame}{Exercise 2: Solution}
-    \textbf{Detailed Solution}:
+\begin{frame}{Exercise 2 (MA($q$)): Solution}
+    \footnotesize
+    Let $\E[\varepsilon_t]=0$, $\Var(\varepsilon_t)=\sigma_\varepsilon^2$, and $\E[\varepsilon_t\varepsilon_s]=0$ for $t\neq s$.
     
-    \vspace{1em}
-    
-    % PLACEHOLDER: Insert detailed solution here
-    [Solution steps to be added once problem statement is available]
-    
-    \vspace{1em}
-    
-    \begin{block}{Key Takeaway}
-        [Main insight from this exercise]
+    \vspace{0.3em}
+    \begin{enumerate}[(a)]
+        \item \textbf{Covariance stationarity}: $\E[y_t]=\sum_{j=0}^q \theta_j \E[\varepsilon_{t-j}]=0$ (constant).
+        
+        Variance:
+        \[
+        \gamma_0=\Var(y_t)=\sigma_\varepsilon^2\sum_{j=0}^q \theta_j^2 < \infty .
+        \]
+        \item \textbf{Autocovariance truncation}: for $k\ge 0$,
+        \[
+        \gamma_k=\Cov(y_t,y_{t-k})
+        =\sigma_\varepsilon^2\sum_{j=0}^{q-k}\theta_{j+k}\theta_j,
+        \]
+        because only terms with matching innovation indices survive. If $k>q$, the sum is empty $\Rightarrow \gamma_k=0$.
+        \item \textbf{Absolute summability}: since $\gamma_k=0$ for $|k|>q$,
+        \[
+        \sum_{k=-\infty}^{\infty}|\gamma_k|=\sum_{k=-q}^{q}|\gamma_k|<\infty
+        \quad\Rightarrow\quad
+        \sum_{k=-\infty}^{\infty}|\rho_k|<\infty.
+        \]
+    \end{enumerate}
+    \begin{block}{Key takeaway}
+        Finite MA $\Rightarrow$ always covariance stationary and has \textbf{short memory}: ACF cuts off after $q$.
     \end{block}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Tim's Practice Problems: Exercise 3}
-    \begin{block}{Problem Statement}
-        \textit{[Exercise 3 from practice\_problems\_week2.pdf]}
-        
-        \vspace{0.5em}
-        
-        % PLACEHOLDER: Insert the actual problem statement here
-        Problem to be inserted from the problem set.
+\begin{frame}{Tim's Practice Problems: Exercise 2 (MA(2) invertibility)}
+    \footnotesize
+    \begin{block}{Problem}
+        Consider a second-order moving-average process
+        \[
+        x_t=\varepsilon_t+\theta_1\varepsilon_{t-1}+\theta_2\varepsilon_{t-2},
+        \qquad \varepsilon_t \overset{iid}{\sim}N(0,\sigma^2).
+        \]
+        \begin{enumerate}[(a)]
+            \item State conditions on $(\theta_1,\theta_2)$ for the process to be \textbf{invertible}.
+            \item Characterize the family of \textbf{observationally equivalent}, non-invertible MA(2) representations.
+        \end{enumerate}
     \end{block}
+\end{frame}
+
+\begin{frame}{Exercise 2 (MA(2)): Solution}
+    \footnotesize
+    Write $x_t=\Theta(L)\varepsilon_t$ with $\Theta(L)=1+\theta_1L+\theta_2L^2$.
     
-    \vspace{1em}
-    
-    \textbf{Solution Approach}:
-    \begin{enumerate}
-        \item Step 1: [To be completed]
-        \item Step 2: [To be completed]
-        \item Step 3: [To be completed]
+    \vspace{0.3em}
+    \begin{enumerate}[(a)]
+        \item \textbf{Invertibility} $\iff$ all roots of $\Theta(z)=0$ satisfy $|z|>1$.
+        
+        Equivalently, factor $\Theta(L)=(1-\lambda_1L)(1-\lambda_2L)$ with
+        $\lambda_1+\lambda_2=-\theta_1$, $\lambda_1\lambda_2=\theta_2$.
+        Then invertibility $\iff |\lambda_1|<1$ and $|\lambda_2|<1$ (roots outside unit circle).
+        
+        \item \textbf{Observationally equivalent non-invertible family (root flipping)}:
+        
+        If $\Theta(L)=\prod_{i=1}^2(1-\lambda_iL)$, pick any subset $S\subseteq\{1,2\}$ and define
+        \[
+        \widetilde\Theta(L)=\prod_{i\in S}(1-\lambda_i^{-1}L)\prod_{i\notin S}(1-\lambda_iL),
+        \]
+        i.e., \emph{replace} any factor with $|\lambda_i|<1$ by its reciprocal (moving the corresponding root \emph{inside} the unit circle).
+        
+        With suitably rescaled white noise $\tilde\varepsilon_t$ (variance scaled by $\prod_{i\in S}\lambda_i^2$), the process
+        $x_t=\widetilde\Theta(L)\tilde\varepsilon_t$ has the \textbf{same second moments} as the original MA(2), hence is observationally equivalent.
     \end{enumerate}
+    \begin{block}{Key takeaway}
+        For MA models, \textbf{second moments cannot distinguish} between invertible and root-flipped non-invertible representations.
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Tim's Practice Problems: Exercise 3 (nonstationary bivariate)}
+    \footnotesize
+    \begin{block}{Problem}
+        Consider the non-stationary processes
+        \[
+        y_{1t}=y_{1,t-1}+\varepsilon_{1t}+\theta\varepsilon_{1,t-1},
+        \qquad
+        y_{2t}=\phi y_{1t}+\varepsilon_{2t},
+        \]
+        where $|\theta|<1$ and $\phi\neq 0$.
+        \begin{enumerate}[(a)]
+            \item Show that the vector of first differences $[\Delta y_{1t},\Delta y_{2t}]'$ is a \textbf{non-invertible} MA(1) process.
+            \item Are there observationally equivalent, \textbf{invertible} representations? Why or why not?
+        \end{enumerate}
+    \end{block}
 \end{frame}
 
 \begin{frame}{Exercise 3: Solution}
-    \textbf{Detailed Solution}:
+    \footnotesize
+    First differences:
+    \[
+    \Delta y_{1t}=\varepsilon_{1t}+\theta\varepsilon_{1,t-1},\qquad
+    \Delta y_{2t}=\phi\Delta y_{1t}+(\varepsilon_{2t}-\varepsilon_{2,t-1}).
+    \]
+    Define $u_t=(\varepsilon_{1t},\varepsilon_{2t})'$ and write
+    \[
+    \Delta y_t
+    =
+    \underbrace{\begin{pmatrix}1&0\\ \phi&1\end{pmatrix}}_{A_0}u_t
+    +
+    \underbrace{\begin{pmatrix}\theta&0\\ \phi\theta&-1\end{pmatrix}}_{A_1}u_{t-1}
+    \;=\;
+    (A_0+A_1L)u_t,
+    \]
+    so it is a VMA(1).
     
-    \vspace{1em}
+    \vspace{0.3em}
+    \textbf{Non-invertibility}: check the determinant
+    \[
+    \det(A_0+A_1z)=\det\!\begin{pmatrix}1+\theta z&0\\ \phi(1+\theta z)&1-z\end{pmatrix}
+    =(1+\theta z)(1-z),
+    \]
+    which has a root at $z=1$ (on the unit circle) $\Rightarrow$ fails invertibility.
     
-    % PLACEHOLDER: Insert detailed solution here
-    [Solution steps to be added once problem statement is available]
-    
-    \vspace{1em}
-    
-    \begin{block}{Key Takeaway}
-        [Main insight from this exercise]
+    \vspace{0.3em}
+    \textbf{(b)} No observationally equivalent \emph{invertible} MA(1) representation within the usual class: the problematic root is exactly at $z=1$ and cannot be ``flipped'' outside the unit circle.
+    \begin{block}{Key takeaway}
+        Non-invertibility can be \textbf{structural} (unit-circle root), not just a choice of MA parameterization.
     \end{block}
 \end{frame}
 
