@@ -1,0 +1,104 @@
+\documentclass[12pt]{article}
+ 
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,scrextend}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setlength{\headheight}{28pt}
+
+% Common shortcuts (kept close to template)
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\E}{\mathbb E}
+\newcommand{\imp}{\Rightarrow}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{multicol}
+\usepackage{datetime}
+
+% Date (update as needed)
+\newdate{date}{07}{01}{2026}
+
+\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue,
+citecolor=blue, urlcolor=blue]{hyperref}
+
+\newtheorem*{definition}{Definition}
+\newtheorem{problem}{Problem}
+
+\begin{document}
+ 
+\lhead{TA: Rafael Lincoln \\ Prof. Tim Cogley}
+\rhead{Econometrics II (Time Series) \\ \displaydate{date}}
+
+\section*{Problem Set 1 --- Practice for the Exam (Not for Submission)}
+
+\begin{addmargin}[0.5em]{0.5em}
+\textbf{Important:} You \textbf{do not need to submit} this problem set, and you \textbf{do not need to do all exercises}.\\
+We will cover the solutions in class and then provide written solutions afterwards for your study.\\
+The goal is simply to give you additional material to prepare for the exam.
+\end{addmargin}
+
+\vspace{0.8em}
+
+\begin{problem}[Nonstationary bivariate system \& non-invertibility]
+Consider the non-stationary processes
+\[
+y_{1t} = y_{1,t-1} + \varepsilon_{1t} + \theta \varepsilon_{1,t-1},
+\qquad
+y_{2t} = \phi y_{1t} + \varepsilon_{2t},
+\]
+where $|\theta|<1$ and $\phi\neq 0$.
+\begin{enumerate}
+    \item[(a)] Show that the vector of first differences $[\Delta y_{1t}, \Delta y_{2t}]'$ is a non-invertible MA(1) process.
+    \item[(b)] Are there any observationally equivalent, invertible representations? Why or why not?
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[Finite MA($q$): stationarity and ACF truncation]
+A finite-order MA($q$) process can be expressed as
+\[
+y_t = \sum_{j=0}^{q}\theta_j \varepsilon_{t-j},
+\]
+where $\varepsilon_t$ is white noise and $\theta_0 = 1$. Show that all finite-order moving-average processes:
+\begin{enumerate}
+    \item[(a)] are covariance stationary;
+    \item[(b)] have autocovariance functions that truncate at lag $q$, i.e.,
+    \[
+    \E(y_t y_{t-k})=
+    \begin{cases}
+        \Gamma_k \neq 0 & \text{for } k \leq q,\\
+        0 & \text{for } k > q;
+    \end{cases}
+    \]
+    \item[(c)] have absolutely summable autocovariances (equivalently, ACFs),
+    \[
+    \sum_{j=-\infty}^{\infty} |\Gamma_j|
+    =
+    \sum_{j=-q}^{q} |\Gamma_j|
+    < \infty.
+    \]
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[MA(2): invertibility and observational equivalence]
+Consider a second-order moving average process
+\[
+x_t = \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2},
+\]
+where the innovation $\varepsilon_t$ is iid $N(0,\sigma^2)$.
+\begin{enumerate}
+    \item[(a)] State conditions on $\theta_1,\theta_2$ for the process to be invertible.
+    \item[(b)] Characterize the family of observationally equivalent, non-invertible representations.
+\end{enumerate}
+\end{problem}
+
+\end{document}
+
