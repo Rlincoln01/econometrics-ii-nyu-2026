@@ -1,0 +1,2156 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% Theme and color setup
+\usetheme{default}
+\usecolortheme{default}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Custom colors (MIT-inspired)
+\definecolor{mitred}{RGB}{163,31,52}
+\definecolor{darkblue}{RGB}{0,40,85}
+\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{darkgray}{RGB}{64,64,64}
+
+% Set main colors
+\setbeamercolor{frametitle}{fg=white,bg=darkblue}
+\setbeamercolor{title}{fg=darkblue}
+\setbeamercolor{author}{fg=black}
+\setbeamercolor{institute}{fg=black}
+\setbeamercolor{date}{fg=black}
+\setbeamercolor{structure}{fg=darkblue}
+\setbeamercolor{normal text}{fg=black}
+\setbeamercolor{itemize item}{fg=mitred}
+\setbeamercolor{itemize subitem}{fg=darkblue}
+\setbeamercolor{enumerate item}{fg=darkblue}
+
+% Frame title band
+\newlength{\titlebandht}
+\setlength{\titlebandht}{4ex}
+
+\setbeamertemplate{frametitle}{
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,ht=\titlebandht,dp=1.1ex,leftskip=1.2em,rightskip=1.2em]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+    \ifx\insertframesubtitle\@empty\relax\else\\[-0.2ex]
+      \usebeamerfont{framesubtitle}\insertframesubtitle
+    \fi
+  \end{beamercolorbox}
+  \vspace{0.6em}
+}
+
+% Font settings
+\usefonttheme{professionalfonts}
+\usefonttheme{serif}
+
+% Footline with page numbers
+\setbeamertemplate{footline}{
+    \hfill\insertframenumber\hspace{2em}\vspace{0.5em}
+}
+
+% Packages
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{hyperref}
+
+% Custom commands for math
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Corr}{\text{Corr}}
+\newcommand{\Span}{\text{span}}
+\newcommand{\xbf}{\mathbf{x}}
+\newcommand{\ybf}{\mathbf{y}}
+\newcommand{\zbf}{\mathbf{z}}
+\newcommand{\ubf}{\mathbf{u}}
+\newcommand{\vbf}{\mathbf{v}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\plim}{plim}
+\DeclareMathOperator{\proj}{proj}
+
+% Theorem environments
+\setbeamertemplate{theorems}[numbered]
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\newtheorem{assumption}{Assumption}
+\theoremstyle{definition}
+
+% Block colors
+\setbeamercolor{block title}{bg=lightgray,fg=darkblue}
+\setbeamercolor{block body}{bg=lightgray!50}
+
+% Alert block colors
+\setbeamercolor{block title alerted}{bg=mitred!15,fg=mitred}
+\setbeamercolor{block body alerted}{bg=mitred!5}
+
+% Title information
+\title{Identification, ARMA Models, and Wold Decomposition}
+\subtitle{TA Session 2: Reduced-Form Time Series Analysis}
+\author{Rafael Lincoln}
+\institute{Econometrics II -- NYU PhD Program}
+\date{Spring 2026}
+
+\begin{document}
+
+% ============================================================================
+% TITLE SLIDE
+% ============================================================================
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+% ============================================================================
+% OUTLINE
+% ============================================================================
+\begin{frame}{Today's Roadmap}
+    \textbf{Hour 1: Theory} (~25-30 minutes per topic)
+    \begin{enumerate}
+        \item \textbf{Identification in Time Series}
+        \begin{itemize}
+            \item Global vs. local identification
+            \item Observational equivalence and ACGF
+            \item Causality \& invertibility
+        \end{itemize}
+        \vspace{0.3em}
+        \item \textbf{Reduced-Form Models: AR, MA, ARMA}
+        \begin{itemize}
+            \item Definitions, stationarity, and invertibility
+            \item Observational equivalence in MA processes
+        \end{itemize}
+        \vspace{0.3em}
+        \item \textbf{Wold's Decomposition Theorem}
+    \end{enumerate}
+    
+    \vspace{0.5em}
+    \textbf{Hour 2: Exercises}
+    \begin{itemize}
+        \item Tim's Practice Problems (Ex. 2, 3)
+        \item Medeiros ARMA Exercises (1, 2, 3, 6) + Vector Processes (Ex. 4)
+    \end{itemize}
+\end{frame}
+
+% ============================================================================
+% PART I: IDENTIFICATION
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part I: Identification in Time Series}}\\[1em]
+        {\large The Challenge of Learning from Data}
+    \end{center}
+    
+    \vspace{2em}
+    
+    \begin{center}
+        \textcolor{mitred}{\textbf{Always Remember: Identification is a non-testable assumption!}}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The Identification Problem: Setup}
+    \textbf{Setup}: We have a parametric model $\mathcal{M}(\theta)$ with structural parameters $\theta \in \Theta$.
+    
+    \vspace{0.5em}
+    
+    The model generates a family of distributions for observed data:
+    \[
+    \mathbb{D}(\mathbf{Y}^T \mid \theta), \quad \text{where } \mathbf{Y}^T = \{y_t\}_{t=1}^T
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{The Fundamental Question}:
+    \begin{center}
+        \textit{Can we uniquely determine $\theta$ from the distribution of the data?}
+    \end{center}
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Why This Matters}
+        If two different values of $\theta$ generate the \textbf{same distribution} of data, then we \textbf{cannot distinguish} between them using any amount of data!
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Global and Local Identification}
+    \label{slide:global_local_id}
+    \begin{definition}[Global Identification]
+        $\theta_0 \in \Theta$ is \textbf{globally identified} if for all $\theta \in \Theta$:
+        \[
+        \mathbb{D}(\mathbf{Y}^T \mid \theta) = \mathbb{D}(\mathbf{Y}^T \mid \theta_0) \implies \theta = \theta_0
+        \]
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \begin{definition}[Local Identification]
+        $\theta_0 \in \Theta$ is \textbf{locally identified} if there exists a neighborhood $U_{\theta_0}$ such that for all $\theta \in U_{\theta_0}$:
+        \[
+        \mathbb{D}(\mathbf{Y}^T \mid \theta) = \mathbb{D}(\mathbf{Y}^T \mid \theta_0) \implies \theta = \theta_0
+        \]
+    \end{definition}
+    
+    \vspace{0.3em}
+    
+    \textbf{Intuition}: Global $\Rightarrow$ unique in entire space; Local $\Rightarrow$ unique in a neighborhood.
+    
+    \vspace{0.2em}
+    
+    \hfill \hyperlink{slide:info_matrix}{\beamerbutton{How to check? $\rightarrow$ Appendix}}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Linear Gaussian Models: Why They Matter for Time Series}
+    For \textbf{linear Gaussian models}: $\mathbf{Y}^T \sim \mathcal{N}(\mu(\theta), \Sigma(\theta))$
+    
+    \vspace{0.5em}
+    
+    The mean and variance \textbf{fully characterize} the distribution.
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Connection to Time Series}
+        \textbf{Most time series models we study are linear Gaussian!}
+        \begin{itemize}
+            \item AR, MA, ARMA processes with Gaussian innovations
+            \item VARs and linearized DSGE models
+            \item Wold decomposition assumes covariance stationarity
+        \end{itemize}
+        
+        \vspace{0.3em}
+        
+        $\Rightarrow$ \textbf{Second-moment properties} (autocovariances) become the key object for identification!
+    \end{block}
+    
+    \vspace{0.3em}
+    
+    \textbf{Implication}: If two parameter values yield the same autocovariance structure, they are \textbf{observationally equivalent}.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Observational Equivalence}
+    \begin{definition}[Observational Equivalence]
+        Two models $\mathcal{M}(\theta_1)$ and $\mathcal{M}(\theta_2)$ are \textbf{observationally equivalent} if:
+        \[
+        \mathbb{D}(\mathbf{Y}^T \mid \theta_1) = \mathbb{D}(\mathbf{Y}^T \mid \theta_2)
+        \]
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{In Time Series}: For covariance-stationary Gaussian processes, observational equivalence reduces to having the \textbf{same second-moment properties}.
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{The Identification Challenge}
+        Different structural models/parameters can generate \textbf{identical autocovariance functions}.
+        
+        \vspace{0.3em}
+        
+        $\Rightarrow$ Data alone cannot distinguish between them!
+    \end{alertblock}
+    
+    \vspace{0.3em}
+    
+    \textbf{Next}: How do we formalize ``same second-moment properties''?
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The Autocovariance Generating Function (ACGF)}
+
+    \vspace{-0.5em}
+
+    \textbf{Tool for comparing second-moment properties}:
+    
+    \begin{definition}[ACGF]
+        For a covariance-stationary process with autocovariances $\Gamma(j)$:
+        \[
+        \Omega(z) = \sum_{j=-\infty}^{\infty} \Gamma(j) z^j
+        \]
+    \end{definition}
+    
+    % \vspace{0.5em}
+    
+    % The ACGF is a z-transform that converts the infinite sequence of autocovariances into a single analytic function.
+    
+    % \vspace{0.5em}
+    
+    \begin{block}{Key Insight: The Identification Challenge in Macroeconometrics}
+        \textbf{Two time series models are observationally equivalent} if and only if they have the \textbf{same ACGF}:
+        \[
+        \Omega(z;\theta_1) = \Omega(z;\theta_2) \quad \forall z
+        \]
+        
+        This is the root of why structural interpretation requires \textbf{additional identifying assumptions}!
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Preview: Types of Indeterminacy}
+    Observational equivalence can lead to \textbf{indeterminacy} --- multiple structural interpretations consistent with the same data.
+    
+    \vspace{0.5em}
+    
+    \textbf{Three main sources} (covered in detail in the VAR section):
+    \begin{enumerate}
+        \item \textbf{Static Indeterminacy}: Orthogonal rotations of shocks
+        \item \textbf{Dynamic Indeterminacy}: Non-fundamental representations
+        \item \textbf{Size Indeterminacy}: More shocks than observables
+    \end{enumerate}
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Example: MA(1) ``Root Flipping''}
+        Consider $y_t = u_t + \theta u_{t-1}$ with $|\theta| < 1$.
+        
+        The process with $\theta^* = 1/\theta$ and rescaled variance has \textbf{identical autocovariances}!
+        
+        \vspace{0.2em}
+        
+        Both: $\rho_1 = \frac{\theta}{1+\theta^2}$ (same for $\theta$ and $1/\theta$)
+    \end{block}
+    
+    \vspace{0.3em}
+    
+    \textit{We'll develop identification strategies when we cover Structural VARs.}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Causality in Time Series}
+    Following Wolf (2022), we define causality for VARMA processes:
+    
+    \begin{definition}[Causal Process]
+        A VARMA process $\{y_t\}$ is said to be \textbf{causal} with respect to $\{z_t\}$ if:
+        \[
+        y_t \in \Span(z_\tau, -\infty < \tau \leq t)
+        \]
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Interpretation}: The current value $y_t$ can be expressed as a function of \textbf{current and past} values of $z_t$ only --- no future values needed.
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Sufficient Condition}
+        For VMA: $y_t = \Theta(L)z_t$, causality holds if $\Theta(L)$ is a \textbf{one-sided} polynomial in the lag operator (only non-negative powers of $L$).
+        
+        \vspace{0.2em}
+        
+        This gives the VMA($\infty$) representation we use throughout.
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Invertibility in Time Series}
+    \begin{definition}[Invertibility]
+        A VARMA process $\{y_t\}$ is \textbf{invertible} with respect to $\{z_t\}$ if:
+        \[
+        z_t \in \Span(y_\tau, -\infty < \tau \leq t)
+        \]
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Interpretation}: We can recover the innovations $z_t$ from \textbf{current and past observables} $y_t$.
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Sufficient Condition}
+        For VMA: $y_t = \Theta(L)z_t$, invertibility holds if $\Theta(L)$ has a \textbf{one-sided inverse}, giving a VAR($\infty$) representation:
+        \[
+        \Theta(L)^{-1}y_t = z_t
+        \]
+    \end{block}
+    
+    \vspace{0.3em}
+    
+    \begin{alertblock}{Warning (Wolf, 2022)}
+        Invertibility is \textbf{far from guaranteed} in structural models!
+        
+        E.g., if we have 5 shocks but only 2 observables $\Rightarrow$ cannot possibly be invertible.
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Why Invertibility Matters}
+    \textbf{For estimation and structural analysis}:
+    
+    \vspace{0.5em}
+    
+    If the process is invertible:
+    \begin{itemize}
+        \item Innovations $z_t$ can be recovered from data
+        \item We can estimate VAR and back out the shocks
+        \item IRFs and variance decompositions become meaningful
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{If NOT invertible}:
+    \begin{itemize}
+        \item VAR residuals are \textbf{not} the structural shocks
+        \item Standard SVAR methods may give misleading results
+        \item Need alternative identification strategies
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Necessary Condition}
+        For invertibility: $n_{\text{shocks}} \leq n_{\text{observables}}$
+        
+        But this is \textbf{not sufficient}! (Forward-looking behavior can break invertibility)
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Part I: Summary}
+    \begin{center}
+    \small
+    \begin{tabular}{p{3.8cm}p{8.5cm}}
+        \toprule
+        \textbf{Concept} & \textbf{Key Point} \\
+        \midrule
+        Global Identification & Unique $\theta$ in entire parameter space \\[0.4em]
+        Local Identification & Unique in neighborhood \\[0.4em]
+        Linear Gaussian & Second moments fully characterize distribution \\[0.4em]
+        Observational Equiv. & Same ACGF $\Rightarrow$ indistinguishable \\[0.4em]
+        Causality & $y_t$ depends only on current/past $z$'s \\[0.4em]
+        Invertibility & $z_t$ recoverable from current/past $y$'s \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    
+    \vspace{0.5em}
+    
+    \textbf{Key Insight}: In linear Gaussian time series, identification hinges on second-moment properties. Observational equivalence $\Rightarrow$ \textbf{indeterminacy}, which requires additional assumptions to resolve (covered in VAR section).
+\end{frame}
+
+% ============================================================================
+% PART II: REDUCED-FORM MODELS
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part II: Reduced-Form Models}}\\[1em]
+        {\large AR, MA, and ARMA Processes}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The AR($p$) Process: Definition}
+    \begin{definition}[Autoregressive Process of Order $p$]
+        A stochastic process $\{Y_t\}$ is AR($p$) if:
+        \[
+        Y_t = \E[Y_t \mid \F_{t-1}] + u_t = \phi_0 + \phi_1 y_{t-1} + \cdots + \phi_p y_{t-p} + u_t
+        \]
+        Equivalently: $\Phi_p(L)y_t = \phi_0 + u_t$, where:
+        \[
+        \Phi_p(L) = 1 - \phi_1 L - \phi_2 L^2 - \cdots - \phi_p L^p
+        \]
+        and $u_t$ is white noise: $\E[u_t \mid \F_{t-1}] = 0$, $\E[u_t^2 \mid \F_{t-1}] = \sigma^2$.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Interpretation}: Current value = conditional expectation given past + innovation.
+    
+    \vspace{0.3em}
+    
+    \textbf{Note}: AR processes are \textbf{always invertible} (by construction, $u_t = y_t - \E[y_t \mid \F_{t-1}]$).
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The Companion Form}
+    \textbf{Idea}: Cast AR($p$) as a VAR(1) by stacking variables.
+    
+    \begin{definition}[Companion Form]
+        \[
+        \underbrace{\begin{bmatrix} Y_t \\ Y_{t-1} \\ \vdots \\ Y_{t-p+1} \end{bmatrix}}_{\mathbf{X}_t} = 
+        \begin{bmatrix} \phi_0 \\ 0 \\ \vdots \\ 0 \end{bmatrix} +
+        \underbrace{\begin{bmatrix} \phi_1 & \phi_2 & \cdots & \phi_p \\ 1 & 0 & \cdots & 0 \\ \vdots & \ddots & & \vdots \\ 0 & \cdots & 1 & 0 \end{bmatrix}}_{F}
+        \underbrace{\begin{bmatrix} Y_{t-1} \\ Y_{t-2} \\ \vdots \\ Y_{t-p} \end{bmatrix}}_{\mathbf{X}_{t-1}} +
+        \begin{bmatrix} u_t \\ 0 \\ \vdots \\ 0 \end{bmatrix}
+        \]
+    \end{definition}
+    
+    Compactly: $\mathbf{X}_t = c + F\mathbf{X}_{t-1} + v_t$
+    
+    \vspace{0.5em}
+    
+    \textbf{Why useful?}
+    \begin{itemize}
+        \item $\{\mathbf{X}_t\}$ is Markovian even though $\{Y_t\}$ is not
+        \item Stationarity analysis reduces to eigenvalue analysis of $F$
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{AR($p$): Stationarity Conditions}
+    \begin{theorem}[Asymptotic Stationarity of AR($p$)]
+        An AR($p$) process is \textbf{asymptotically stationary} if the eigenvalues of the companion matrix $F$ are all \textbf{inside the unit circle}.
+    \end{theorem}
+    
+    \vspace{0.3em}
+    
+    \begin{proof}[Sketch]
+        Iterating backward: $\mathbf{X}_t = F^t \mathbf{X}_0 + \sum_{i=0}^{t-1} F^i v_{t-i}$. For this not to explode, need $F^t \to 0$, which requires $|\lambda_i| < 1$ for all eigenvalues.
+    \end{proof}
+    
+    \vspace{0.5em}
+    
+    \begin{corollary}[Characteristic Polynomial Version]
+        AR($p$) is stationary iff roots of $\Phi_p(z) = 1 - \phi_1 z - \cdots - \phi_p z^p = 0$ lie \textbf{outside the unit circle}.
+    \end{corollary}
+    
+    \textbf{Connection}: Eigenvalues of $F$ are reciprocals of polynomial roots.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{AR($p$): Moments (Yule-Walker Equations)}
+    For a weakly-stationary AR($p$) process:
+    
+    \vspace{0.5em}
+    
+    \textbf{Expected value}:
+    \[
+    \E[y_t] = \frac{\phi_0}{1 - \sum_{i=1}^p \phi_i}
+    \]
+    
+    % \vspace{0.3em}
+    
+    \textbf{Autocovariance} (Yule-Walker Equations):
+    \[
+    \gamma_k = \sum_{i=1}^p \phi_i \gamma_{k-i}, \quad k \geq 1
+    \]
+    
+    % \vspace{0.3em}
+    
+    \textbf{Variance}:
+    \[
+    \gamma_0 = \sigma^2 + \sum_{i=1}^p \phi_i \gamma_i
+    \]
+    
+    % \vspace{0.5em}
+    
+    \begin{block}{Key Pattern}
+        ACF \textbf{decays geometrically} --- signature of AR processes!
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{AR(1) Example: Monetary Policy and Inflation}
+    \textbf{Recall from Lecture 1}: The simple monetary transmission model:
+    \begin{align*}
+        y_t &= -\gamma(i_t - \E_t[\pi_{t+1}]) + u_{1t} \quad \text{(IS curve)} \\
+        \pi_t &= \lambda y_t + u_{2t} \quad \text{(Phillips curve)} \\
+        i_t &= \rho\pi_t + i^* \quad \text{(Taylor rule)}
+    \end{align*}
+    
+    \vspace{0.3em}
+    
+    \textbf{Reduced form for inflation}:
+    \[
+    \pi_t = \phi_0 + \phi_1 \pi_{t-1} + v_t
+    \]
+    where $\phi_1 = 1 + \lambda\gamma(\rho - 1)$ (function of structural parameters!)
+    
+    \vspace{0.3em}
+    
+    \textbf{Stability requires}: $|\phi_1| < 1$ $\Leftrightarrow$ \textbf{Taylor Principle}: $\rho > 1$
+    
+    \vspace{0.3em}
+    
+    \textit{Key insight}: The reduced-form AR coefficient encodes structural policy parameters!
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{AR(1) Inflation Example: Behavior by $\rho$}
+    \textbf{Cases} (with $\lambda = 0.5$, $\gamma = -0.5$):
+    
+    \vspace{0.5em}
+    
+    \begin{center}
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Taylor Rule $\rho$} & \textbf{Reduced-form $\phi_1$} & \textbf{Behavior} \\
+        \midrule
+        $\rho = 0$ & $\phi_1 > 1$ & Explosive inflation \\
+        $0 < \rho < 1$ & $\phi_1 > 1$ & Explosive inflation \\
+        $\rho = 1$ & $\phi_1 = 1$ & Random walk \\
+        $1 < \rho < 5$ & $0 < \phi_1 < 1$ & Stationary, persistent \\
+        $5 < \rho < 9$ & $-1 < \phi_1 < 0$ & Stationary, oscillating \\
+        $\rho > 9$ & $\phi_1 < -1$ & Explosive (over-reaction) \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    
+    \vspace{0.5em}
+    
+    \textbf{ACF}: $\rho_k = \phi_1^k$ --- geometric decay toward zero.
+    
+    \vspace{0.3em}
+    
+    See figures in Appendix \hyperlink{slide:ar1_figures}{\beamerbutton{$\rightarrow$ Figures}}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The MA($q$) Process: Definition}
+    \begin{definition}[Moving Average Process of Order $q$]
+        A process $\{y_t\}$ is MA($q$) if:
+        \[
+        y_t = \theta_0 + u_t + \theta_1 u_{t-1} + \cdots + \theta_q u_{t-q} = \theta_0 + \theta_q(L) u_t
+        \]
+        where $\theta_q(L) = 1 + \theta_1 L + \cdots + \theta_q L^q$ and $u_t \sim WN(0, \sigma^2)$.
+    \end{definition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Key difference from AR}: Current value is a weighted sum of current and \textbf{past innovations} (not past values of $y$).
+    
+    \vspace{0.5em}
+    
+    \begin{proposition}
+        All finite-order MA($q$) processes are \textbf{covariance-stationary} and \textbf{mean-ergodic}.
+    \end{proposition}
+    
+    \textbf{Intuition}: Finite sum of stationary (white noise) terms is always stationary.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{MA($q$): Moments}
+    \textbf{Expected value}: $\E[y_t] = \theta_0$
+    
+    \vspace{0.3em}
+    
+    \textbf{Variance}:
+    \[
+    \gamma_0 = \sigma^2\left(1 + \sum_{j=1}^q \theta_j^2\right)
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Autocovariance}:
+    \[
+    \gamma_k = \begin{cases}
+        \left(\theta_k + \sum_{j=1}^{q-k} \theta_j \theta_{j+k}\right)\sigma^2 & \text{if } k \leq q \\
+        0 & \text{if } k > q
+    \end{cases}
+    \]
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Key Pattern}
+        ACF \textbf{cuts off} after lag $q$ --- signature of MA processes!
+        
+        (Contrast with AR: geometric decay)
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{MA($q$): Invertibility}
+    \begin{definition}[Invertibility]
+        An MA($q$) process is \textbf{invertible} if $u_t$ lies in the space spanned by current and past observables: $u_t \in \Span(y_\tau, -\infty < \tau \leq t)$.
+    \end{definition}
+    
+    \vspace{0.3em}
+    
+    Equivalently, MA($q$) can be written as AR($\infty$):
+    \[
+    u_t = \theta_q(L)^{-1}(y_t - \theta_0) = \sum_{j=0}^{\infty} \psi_j(y_{t-j} - \theta_0)
+    \]
+    
+    \vspace{0.5em}
+    
+    \begin{theorem}[Invertibility Condition]
+        MA($q$) is invertible iff roots of $\theta_q(z) = 1 + \theta_1 z + \cdots + \theta_q z^q = 0$ lie \textbf{outside the unit circle}.
+    \end{theorem}
+    
+    \vspace{0.3em}
+    
+    \textbf{Practical importance}: Invertibility allows expressing $u_t$ as function of observables --- essential for estimation!
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{MA(1): Observational Equivalence Example}
+    \textbf{Key fact}: For any MA process, there exists a family of observationally equivalent alternatives with the same mean and autocovariances.
+    
+    \vspace{0.5em}
+    
+    \textbf{Example}: MA(1) with $y_t = u_t + \theta u_{t-1}$, $u_t \sim (0,\sigma^2)$.
+    
+    \vspace{0.3em}
+    
+    \textbf{Autocorrelation at lag 1}:
+    \[
+    \rho_1 = \frac{\theta}{1+\theta^2}
+    \]
+    
+    \textbf{Observation}: Both $\theta$ and $1/\theta$ give the \textbf{same} $\rho_1$!
+    
+    \vspace{0.3em}
+    
+    The \textbf{invertible} representation ($|\theta| < 1$) is obs. equivalent to a \textbf{non-invertible} one:
+    \begin{itemize}
+        \item Original: $\theta$, $\sigma^2$
+        \item Alternative: $\theta^* = 1/\theta$, $\sigma^{*2} = \theta^2 \sigma^2$
+    \end{itemize}
+    
+    \vspace{0.3em}
+    
+    \begin{alertblock}{Resolution}
+        We \textbf{cannot test} statistically whether a process is invertible!
+        
+        We impose invertibility as an \textit{a priori} identifying assumption.
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{MA Observational Equivalence: ACGF Perspective}
+    \textbf{Tool}: The Autocovariance Generating Function.
+    
+    \begin{proposition}
+        For MA($q$): $y_t - \theta_0 = \theta_q(L)\varepsilon_t$, the ACGF is:
+        \[
+        \Gamma_Y(z) = \theta_q(z)\theta_q(z^{-1})\sigma^2_\varepsilon
+        \]
+    \end{proposition}
+    
+    \vspace{0.5em}
+    
+    \textbf{Two MA processes are observationally equivalent} if they have:
+    \begin{enumerate}
+        \item Same mean: $\theta_0^X = \theta_0^Y$
+        \item Same ACGF: $\Gamma_X(z) = \Gamma_Y(z)$
+    \end{enumerate}
+    
+    \vspace{0.5em}
+    
+    \textbf{For MA(1)}: Matching $\Gamma(z) = (1+\theta z)(1+\theta z^{-1})\sigma^2$ allows the ``flip'':
+    \[
+    \theta \leftrightarrow 1/\theta, \quad \sigma^2 \leftrightarrow \theta^2\sigma^2
+    \]
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The ARMA($p,q$) Process}
+
+    \vspace{-1em}
+
+    \begin{definition}[ARMA Process]
+        A process $\{Y_t\}$ is ARMA($p,q$) if:
+        \[
+        Y_t = \phi_0 + \sum_{i=1}^p \phi_i Y_{t-i} + u_t + \sum_{j=1}^q \theta_j u_{t-j}
+        \]
+        Or: $\Phi_p(L)Y_t = \phi_0 + \Theta_q(L)u_t$
+    \end{definition}
+    
+    % \vspace{0.5em}
+    
+    \begin{proposition}[Stationarity and Invertibility]
+        \begin{itemize}
+            \item \textbf{Stationarity}: Roots of $\Phi_p(z) = 0$ outside unit circle (AR part)
+            \item \textbf{Invertibility}: Roots of $\Theta_q(z) = 0$ outside unit circle (MA part)
+        \end{itemize}
+    \end{proposition}
+    
+    % \vspace{0.3em}
+    
+    \textbf{ACGF}:
+    \[
+    \Gamma(z) = \frac{\Theta_q(z)\Theta_q(z^{-1})}{\Phi_p(z)\Phi_p(z^{-1})}\sigma^2_\varepsilon
+    \]
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{ARMA: Common Factor Problem}
+    \textbf{Identification issue}: If AR and MA polynomials share a common root, the model is \textbf{not identified}.
+    
+    \vspace{0.5em}
+    
+    \textbf{Example}: ARMA(1,1) with $(1-\phi L)y_t = (1+\theta L)u_t$
+    
+    If $\phi = -\theta$ (common factor):
+    \[
+    (1-\phi L)y_t = (1-\phi L)u_t \implies y_t = u_t
+    \]
+    
+    The ARMA(1,1) is \textbf{observationally equivalent to white noise}!
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Solution}
+        For a \textbf{canonical} (identified) ARMA representation, require:
+        
+        $\Phi_p(z)$ and $\Theta_q(z)$ have \textbf{no common roots}.
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{ARMA: Equivalent Representations}
+    A stationary and invertible ARMA($p,q$) admits:
+    
+    \vspace{0.5em}
+    
+    \textbf{1. MA($\infty$) Representation}:
+    \[
+    y_t = \mu + \psi(L)u_t = \mu + \sum_{j=0}^{\infty} \psi_j u_{t-j}
+    \]
+    where $\psi(L) = \Phi_p(L)^{-1}\Theta_q(L)$
+    
+    \vspace{0.5em}
+    
+    \textbf{2. AR($\infty$) Representation}:
+    \[
+    \pi(L)(y_t - \mu) = u_t
+    \]
+    where $\pi(L) = \Theta_q(L)^{-1}\Phi_p(L)$
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Key Insight}
+        ARMA provides a \textbf{parsimonious parametric approximation} to MA($\infty$)/AR($\infty$) --- crucial for Wold decomposition!
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Summary: AR vs MA vs ARMA}
+    \begin{center}
+    \small
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Property} & \textbf{AR($p$)} & \textbf{MA($q$)} & \textbf{ARMA($p,q$)} \\
+        \midrule
+        Stationarity & Roots of $\Phi(z)$ & Always & Roots of $\Phi(z)$ \\
+         & outside UC & stationary & outside UC \\[0.5em]
+        Invertibility & Always & Roots of $\Theta(z)$ & Roots of $\Theta(z)$ \\
+         & invertible & outside UC & outside UC \\[0.5em]
+        ACF pattern & Geometric & Cuts off & Geometric \\
+         & decay & after lag $q$ & decay \\[0.5em]
+        PACF pattern & Cuts off & Geometric & Geometric \\
+         & after lag $p$ & decay & decay \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    
+    \vspace{0.3em}
+    
+    \textbf{UC} = Unit Circle; \textbf{PACF} = Partial Autocorrelation Function
+\end{frame}
+
+% ============================================================================
+% PART III: WOLD DECOMPOSITION
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part III: Wold's Decomposition Theorem}}\\[1em]
+        {\large The Fundamental Representation of Stationary Processes}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Wold's Representation Theorem}
+    \begin{theorem}[Wold, 1938]
+        Let $\{y_t\}$ be an $n$-dimensional \textbf{covariance-stationary} time series. There exists an $n \times n$ lag polynomial $\Psi(L)$ and $u_t \sim WN(0, \Sigma)$ such that:
+        \[
+        y_t = \Psi(L) u_t + d_t, \quad \Psi(L) = I + \sum_{\ell=1}^{\infty} \Psi_\ell L^\ell
+        \]
+        where:
+        \begin{enumerate}
+            \item $\Psi(L)$ is \textbf{square-summable}
+            \item $u_t = y_t - \E^*[y_t \mid \{y_\tau\}_{-\infty < \tau \leq t-1}]$ (one-step-ahead forecast errors)
+            \item $\{y_t\}$ is \textbf{invertible} with respect to $u_t$
+            \item $\{d_t\}$ is a \textbf{purely deterministic} process
+        \end{enumerate}
+    \end{theorem}
+    
+    \vspace{0.3em}
+    
+    \textbf{In words}: Any covariance-stationary time series = VMA($\infty$) + deterministic
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Why Wold Matters: The Key Insight}
+    % \textbf{From Wolf (2022)}:
+    
+    % \vspace{0.5em}
+    
+    The Wold decomposition does something \textbf{very simple}: it splits a process $\{y_t\}$ into:
+    \begin{enumerate}
+        \item \textbf{One-step-ahead prediction errors} $u_t$
+        \item \textbf{A perfectly predictable residual} $d_t$
+    \end{enumerate}
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Three Equivalent Representations}
+        For second-order properties, we can \textbf{freely map} between:
+        \begin{enumerate}
+            \item \textbf{Autocovariance function}: $\{\Gamma_k\}_{k=0}^{\infty}$
+            \item \textbf{Spectral density}: $s_y(\omega)$
+            \item \textbf{Wold decomposition}: $\{\Psi_j, \Sigma\}$
+        \end{enumerate}
+        
+        \vspace{0.2em}
+        
+        \textbf{Mapping}: $\Psi_\ell = \Cov(y_t, u_{t-\ell})\Sigma^{-1}$
+    \end{block}
+    
+    \vspace{0.3em}
+    
+    \textbf{Key}: The Wold decomposition is \textbf{identifiable from data}!
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Wold: Practical Implications}
+    \textbf{Problem}: MA($\infty$) has infinitely many parameters --- cannot estimate!
+    
+    \vspace{0.5em}
+    
+    \textbf{Solution}: ARMA($p,q$) provides a parsimonious approximation:
+    \[
+    \Phi_p(L)y_t = \Theta_q(L)u_t \quad \Leftrightarrow \quad y_t = \frac{\Theta_q(L)}{\Phi_p(L)}u_t
+    \]
+    
+    The ratio $\psi(L) = \Theta_q(L)/\Phi_p(L)$ approximates the Wold coefficients $\{\Psi_i\}$.
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Why This Matters}
+        \begin{itemize}
+            \item We can \textbf{estimate} finite-parameter ARMA/VAR models
+            \item These approximate the infinite-parameter Wold representation
+            \item From VAR, we can also get VAR($\infty$) representation: $A(L)y_t = u_t$
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Wold vs. Structural: A Critical Warning}
+    \begin{alertblock}{Wold Innovations $\neq$ Structural Shocks!}
+        The Wold coefficients $\{\Psi_j\}$ are \textbf{reduced-form} objects.
+        
+        \textbf{Nothing guarantees they are interesting} --- they are just coefficients on reduced-form prediction errors!
+    \end{alertblock}
+    
+    % \vspace{0.5em}
+    
+    \textbf{Structural VMA} (what we want):
+    \[
+    y_t = \sum_{\ell=0}^{\infty} \Theta_\ell \varepsilon_{t-\ell}, \quad \varepsilon_t = \text{structural shocks}
+    \]
+    
+    \textbf{Wold representation} (what we estimate):
+    \[
+    y_t = \sum_{j=0}^{\infty} \Psi_j u_{t-j}, \quad u_t = \text{prediction errors}
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{The gap}: Identifying $\Theta_\ell$ from $\Psi_j$ requires \textbf{additional assumptions}!
+    
+    $\Rightarrow$ This is the \textbf{identification problem} we'll address in Structural VARs.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Summary}
+    \textbf{Identification}:
+    \begin{itemize}
+        \item Global vs. local: uniqueness in entire space vs. neighborhood
+        \item Linear Gaussian $\Rightarrow$ second moments matter
+        \item Observational equivalence: same ACGF $\Rightarrow$ indistinguishable
+        \item Causality: $y_t$ from current/past $z$'s; Invertibility: $z_t$ from $y$'s
+    \end{itemize}
+    
+    \vspace{0.3em}
+    
+    \textbf{Reduced-Form Models}:
+    \begin{itemize}
+        \item AR($p$): Stationary if roots outside UC; ACF decays geometrically
+        \item MA($q$): Always stationary; invertible if roots outside UC; ACF cuts off
+        \item ARMA: Combines both; common factor $\Rightarrow$ non-identification
+    \end{itemize}
+    
+    \vspace{0.3em}
+    
+    \textbf{Wold's Theorem}:
+    \begin{itemize}
+        \item Any stationary process = VMA($\infty$) + deterministic
+        \item Wold innovations = prediction errors (\textbf{not} structural shocks!)
+        \item Reduced-form, identifiable; structural interpretation needs more
+    \end{itemize}
+\end{frame}
+
+% ============================================================================
+% PART IV: EXERCISES
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Part IV: Exercises}}\\[1em]
+        % {\large Hour 2}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+% TIM'S EXERCISES
+% ----------------------------------------------------------------------------
+\begin{frame}{Tim's Practice Problems: Exercise 2}
+    \begin{block}{Problem Statement}
+        \textit{[Exercise 2 from practice\_problems\_week2.pdf]}
+        
+        \vspace{0.5em}
+        
+        % PLACEHOLDER: Insert the actual problem statement here
+        Problem to be inserted from the problem set.
+    \end{block}
+    
+    \vspace{1em}
+    
+    \textbf{Solution Approach}:
+    \begin{enumerate}
+        \item Step 1: [To be completed]
+        \item Step 2: [To be completed]
+        \item Step 3: [To be completed]
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Exercise 2: Solution}
+    \textbf{Detailed Solution}:
+    
+    \vspace{1em}
+    
+    % PLACEHOLDER: Insert detailed solution here
+    [Solution steps to be added once problem statement is available]
+    
+    \vspace{1em}
+    
+    \begin{block}{Key Takeaway}
+        [Main insight from this exercise]
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Tim's Practice Problems: Exercise 3}
+    \begin{block}{Problem Statement}
+        \textit{[Exercise 3 from practice\_problems\_week2.pdf]}
+        
+        \vspace{0.5em}
+        
+        % PLACEHOLDER: Insert the actual problem statement here
+        Problem to be inserted from the problem set.
+    \end{block}
+    
+    \vspace{1em}
+    
+    \textbf{Solution Approach}:
+    \begin{enumerate}
+        \item Step 1: [To be completed]
+        \item Step 2: [To be completed]
+        \item Step 3: [To be completed]
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Exercise 3: Solution}
+    \textbf{Detailed Solution}:
+    
+    \vspace{1em}
+    
+    % PLACEHOLDER: Insert detailed solution here
+    [Solution steps to be added once problem statement is available]
+    
+    \vspace{1em}
+    
+    \begin{block}{Key Takeaway}
+        [Main insight from this exercise]
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+% MEDEIROS EXERCISES - ARMA
+% ----------------------------------------------------------------------------
+\begin{frame}{Medeiros ARMA: Exercise 1 --- Statement}
+    \begin{block}{Problem}
+        Let $y_t$, $t = 1, \ldots, T$, be a time series described by an MA(1) process:
+        \[
+        y_t = \mu + \varepsilon_t + \theta \varepsilon_{t-1}, \quad \varepsilon_t \sim \text{IID}(0, \sigma_\varepsilon^2)
+        \]
+        Suppose that $y_t$ is observed with \textbf{additive measurement noise}, i.e., $x_t = y_t + u_t$, where $u_t \sim \text{IID}(0, \sigma_u^2)$ and $\E(\varepsilon_t u_s) = 0$ for all $t, s$.
+    \end{block}
+    
+    \vspace{0.5em}
+    
+    \textbf{Compute}:
+    \begin{enumerate}[(a)]
+        \item The mean and variance of $x_t$.
+        \item The autocovariances of $x_t$.
+        \item Which ARMA$(p, q)$ process best describes $x_t$?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 1 --- Solution (a)}
+    \textbf{(a) Mean and Variance of $x_t$}:
+    
+    \vspace{0.5em}
+    
+    Since $x_t = y_t + u_t = \mu + \varepsilon_t + \theta \varepsilon_{t-1} + u_t$:
+    
+    \vspace{0.3em}
+    
+    \textbf{Mean}:
+    \[
+    \E(x_t) = \E(\mu + \varepsilon_t + \theta \varepsilon_{t-1} + u_t) = \mu
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Variance}: Since $\varepsilon_t$, $\varepsilon_{t-1}$, and $u_t$ are mutually uncorrelated:
+    \begin{align*}
+    \gamma_0 &= \Var(x_t) = \Var(\varepsilon_t) + \theta^2 \Var(\varepsilon_{t-1}) + \Var(u_t) \\
+    &= \sigma_\varepsilon^2 + \theta^2 \sigma_\varepsilon^2 + \sigma_u^2 = \boxed{(1 + \theta^2)\sigma_\varepsilon^2 + \sigma_u^2}
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 1 --- Solution (b)}
+    \textbf{(b) Autocovariances of $x_t$}:
+    
+    \vspace{0.5em}
+    
+    For $k \geq 1$:
+    \[
+    \gamma_k = \Cov(x_t, x_{t-k}) = \Cov(\varepsilon_t + \theta\varepsilon_{t-1} + u_t, \varepsilon_{t-k} + \theta\varepsilon_{t-k-1} + u_{t-k})
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{For $k = 1$}: The only surviving term is $\Cov(\theta\varepsilon_{t-1}, \varepsilon_{t-1})$:
+    \[
+    \gamma_1 = \theta \cdot \sigma_\varepsilon^2 = \boxed{\theta \sigma_\varepsilon^2}
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{For $k \geq 2$}: There are no overlapping terms:
+    \[
+    \gamma_k = \boxed{0}, \quad k \geq 2
+    \]
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Result}
+        The autocovariance structure is: $\gamma_0 = (1+\theta^2)\sigma_\varepsilon^2 + \sigma_u^2$, $\gamma_1 = \theta\sigma_\varepsilon^2$, $\gamma_k = 0$ for $k \geq 2$.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 1 --- Solution (c)}
+    \textbf{(c) Which ARMA$(p,q)$ describes $x_t$?}
+    
+    \vspace{0.5em}
+    
+    The autocovariance ``cuts off'' after lag 1 $\Rightarrow$ \textbf{MA(1)} behavior!
+    
+    \vspace{0.3em}
+    
+    Therefore, $x_t$ can be written as:
+    \[
+    x_t = \mu + \eta_t + \tilde{\theta} \eta_{t-1}, \quad \eta_t \sim \text{WN}(0, \sigma_\eta^2)
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Matching parameters}: We need:
+    \[
+    \gamma_0^{\text{MA}(1)} = (1 + \tilde{\theta}^2)\sigma_\eta^2 = (1+\theta^2)\sigma_\varepsilon^2 + \sigma_u^2
+    \]
+    \[
+    \gamma_1^{\text{MA}(1)} = \tilde{\theta}\sigma_\eta^2 = \theta\sigma_\varepsilon^2
+    \]
+    
+    \vspace{0.3em}
+    
+    \begin{alertblock}{Conclusion}
+        $x_t$ is an \textbf{MA(1)} process, but with parameters different from the original MA(1)! Measurement noise ``hides'' the true structural parameters $(\theta, \sigma_\varepsilon^2)$.
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Medeiros ARMA: Exercise 2 --- Statement}
+    \begin{block}{Problem}
+        Let $\{y_t\}$ and $\{z_t\}$, $t = 1, \ldots, T$, be two stochastic processes:
+        \[
+        y_t = \phi_1 y_{t-1} + \varepsilon_t, \quad z_t = \phi_2 z_{t-1} + u_t
+        \]
+        where $\varepsilon_t \sim \text{IID}(0, \sigma_\varepsilon^2)$, $u_t \sim \text{IID}(0, \sigma_u^2)$, and $\E(\varepsilon_t u_s) = 0$ for all $t, s$.
+    \end{block}
+    
+    \vspace{0.5em}
+    
+    \textbf{Show that}:
+    \begin{enumerate}[(a)]
+        \item If $\phi_1 = \phi_2$, then $x_t = y_t + z_t$ is an AR(1) process.
+        \item If $\phi_1 \neq \phi_2$, then $x_t = y_t + z_t$ is an ARMA$(2, q)$ process with $q \leq 1$.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 2 --- Solution (a)}
+    \textbf{(a) Case $\phi_1 = \phi_2 = \phi$}:
+    
+    \vspace{0.5em}
+    
+    Adding the two equations:
+    \begin{align*}
+    y_t + z_t &= \phi(y_{t-1} + z_{t-1}) + \varepsilon_t + u_t \\
+    x_t &= \phi x_{t-1} + w_t
+    \end{align*}
+    
+    where $w_t = \varepsilon_t + u_t$.
+    
+    \vspace{0.5em}
+    
+    \textbf{Checking that $w_t$ is white noise}:
+    \begin{itemize}
+        \item $\E(w_t) = 0$
+        \item $\Var(w_t) = \sigma_\varepsilon^2 + \sigma_u^2$
+        \item $\Cov(w_t, w_{t-k}) = 0$ for $k \neq 0$ (since $\varepsilon$ and $u$ are serially independent and mutually uncorrelated)
+    \end{itemize}
+    
+    \vspace{0.3em}
+    
+    \begin{block}{Conclusion}
+        $x_t$ is an \textbf{AR(1)} process with parameter $\phi$ and innovation $w_t \sim \text{WN}(0, \sigma_\varepsilon^2 + \sigma_u^2)$.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 2 --- Solution (b) Part 1}
+    \textbf{(b) Case $\phi_1 \neq \phi_2$}:
+    
+    \vspace{0.3em}
+    
+    \textbf{Strategy}: Write in lag-operator notation and combine.
+    
+    \vspace{0.3em}
+    
+    The individual processes are:
+    \[
+    (1 - \phi_1 L)y_t = \varepsilon_t, \quad (1 - \phi_2 L)z_t = u_t
+    \]
+    
+    To eliminate $y_t$ and $z_t$ separately, apply cross-filters:
+    \begin{align*}
+    (1 - \phi_2 L)(1 - \phi_1 L)y_t &= (1 - \phi_2 L)\varepsilon_t \\
+    (1 - \phi_1 L)(1 - \phi_2 L)z_t &= (1 - \phi_1 L)u_t
+    \end{align*}
+    
+    \vspace{0.3em}
+    
+    Summing:
+    \[
+    (1 - \phi_1 L)(1 - \phi_2 L)(y_t + z_t) = (1 - \phi_2 L)\varepsilon_t + (1 - \phi_1 L)u_t
+    \]
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 2 --- Solution (b) Part 2}
+    \textbf{Expanding}:
+    \[
+    [1 - (\phi_1 + \phi_2)L + \phi_1\phi_2 L^2]x_t = \varepsilon_t - \phi_2\varepsilon_{t-1} + u_t - \phi_1 u_{t-1}
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Right-hand side}: Define $\eta_t = \varepsilon_t + u_t - \phi_2\varepsilon_{t-1} - \phi_1 u_{t-1}$.
+    
+    \vspace{0.3em}
+    
+    Is this an MA(1) process in general? Compute autocovariances of $\eta_t$:
+    \begin{itemize}
+        \item $\gamma_0^\eta = (1 + \phi_2^2)\sigma_\varepsilon^2 + (1 + \phi_1^2)\sigma_u^2$
+        \item $\gamma_1^\eta = -\phi_2 \sigma_\varepsilon^2 - \phi_1 \sigma_u^2$
+        \item $\gamma_k^\eta = 0$ for $k \geq 2$
+    \end{itemize}
+    
+    \vspace{0.3em}
+    
+    \begin{block}{Conclusion}
+        $x_t$ follows an \textbf{ARMA(2,1)} process with:
+        \begin{itemize}
+            \item AR part: $(1 - \phi_1 L)(1 - \phi_2 L)$ with roots $1/\phi_1$ and $1/\phi_2$
+            \item MA part: order $q \leq 1$ (it can be 0 if $\gamma_1^\eta = 0$)
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Medeiros ARMA: Exercise 3 --- Statement}
+    \begin{block}{Problem}
+        Consider two independent AR(1) processes $x_t$ and $y_t$ defined by:
+        \[
+        (1 - \rho_1 L)x_t = u_t, \; |\rho_1| < 1 \quad \text{and} \quad (1 - \rho_2 L)y_t = v_t, \; |\rho_2| < 1
+        \]
+        where $\E(u_t) = \E(v_t) = 0$, $\E(u_t v_\tau) = 0$ for all $t, \tau$,\\
+        $\E(u_t u_\tau) = \sigma_u^2$ if $t = \tau$ (0 otherwise), $\E(v_t v_\tau) = \sigma_v^2$ if $t = \tau$.
+        
+        \vspace{0.3em}
+        Let $z_t = x_t + y_t$.
+    \end{block}
+    
+    \vspace{0.3em}
+    
+    \textbf{Tasks}:
+    \begin{enumerate}[(a)]
+        \item Compute $\E(x_{t+1}|\mathcal{F}_t)$, $\E(y_{t+1}|\mathcal{F}_t)$, $\E(z_{t+1}|\mathcal{F}_t)$, and the forecast error variance $V_D$.
+        \item Show that $z_t$ is ARMA(2,1) and find $\theta$.
+        \item Conditions for $z_t$ to be AR(2)? Show that if $\rho_1, \rho_2$ have the same sign, then it cannot be AR(2).
+        \item Show that $\theta \neq \pm 1$.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (a)}
+    \textbf{(a) Conditional forecasts}:
+    
+    \vspace{0.3em}
+    
+    Since $x_t$ and $y_t$ are AR(1):
+    \[
+    \E(x_{t+1}|\mathcal{F}_t) = \rho_1 x_t, \quad \E(y_{t+1}|\mathcal{F}_t) = \rho_2 y_t
+    \]
+    
+    Para $z_t = x_t + y_t$:
+    \[
+    \E(z_{t+1}|\mathcal{F}_t) = \rho_1 x_t + \rho_2 y_t
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Forecast error} $e_{t+1} = z_{t+1} - \E(z_{t+1}|\mathcal{F}_t)$:
+    \[
+    e_{t+1} = (x_{t+1} + y_{t+1}) - (\rho_1 x_t + \rho_2 y_t) = u_{t+1} + v_{t+1}
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Error variance} $V_D$:
+    \[
+    V_D = \Var(e_{t+1}) = \Var(u_{t+1}) + \Var(v_{t+1}) = \boxed{\sigma_u^2 + \sigma_v^2}
+    \]
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (b) Part 1}
+    \textbf{(b) Showing that $z_t$ is ARMA(2,1)}:
+    
+    \vspace{0.3em}
+    
+    From Exercise 2, we know that when $\rho_1 \neq \rho_2$:
+    \[
+    [1 - (\rho_1 + \rho_2)L + \rho_1\rho_2 L^2]z_t = (1 + \theta L)\varepsilon_t
+    \]
+    
+    where $\varepsilon_t$ is white noise with variance $\sigma_\varepsilon^2$.
+    
+    \vspace{0.3em}
+    
+    \textbf{Identification via autocovariances}: For an MA(1), $\eta_t = (1+\theta L)\varepsilon_t$:
+    \[
+    \gamma_0^\eta = (1+\theta^2)\sigma_\varepsilon^2, \quad \gamma_1^\eta = \theta\sigma_\varepsilon^2
+    \]
+    
+    From the previous exercise, the right-hand side has:
+    \[
+    \gamma_0^\eta = (1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2
+    \]
+    \[
+    \gamma_1^\eta = -\rho_2\sigma_u^2 - \rho_1\sigma_v^2
+    \]
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (b) Part 2}
+    \textbf{Solving for $\theta$}:
+    
+    \vspace{0.3em}
+    
+    The lag-1 autocorrelation of an MA(1) is:
+    \[
+    \rho_1^{\text{MA}} = \frac{\gamma_1}{\gamma_0} = \frac{\theta}{1+\theta^2}
+    \]
+    
+    Equating:
+    \[
+    \frac{\theta}{1+\theta^2} = \frac{-\rho_2\sigma_u^2 - \rho_1\sigma_v^2}{(1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2}
+    \]
+    
+    \vspace{0.3em}
+    
+    This is a quadratic equation in $\theta$:
+    \[
+    \theta^2 \cdot (\text{numerador}) - \theta \cdot (\text{denominador}) + (\text{numerador}) = 0
+    \]
+    
+    \begin{alertblock}{Two roots!}
+        There are two solutions, $\theta$ and $1/\theta$, corresponding to observationally equivalent representations (invertible vs.\ non-invertible).
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (c)}
+    \textbf{(c) Conditions for $z_t$ to be AR(2)}:
+    
+    \vspace{0.3em}
+    
+    $z_t$ is AR(2) if the MA part disappears, i.e., $\theta = 0$, which requires $\gamma_1^\eta = 0$:
+    \[
+    -\rho_2\sigma_u^2 - \rho_1\sigma_v^2 = 0 \quad \Rightarrow \quad \boxed{\rho_1\sigma_v^2 = -\rho_2\sigma_u^2}
+    \]
+    
+    \vspace{0.5em}
+    
+    \textbf{If $\rho_1$ and $\rho_2$ have the same sign}:
+    
+    The left-hand side $\rho_1\sigma_v^2$ and the right-hand side $-\rho_2\sigma_u^2$ have opposite signs (since $\sigma_u^2, \sigma_v^2 > 0$).
+    
+    \vspace{0.3em}
+    
+    \begin{alertblock}{Impossibility}
+        If $\text{sgn}(\rho_1) = \text{sgn}(\rho_2)$, then the condition $\rho_1\sigma_v^2 = -\rho_2\sigma_u^2$ can \textbf{never} be satisfied.
+        
+        \vspace{0.2em}
+        
+        Therefore, $z_t$ \textbf{cannot be AR(2)} when $\rho_1$ and $\rho_2$ have the same sign.
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (d)}
+    \textbf{(d) Showing that $\theta \neq \pm 1$}:
+    
+    \vspace{0.5em}
+    
+    Suppose $\theta = 1$. Then $\rho_1^{\text{MA}} = \frac{1}{1+1} = \frac{1}{2}$.
+    
+    \vspace{0.3em}
+    
+    For this to occur, we would need:
+    \[
+    \frac{-\rho_2\sigma_u^2 - \rho_1\sigma_v^2}{(1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2} = \frac{1}{2}
+    \]
+    
+    \vspace{0.3em}
+    
+    Since $|\rho_1|, |\rho_2| < 1$, the denominator $(1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2 > 2\sigma_u^2 + 2\sigma_v^2$ (using $\rho^2 < 1$).
+    
+    The numerator has absolute value $|\rho_2\sigma_u^2 + \rho_1\sigma_v^2| < \sigma_u^2 + \sigma_v^2$.
+    
+    \vspace{0.3em}
+    
+    Therefore, the absolute value of the ratio is:
+    \[
+    \left|\rho_1^{\text{MA}}\right| < \frac{\sigma_u^2 + \sigma_v^2}{2(\sigma_u^2 + \sigma_v^2)} = \frac{1}{2}
+    \]
+    
+    \begin{block}{Conclusion}
+        Since $|\rho_1^{\text{MA}}| < 1/2$, and $\theta = \pm 1$ would imply $|\rho_1^{\text{MA}}| = 1/2$, we have $\boxed{\theta \neq \pm 1}$.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (e)}
+    \textbf{(e) Forecasting using the ARMA(2,1)}:
+    
+    \vspace{0.3em}
+    
+    Do modelo $[1 - (\rho_1+\rho_2)L + \rho_1\rho_2 L^2]z_t = (1+\theta L)\varepsilon_t$:
+    \[
+    z_t = (\rho_1+\rho_2)z_{t-1} - \rho_1\rho_2 z_{t-2} + \varepsilon_t + \theta\varepsilon_{t-1}
+    \]
+    
+    \textbf{Forecast}:
+    \[
+    \E(z_{T+1}|\mathcal{F}_T) = (\rho_1+\rho_2)z_T - \rho_1\rho_2 z_{T-1} + \theta\varepsilon_T
+    \]
+    
+    \textbf{Error}: $e_{T+1} = z_{T+1} - \E(z_{T+1}|\mathcal{F}_T) = \varepsilon_{T+1}$
+    
+    \textbf{Error variance} $V_A$:
+    \[
+    V_A = \Var(\varepsilon_{T+1}) = \sigma_\varepsilon^2
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Comparing $V_A - V_D$}: $V_A = \sigma_\varepsilon^2$ and $V_D = \sigma_u^2 + \sigma_v^2$.
+    
+    Since $(1+\theta^2)\sigma_\varepsilon^2 = (1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2$, and $\theta^2 < 1$, $\rho_i^2 < 1$, we have $V_A \approx V_D$ (depending on the specific parameter values).
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Medeiros ARMA: Exercise 6 --- Statement}
+    \begin{block}{Partial Adjustment Model}
+        The desired level $y_t^*$ is related to $x_t$ by: $y_t^* = \beta x_t$.
+        
+        $x_t$ is covariance-stationary. A fraction $\gamma$ of the disequilibrium is removed through partial adjustment:
+        \[
+        y_t - y_{t-1} = \gamma(y_t^* - y_{t-1}) + e_t, \quad e_t \sim N(0, \sigma_e^2), \; 0 < \gamma < 1
+        \]
+    \end{block}
+    
+    \textbf{Compare with the adaptive expectations model}:
+    \[
+    y_t = \beta x_{t+1}^e + v_t, \quad v_t \sim N(0, \sigma_v^2)
+    \]
+    \[
+    x_{t+1}^e - x_t^e = \lambda(x_t - x_t^e), \quad 0 < \lambda < 1
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Tasks}: (a) Compare the models. (b) Show that OLS of $y_t$ on $y_{t-1}$ and $x_t$ is consistent for the model (1)-(2), but inconsistent for (3)-(4).
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 6 --- Solution (a)}
+    \textbf{(a) Comparing the two models}:
+    
+    \vspace{0.3em}
+    
+    \textbf{Partial Adjustment Model}: Substituting $y_t^* = \beta x_t$:
+    \begin{align*}
+    y_t - y_{t-1} &= \gamma(\beta x_t - y_{t-1}) + e_t \\
+    y_t &= \gamma\beta x_t + (1-\gamma)y_{t-1} + e_t
+    \end{align*}
+    
+    \textbf{Adaptive Expectations Model}: Solving for $x_{t+1}^e$:
+    \[
+    x_{t+1}^e = \lambda x_t + (1-\lambda)x_t^e = \lambda \sum_{j=0}^{\infty}(1-\lambda)^j x_{t-j}
+    \]
+    
+    Substituting into $y_t = \beta x_{t+1}^e + v_t$:
+    \[
+    y_t = \beta\lambda \sum_{j=0}^{\infty}(1-\lambda)^j x_{t-j} + v_t
+    \]
+    
+    Using the Koyck transformation: $y_t = \beta\lambda x_t + (1-\lambda)y_{t-1} + v_t - (1-\lambda)v_{t-1}$
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 6 --- Solution (a) Cont.}
+    \textbf{Reduced-form representation of both models}:
+    
+    \vspace{0.5em}
+    
+    \begin{tabular}{lcc}
+    \toprule
+    & \textbf{Partial Adjustment} & \textbf{Adaptive Expectations} \\
+    \midrule
+    Form & $y_t = \alpha x_t + \phi y_{t-1} + e_t$ & $y_t = \alpha x_t + \phi y_{t-1} + \eta_t$ \\
+    $x_t$ coeff. & $\alpha = \gamma\beta$ & $\alpha = \beta\lambda$ \\
+    $y_{t-1}$ coeff. & $\phi = 1-\gamma$ & $\phi = 1-\lambda$ \\
+    Error & $e_t$ (WN) & $\eta_t = v_t - (1-\lambda)v_{t-1}$ (MA(1)!) \\
+    \bottomrule
+    \end{tabular}
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Key Difference}
+        \begin{itemize}
+            \item In partial adjustment: $e_t$ is white noise $\Rightarrow$ exogenous
+            \item In adaptive expectations: $\eta_t$ is MA(1) $\Rightarrow$ correlated with $y_{t-1}$!
+        \end{itemize}
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 6 --- Solution (b)}
+    \textbf{(b) OLS consistency}:
+    
+    \vspace{0.3em}
+    
+    Consider the regression: $y_t = \alpha x_t + \phi y_{t-1} + u_t$
+    
+    \vspace{0.3em}
+    
+    \textbf{Partial Adjustment Model}: $u_t = e_t$ is white noise.
+    \begin{itemize}
+        \item $\Cov(y_{t-1}, e_t) = 0$ (error is uncorrelated with past variables)
+        \item $\Cov(x_t, e_t) = 0$ (exogeneidade estrita)
+        \item $\Rightarrow$ OLS is \textbf{consistent} $\checkmark$
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{Adaptive Expectations Model}: $u_t = \eta_t = v_t - (1-\lambda)v_{t-1}$
+    \begin{itemize}
+        \item $y_{t-1}$ depends on $v_{t-1}$ (through the recursive equation)
+        \item $\Cov(y_{t-1}, \eta_t) = \Cov(y_{t-1}, -(1-\lambda)v_{t-1}) \neq 0$
+        \item $\Rightarrow$ OLS is \textbf{inconsistent} $\times$
+    \end{itemize}
+    
+    \begin{block}{Intuition}
+        The regressor $y_{t-1}$ is correlated with the error $\eta_t$ due to the MA(1) component.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Medeiros ARMA: Exercise 6 --- Solution (c)}
+    \textbf{(c) How to check which model is appropriate?}
+    
+    \vspace{0.5em}
+    
+    \textbf{Strategy}: Test for autocorrelation in the residuals.
+    
+    \vspace{0.3em}
+    
+    \begin{enumerate}
+        \item \textbf{Estimate by OLS}: $y_t = \hat{\alpha} x_t + \hat{\phi} y_{t-1} + \hat{u}_t$
+        
+        \vspace{0.3em}
+        
+        \item \textbf{Examine the residuals} $\hat{u}_t$:
+        \begin{itemize}
+            \item If $\hat{u}_t$ is white noise $\Rightarrow$ Partial Adjustment Model
+            \item If $\hat{u}_t$ shows autocorrelation (MA(1)) $\Rightarrow$ Adaptive Expectations
+        \end{itemize}
+        
+        \vspace{0.3em}
+        
+        \item \textbf{Formal tests}:
+        \begin{itemize}
+            \item Durbin--Watson test (for AR(1) in the residuals)
+            \item Breusch--Godfrey test (for higher-order autocorrelation)
+            \item Ljung--Box test on the residual ACF
+        \end{itemize}
+    \end{enumerate}
+    
+    \vspace{0.3em}
+    
+    \begin{alertblock}{Caution}
+        If the correct model is adaptive expectations, use appropriate estimation methods (GMM, NLLS, or MLE) instead of OLS.
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+% MEDEIROS - VECTOR PROCESSES (Exercise 4)
+% ----------------------------------------------------------------------------
+\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Statement}
+    \begin{block}{Macroeconomic Model}
+        \begin{align*}
+        (1): & \quad \pi_t = \lambda y_t + \pi_t^e + u_{1t}, \quad 0 < \lambda < 1 \\
+        (2): & \quad y_t = \gamma(i_{t-1} - \pi_t^e) + u_{2,t}, \quad -1 < \gamma < 0 \\
+        (3): & \quad \pi_t^e = \pi_{t-1} \\
+        (4): & \quad i_t = i^* + \rho(\pi_t - \pi^*), \quad \rho \geq 0
+        \end{align*}
+        where $\pi_t$ = inflation, $y_t$ = output gap, $i_t$ = nominal interest rate, $(u_{1t}, u_{2t})' \sim N(0, \Sigma)$.
+    \end{block}
+    
+    \vspace{0.3em}
+    
+    \textbf{Interpretation}: (1) Phillips curve, (2) IS, (3) adaptive expectations, (4) Taylor rule.
+\end{frame}
+
+\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Statement (cont.)}
+    \textbf{Tasks}:
+    \begin{enumerate}[(a)]
+        \item Show that $\pi_t$ follows an ARMA$(p,q)$. Relate the coefficients to the structural parameters.
+        
+        \item Consider $\rho = 0, 1, 2$. What can be said about inflation and monetary policy? Simulate 200 observations in MATLAB.
+        
+        \item Compute $\hat{\pi}_{t+j|t} = \E[\pi_{t+j}|\mathcal{F}_t]$ and $\Var(\pi_{t+j} - \hat{\pi}_{t+j|t})$.
+        
+        \item Let $\mathbf{x}_t = (\pi_t, y_t)'$. Find $\mathbb{D}(\mathbf{x}_t|\mathbf{x}_{t-1})$ and $\E(\pi_t|y_t, \mathbf{x}_{t-1})$.
+        
+        \item What would change if $\pi_t^e = \alpha\pi_{t-1} + (1-\alpha)\pi_{t-1}^e$?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (a) Part 1}
+    \textbf{(a) Deriving the ARMA process for $\pi_t$}:
+    
+    \vspace{0.3em}
+    
+    \textbf{Step 1}: Substitute (3) and (4) into (2):
+    \begin{align*}
+    y_t &= \gamma(i_{t-1} - \pi_{t-1}) + u_{2t} \\
+    &= \gamma(i^* + \rho(\pi_{t-1} - \pi^*) - \pi_{t-1}) + u_{2t} \\
+    &= \gamma(i^* - \rho\pi^*) + \gamma(\rho - 1)\pi_{t-1} + u_{2t}
+    \end{align*}
+    
+    \vspace{0.3em}
+    
+    \textbf{Step 2}: Substitute into (1):
+    \begin{align*}
+    \pi_t &= \lambda[\gamma(i^* - \rho\pi^*) + \gamma(\rho-1)\pi_{t-1} + u_{2t}] + \pi_{t-1} + u_{1t} \\
+    &= c + [1 + \lambda\gamma(\rho-1)]\pi_{t-1} + u_{1t} + \lambda u_{2t}
+    \end{align*}
+    
+    where $c = \lambda\gamma(i^* - \rho\pi^*)$ is a constant.
+\end{frame}
+
+\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (a) Part 2}
+    \textbf{Result}: $\pi_t$ follows an \textbf{AR(1)} process:
+    \[
+    \boxed{\pi_t = c + \phi \pi_{t-1} + \varepsilon_t}
+    \]
+    
+    where:
+    \begin{itemize}
+        \item $\phi = 1 + \lambda\gamma(\rho - 1)$
+        \item $\varepsilon_t = u_{1t} + \lambda u_{2t}$ (a linear combination of the shocks)
+        \item $\Var(\varepsilon_t) = \sigma_{11}^2 + 2\lambda\sigma_{12} + \lambda^2\sigma_{22}^2$
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \begin{block}{Link to Structural Parameters}
+        \begin{itemize}
+            \item $\phi < 1$ (stationarity) $\Leftrightarrow$ $\lambda\gamma(\rho-1) < 0$
+            \item Since $\lambda > 0$ and $\gamma < 0$: $\phi < 1$ $\Leftrightarrow$ $\rho > 1$
+            \item This is the \textbf{Taylor principle}: $\rho > 1$ stabilizes inflation!
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (b)}
+    \textbf{(b) Analysis for different values of $\rho$}:
+    
+    \vspace{0.3em}
+    
+    Suppose $\lambda = 0.5$, $\gamma = -0.5$. Then $\phi = 1 + 0.5 \cdot (-0.5) \cdot (\rho - 1) = 1 - 0.25(\rho - 1)$.
+    
+    \vspace{0.5em}
+    
+    \begin{tabular}{cccc}
+    \toprule
+    $\rho$ & $\phi$ & Stationary? & Interpretation \\
+    \midrule
+    0 & 1.25 & No & Explosive (violates stability/unit-root condition) \\
+    1 & 1.00 & No & Random walk \\
+    2 & 0.75 & Yes & Stationary inflation \\
+    \bottomrule
+    \end{tabular}
+    
+    \vspace{0.5em}
+    
+    \begin{alertblock}{Economic Interpretation}
+        \begin{itemize}
+            \item $\rho = 0$: the central bank does not respond to inflation $\Rightarrow$ explosive inflation
+            \item $\rho = 1$: the central bank responds one-for-one $\Rightarrow$ constant real rate, inflation is I(1)
+            \item $\rho > 1$: the central bank responds more than one-for-one $\Rightarrow$ stationary inflation
+        \end{itemize}
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (c)}
+    \textbf{(c) Forecasts and forecast error variance}:
+    
+    \vspace{0.3em}
+    
+    For the AR(1) $\pi_t = c + \phi\pi_{t-1} + \varepsilon_t$ (assuming $|\phi| < 1$):
+    
+    \vspace{0.3em}
+    
+    \textbf{$j$-step-ahead forecast}:
+    \[
+    \hat{\pi}_{t+j|t} = \mu(1 - \phi^j) + \phi^j \pi_t
+    \]
+    where $\mu = c/(1-\phi)$ is the unconditional mean.
+    
+    \vspace{0.3em}
+    
+    \textbf{Forecast error variance}:
+    \[
+    \Var(\pi_{t+j} - \hat{\pi}_{t+j|t}) = \sigma_\varepsilon^2 \sum_{i=0}^{j-1}\phi^{2i} = \sigma_\varepsilon^2 \cdot \frac{1 - \phi^{2j}}{1 - \phi^2}
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Limit}: As $j \to \infty$:
+    \[
+    \lim_{j\to\infty} \Var(\pi_{t+j} - \hat{\pi}_{t+j|t}) = \frac{\sigma_\varepsilon^2}{1 - \phi^2} = \Var(\pi_t)
+    \]
+\end{frame}
+
+\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (d)}
+    \textbf{(d) Conditional distribution of $\mathbf{x}_t = (\pi_t, y_t)'$}:
+    
+    \vspace{0.3em}
+    
+    From the model equations:
+    \begin{align*}
+    \pi_t &= c_\pi + \phi \pi_{t-1} + \varepsilon_t \\
+    y_t &= c_y + \gamma(\rho-1)\pi_{t-1} + u_{2t}
+    \end{align*}
+    
+    Therefore, $\mathbf{x}_t | \mathbf{x}_{t-1} \sim N(\boldsymbol{\mu}_t, \boldsymbol{\Sigma})$, where:
+    \[
+    \boldsymbol{\mu}_t = \begin{pmatrix} c_\pi + \phi\pi_{t-1} \\ c_y + \gamma(\rho-1)\pi_{t-1} \end{pmatrix}, \quad
+    \boldsymbol{\Sigma} = \begin{pmatrix} \sigma_\varepsilon^2 & \lambda\sigma_{22}^2 + \sigma_{12} \\ \lambda\sigma_{22}^2 + \sigma_{12} & \sigma_{22}^2 \end{pmatrix}
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Conditional expectation} $\E(\pi_t | y_t, \mathbf{x}_{t-1})$:
+    
+    Using the conditional normal formula:
+    \[
+    \E(\pi_t | y_t, \mathbf{x}_{t-1}) = \E(\pi_t|\mathbf{x}_{t-1}) + \frac{\Cov(\pi_t, y_t)}{\Var(y_t)}[y_t - \E(y_t|\mathbf{x}_{t-1})]
+    \]
+\end{frame}
+
+\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (e)}
+    \textbf{(e) Generalized adaptive expectations}: $\pi_t^e = \alpha\pi_{t-1} + (1-\alpha)\pi_{t-1}^e$
+    
+    \vspace{0.3em}
+    
+    Solving recursively:
+    \[
+    \pi_t^e = \alpha \sum_{j=0}^{\infty}(1-\alpha)^j \pi_{t-1-j}
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{Effect on the model}: inflation now depends on the entire past history, not only on $\pi_{t-1}$.
+    
+    \vspace{0.3em}
+    
+    Using the Koyck transformation:
+    \[
+    \pi_t^e = \alpha\pi_{t-1} + (1-\alpha)\pi_{t-1}^e
+    \]
+    
+    \vspace{0.3em}
+    
+    The process for $\pi_t$ becomes an \textbf{ARMA(2,1)} instead of AR(1):
+    \[
+    \pi_t = c + \phi_1\pi_{t-1} + \phi_2\pi_{t-2} + \varepsilon_t + \theta\varepsilon_{t-1}
+    \]
+    
+    where the coefficients depend on $\alpha, \lambda, \gamma, \rho$ in a more complex way.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Exercise Session: Summary}
+    \textbf{Key Skills Practiced}:
+    
+    \vspace{0.5em}
+    
+    \begin{enumerate}
+        \item Checking stationarity conditions (roots outside unit circle)
+        \item Computing autocovariances and ACF for ARMA processes
+        \item Converting between AR and MA representations
+        \item Identifying common factors and parameter redundancy
+        \item Working with vector processes
+    \end{enumerate}
+    
+    \vspace{1em}
+    
+    \begin{alertblock}{For Next Session}
+        Review these exercises and attempt additional problems from the appendix for extra practice.
+    \end{alertblock}
+\end{frame}
+
+% ============================================================================
+% APPENDIX
+% ============================================================================
+\appendix
+
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Appendix}}\\[1em]
+        {\large Detailed Material and Extended Examples}
+    \end{center}
+\end{frame}
+
+% ============================================================================
+% A1: LOCAL IDENTIFICATION - INFORMATION MATRIX
+% ============================================================================
+\begin{frame}{Checking Local Identification: The Information Matrix}
+    \label{slide:info_matrix}
+    \textbf{Idea}: Use the Kullback-Leibler divergence between distributions:
+    \[
+    \Delta_{KL}(\theta \mid \theta_0) = -\int \log\left(\frac{\mathbb{D}(\mathbf{Y}^T \mid \theta)}{\mathbb{D}(\mathbf{Y}^T \mid \theta_0)}\right) \mathbb{D}(\mathbf{Y}^T \mid \theta_0) \, d\mathbf{Y}^T
+    \]
+    
+    \vspace{0.3em}
+    
+    By Jensen's inequality: $\Delta_{KL}(\theta \mid \theta_0) \geq 0$, with equality iff distributions are equal.
+    
+    \vspace{0.5em}
+    
+    \textbf{Second-order condition}: The Hessian at $\theta_0$ is the \textbf{Fisher Information Matrix}:
+    \[
+    \mathcal{I}(\theta_0) = -\E_{\theta_0}\left[\nabla_{\theta^2} \log \mathbb{D}(\mathbf{Y}^T \mid \theta_0)\right]
+    \]
+    
+    \vspace{0.3em}
+    
+    \begin{theorem}[Local Identification Condition]
+        If $\mathcal{I}(\theta_0)$ is \textbf{positive definite} (full rank), then $\theta_0$ is locally identified.
+    \end{theorem}
+    
+    \vspace{0.3em}
+    
+    \hfill \hyperlink{slide:global_local_id}{\beamerbutton{$\leftarrow$ Back to main slides}}
+\end{frame}
+
+% ============================================================================
+% A2: AR(1) FIGURES
+% ============================================================================
+\begin{frame}{AR(1) Inflation Example: Figures}
+    \label{slide:ar1_figures}
+    
+    \textbf{Figure 1}: Sensitivity of $\phi_1$ to Taylor Rule coefficient $\rho$
+    
+    \vspace{0.5em}
+    
+    % PLACEHOLDER: Include figure from metrics bible
+    % \includegraphics[width=0.8\textwidth]{Figures/param_combination.png}
+    
+    \begin{center}
+        \textit{[Figure: param\_combination.png from metrics bible]}
+    \end{center}
+    
+    \vspace{0.5em}
+    
+    Under the simple monetary policy model with $\lambda = 0.5$, $\gamma = -0.5$:
+    \begin{itemize}
+        \item Stability requires $1 < \rho < 9$
+        \item Taylor principle ($\rho > 1$) ensures stationary inflation
+    \end{itemize}
+    
+    \hfill \hyperlink{slide:global_local_id}{\beamerbutton{$\leftarrow$ Back}}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{AR(1) Inflation: ACF Patterns}
+    \textbf{Figure 2}: ACF under different Taylor Rule calibrations
+    
+    \vspace{0.5em}
+    
+    % PLACEHOLDER: Include figure from metrics bible
+    % \includegraphics[width=0.45\textwidth]{Figures/acf_pi_1.png}
+    % \includegraphics[width=0.45\textwidth]{Figures/acf_pi_2.png}
+    
+    \begin{center}
+        \textit{[Figure: acf\_pi\_1.png, acf\_pi\_2.png from metrics bible]}
+    \end{center}
+    
+    \vspace{0.5em}
+    
+    \textbf{Key observations}:
+    \begin{itemize}
+        \item $\rho \in \{2,3,4\}$: Persistent, non-oscillatory decay
+        \item $\rho \in \{6,7,8\}$: Faster decay, potentially oscillating
+    \end{itemize}
+\end{frame}
+
+% ============================================================================
+% A3: DETAILED PROOFS
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{A3: Detailed Proofs}}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Proof: MA($q$) Stationarity}
+    \textbf{Claim}: All finite-order MA($q$) processes are covariance-stationary.
+    
+    \vspace{0.5em}
+    
+    \textbf{Proof}:
+    
+    \textbf{Mean}:
+    \[
+    \E[y_t] = \E\left[u_t + \sum_{j=1}^q \theta_j u_{t-j} + \theta_0\right] = \theta_0
+    \]
+    
+    \textbf{Autocovariance}:
+    \begin{align*}
+        \Gamma_k &= \E[(y_t - \mu)(y_{t-k} - \mu)] \\
+        &= \E\left[\left(\sum_{j=0}^q \theta_j u_{t-j}\right)\left(\sum_{m=0}^q \theta_m u_{t-k-m}\right)\right]
+    \end{align*}
+    
+    Since $\E[u_s u_r] = \sigma^2 \mathbf{1}_{s=r}$:
+    \[
+    \Gamma_k = \begin{cases} \left(\theta_k + \sum_{j=1}^{q-k}\theta_j\theta_{j+k}\right)\sigma^2 & k \leq q \\ 0 & k > q \end{cases}
+    \]
+    
+    Both moments are \textbf{independent of $t$}. $\square$
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Proof: Invertibility Condition for MA($q$)}
+    \textbf{Claim}: MA($q$) is invertible iff roots of $\theta_q(z) = 0$ lie outside unit circle.
+    
+    \vspace{0.3em}
+    
+    \textbf{Proof}: Start with $y_t = \theta_0 + \theta_q(L)u_t$. We need:
+    \[
+    u_t = \theta_q(L)^{-1}(y_t - \theta_0)
+    \]
+    
+    Factor the polynomial: $\theta_q(L) = (1-\lambda_1 L)(1-\lambda_2 L)\cdots(1-\lambda_q L)$
+    
+    where $\lambda_i$ are reciprocals of the roots.
+    
+    \vspace{0.3em}
+    
+    For each factor: $(1-\lambda_i L)^{-1} = \sum_{k=0}^{\infty}(\lambda_i L)^k$
+    
+    This converges iff $|\lambda_i| < 1$, i.e., roots $|1/\lambda_i| > 1$ (outside UC).
+    
+    \vspace{0.3em}
+    
+    If convergent:
+    \[
+    \theta_q(L)^{-1} = \sum_{j=0}^{\infty}\psi_j L^j \quad \Rightarrow \quad u_t = \sum_{j=0}^{\infty}\psi_j(y_{t-j} - \theta_0) \in \Span\{y_t, y_{t-1}, \ldots\}
+    \]
+    $\square$
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{MA($\infty$) Representation of AR($p$)}
+    \textbf{Claim}: A stationary AR($p$) can be written as MA($\infty$).
+    
+    \vspace{0.5em}
+    
+    \textbf{Proof} (AR(1) case): Let $y_t = \phi_1 y_{t-1} + u_t$ with $|\phi_1| < 1$.
+    
+    Iterating backward (assuming process started infinitely far in the past):
+    \begin{align*}
+        y_t &= \phi_1 y_{t-1} + u_t \\
+        &= \phi_1(\phi_1 y_{t-2} + u_{t-1}) + u_t \\
+        &= \cdots \\
+        &= \sum_{i=0}^{\infty} \phi_1^i u_{t-i} + \lim_{n\to\infty} \phi_1^n y_{t-n}
+    \end{align*}
+    
+    Since $|\phi_1| < 1$: $\phi_1^n \to 0$ and $\sum|\phi_1|^i < \infty$.
+    
+    \vspace{0.3em}
+    
+    Therefore: $y_t = \sum_{i=0}^{\infty}\psi_i u_{t-i}$ with $\psi_i = \phi_1^i$.
+    
+    \vspace{0.3em}
+    
+    \textbf{General case}: Use companion form and iterate. $\square$
+\end{frame}
+
+% ============================================================================
+% A4: EXTENDED EXAMPLES
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{A4: Extended Examples}}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example: Observational Equivalence in MA(2)}
+    Consider MA(2): $y_t = u_t + \theta_1 u_{t-1} + \theta_2 u_{t-2}$
+    
+    \vspace{0.3em}
+    
+    Factor: $\theta_2(z) = 1 + \theta_1 z + \theta_2 z^2 = (1-\lambda_1 z)(1-\lambda_2 z)$
+    
+    where $\theta_1 = -(\lambda_1 + \lambda_2)$, $\theta_2 = \lambda_1\lambda_2$
+    
+    \vspace{0.5em}
+    
+    \textbf{Invertible representation}: Roots outside UC $\Rightarrow$ $|\lambda_i| < 1$
+    
+    \textbf{Non-invertible alternative}: ``Flip'' each root:
+    \[
+    \lambda_i^* = 1/\lambda_i \quad \Rightarrow \quad \theta_1^* = \theta_1/\theta_2, \quad \theta_2^* = 1/\theta_2
+    \]
+    
+    \textbf{Match ACGF}: Scale variance by $\sigma^{*2} = \sigma^2 \theta_2^2$
+    
+    \vspace{0.5em}
+    
+    \textbf{Result}: These have \textbf{identical} autocovariance structure but different impulse responses!
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Example: NK Model Invertibility (Wolf, 2022)}
+    \textbf{Three-equation NK model} with demand, supply, and monetary shocks:
+    
+    \[
+    \begin{pmatrix} y_t \\ \pi_t \\ i_t \end{pmatrix} = \frac{1}{1+\phi_\pi\kappa} \begin{pmatrix} \sigma^d & \phi_\pi\sigma^s & -\sigma^m \\ \kappa\sigma^d & -\sigma^s & -\kappa\sigma^m \\ \phi_\pi\kappa\sigma^d & -\phi_\pi\sigma^s & \sigma^m \end{pmatrix} \begin{pmatrix} \varepsilon_t^d \\ \varepsilon_t^s \\ \varepsilon_t^m \end{pmatrix}
+    \]
+    
+    \vspace{0.3em}
+    
+    \textbf{With all 3 observables}: Impact matrix $\Theta$ is invertible for standard parameters.
+    
+    \vspace{0.3em}
+    
+    \textbf{With only $y_t$ and $\pi_t$}:
+    \begin{itemize}
+        \item Can back out $\varepsilon_t^s$ (supply shock)
+        \item \textbf{Cannot} disentangle $\varepsilon_t^d$ and $\varepsilon_t^m$!
+    \end{itemize}
+    
+    \vspace{0.3em}
+    
+    \begin{alertblock}{Lesson}
+        Even in well-specified models, fewer observables than shocks $\Rightarrow$ non-invertibility!
+    \end{alertblock}
+\end{frame}
+
+% ============================================================================
+% A5: REFERENCE MATERIAL
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{A5: Reference Material}}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Key Formulas: Quick Reference}
+    \textbf{AR($p$)}:
+    \begin{itemize}
+        \item Process: $\Phi_p(L)y_t = \phi_0 + u_t$
+        \item Stationarity: Roots of $\Phi_p(z) = 0$ outside UC
+        \item Mean: $\mu = \phi_0/(1-\sum\phi_i)$
+        \item Yule-Walker: $\gamma_k = \sum_{i=1}^p \phi_i \gamma_{k-i}$
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{MA($q$)}:
+    \begin{itemize}
+        \item Process: $y_t = \theta_0 + \Theta_q(L)u_t$
+        \item Always stationary
+        \item Invertibility: Roots of $\Theta_q(z) = 0$ outside UC
+        \item $\gamma_k = 0$ for $k > q$ (cutoff)
+    \end{itemize}
+    
+    \vspace{0.5em}
+    
+    \textbf{ARMA($p,q$)}:
+    \begin{itemize}
+        \item Process: $\Phi_p(L)y_t = \phi_0 + \Theta_q(L)u_t$
+        \item ACGF: $\Gamma(z) = \frac{\Theta_q(z)\Theta_q(z^{-1})}{\Phi_p(z)\Phi_p(z^{-1})}\sigma^2$
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{References}
+    \small
+    \begin{itemize}
+        \item Fernández-Villaverde, Rubio-Ramírez, Schorfheide (2016). ``Solution and Estimation Methods for DSGE Models.'' \textit{Handbook of Macroeconomics}
+        
+        \item Hamilton (1994). \textit{Time Series Analysis}. Princeton University Press
+        
+        \item Wolf (2022). ``Linear Time Series'' (MIT 14.461 Lecture Notes)
+        
+        \item Komunjer, Ng (2011). ``Dynamic Identification of DSGE Models.'' \textit{Econometrica}
+        
+        \item Lecture Notes in Econometrics (Lincoln, 2025). Chapter 7: Time Series
+        
+        \item Lecture Notes in Macroeconomics (Lincoln, 2025). Chapter 21: Identification
+    \end{itemize}
+\end{frame}
+
+\end{document}
