@@ -327,59 +327,69 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Causality in Time Series}
-    Following Wolf (2022), we define causality for VARMA processes:
+\begin{frame}{Causality and Invertibility: General Definitions}
+    Let $\{Y_t\}$ be a stationary process and $\{Z_t\}$ an input/shock process. Define filtrations:
+    \[
+    \mathcal{F}^Z_t = \sigma(Z_t, Z_{t-1}, \ldots), \qquad \mathcal{F}^Y_t = \sigma(Y_t, Y_{t-1}, \ldots)
+    \]
     
-    \begin{definition}[Causal Process]
-        A VARMA process $\{y_t\}$ is said to be \textbf{causal} with respect to $\{z_t\}$ if:
-        \[
-        y_t \in \Span(z_\tau, -\infty < \tau \leq t)
-        \]
+    \begin{definition}[Causality]
+        $\{Y_t\}$ is \textbf{causal with respect to} $\{Z_t\}$ if $Y_t$ is $\mathcal{F}^Z_t$-measurable for all $t$.
     \end{definition}
     
-    \vspace{0.5em}
+    \textbf{Interpretation}: $Y_t$ depends only on \textbf{current and past} values of $Z$ --- no future inputs needed.
     
-    \textbf{Interpretation}: The current value $y_t$ can be expressed as a function of \textbf{current and past} values of $z_t$ only --- no future values needed.
+    \vspace{0.3em}
     
-    \vspace{0.5em}
+    \begin{definition}[Invertibility]
+        $\{Y_t\}$ is \textbf{invertible with respect to} $\{Z_t\}$ if $Z_t$ is $\mathcal{F}^Y_t$-measurable for all $t$.
+    \end{definition}
     
-    \begin{block}{Sufficient Condition}
-        For VMA: $y_t = \Theta(L)z_t$, causality holds if $\Theta(L)$ is a \textbf{one-sided} polynomial in the lag operator (only non-negative powers of $L$).
-        
-        \vspace{0.2em}
-        
-        This gives the VMA($\infty$) representation we use throughout.
-    \end{block}
+    \textbf{Interpretation}: The shocks $Z_t$ can be \textbf{recovered from current and past observables} $Y_t$.
+    
+    \vspace{0.3em}
+    
+    \begin{alertblock}{Important Caveat}
+        These are \textbf{not intrinsic properties} of a stationary process --- you must specify the representation (input/shock process). Stationarity guarantees a causal Wold MA($\infty$) w.r.t.\ Wold innovations, but does \textbf{not} imply a given structural shock is recoverable.
+    \end{alertblock}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Invertibility in Time Series}
-    \begin{definition}[Invertibility]
-        A VARMA process $\{y_t\}$ is \textbf{invertible} with respect to $\{z_t\}$ if:
-        \[
-        z_t \in \Span(y_\tau, -\infty < \tau \leq t)
-        \]
-    \end{definition}
+\begin{frame}{VARMA Case: Sufficient Conditions}
+    Consider a VARMA process: $\Phi(L) Y_t = \Theta(L) Z_t$, where $Z_t \sim \text{WN}(0, \Sigma)$.
     
-    \vspace{0.5em}
+    \vspace{0.3em}
     
-    \textbf{Interpretation}: We can recover the innovations $z_t$ from \textbf{current and past observables} $y_t$.
+    \begin{block}{Sufficient Condition for Causality}
+        $\{Y_t\}$ is \textbf{causal} w.r.t.\ $\{Z_t\}$ if $\det \Phi(z) \neq 0$ for all $|z| \leq 1$.
+        
+        \vspace{0.2em}
+        
+        $\Rightarrow$ Roots of $\det \Phi(z) = 0$ lie \textbf{outside the unit circle}.
+        
+        \vspace{0.2em}
+        
+        This yields the VMA($\infty$) representation: $Y_t = \Phi(L)^{-1}\Theta(L) Z_t = \Psi(L) Z_t$ with $\Psi(L)$ one-sided.
+    \end{block}
     
-    \vspace{0.5em}
+    \vspace{0.3em}
     
-    \begin{block}{Sufficient Condition}
-        For VMA: $y_t = \Theta(L)z_t$, invertibility holds if $\Theta(L)$ has a \textbf{one-sided inverse}, giving a VAR($\infty$) representation:
-        \[
-        \Theta(L)^{-1}y_t = z_t
-        \]
+    \begin{block}{Sufficient Condition for Invertibility}
+        $\{Y_t\}$ is \textbf{invertible} w.r.t.\ $\{Z_t\}$ if $\det \Theta(z) \neq 0$ for all $|z| \leq 1$.
+        
+        \vspace{0.2em}
+        
+        $\Rightarrow$ Roots of $\det \Theta(z) = 0$ lie \textbf{outside the unit circle}.
+        
+        \vspace{0.2em}
+        
+        This yields the VAR($\infty$) representation: $\Pi(L) Y_t = Z_t$ with $\Pi(L)$ one-sided.
     \end{block}
     
     \vspace{0.3em}
     
     \begin{alertblock}{Warning (Wolf, 2022)}
-        Invertibility is \textbf{far from guaranteed} in structural models!
-        
-        E.g., if we have 5 shocks but only 2 observables $\Rightarrow$ cannot possibly be invertible.
+        Invertibility is \textbf{far from guaranteed} in structural models! E.g., 5 shocks but only 2 observables $\Rightarrow$ cannot possibly be invertible.
     \end{alertblock}
 \end{frame}
 
@@ -426,8 +436,8 @@
         Local Identification & Unique in neighborhood \\[0.4em]
         Linear Gaussian & Second moments fully characterize distribution \\[0.4em]
         Observational Equiv. & Same ACGF $\Rightarrow$ indistinguishable \\[0.4em]
-        Causality & $y_t$ depends only on current/past $z$'s \\[0.4em]
-        Invertibility & $z_t$ recoverable from current/past $y$'s \\
+        Causality & $Y_t$ is $\mathcal{F}^Z_t$-measurable (depends on current/past $Z$'s) \\[0.4em]
+        Invertibility & $Z_t$ is $\mathcal{F}^Y_t$-measurable (recoverable from current/past $Y$'s) \\
         \bottomrule
     \end{tabular}
     \end{center}
