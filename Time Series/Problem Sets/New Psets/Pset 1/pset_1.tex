@@ -6,11 +6,25 @@
 \pagestyle{fancy}
 \setlength{\headheight}{28pt}
 
+% Red "alertblock"-style boxes (Beamer-like)
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\newtcolorbox{alertblock}[1]{%
+  colback=red!5!white,
+  colframe=red!70!black,
+  fonttitle=\bfseries,
+  title=#1,
+  sharp corners,
+  boxrule=0.9pt,
+  left=1.2mm,right=1.2mm,top=1mm,bottom=1mm
+}
+
 % Common shortcuts (kept close to template)
 \newcommand{\R}{\mathbb R}
 \newcommand{\N}{\mathbb N}
 \newcommand{\Z}{\mathbb Z}
 \newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\mathrm{Var}}
 \newcommand{\imp}{\Rightarrow}
 \newcommand{\set}[1]{\left\{ #1 \right\}}
 
@@ -36,11 +50,11 @@ citecolor=blue, urlcolor=blue]{hyperref}
 
 \section*{Problem Set 1 --- Practice for the Exam (Not for Submission)}
 
-\begin{addmargin}[0.5em]{0.5em}
-\textbf{Important:} You \textbf{do not need to submit} this problem set, and you \textbf{do not need to do all exercises}.\\
-We will cover the solutions in class and then provide written solutions afterwards for your study.\\
-The goal is simply to give you additional material to prepare for the exam.
-\end{addmargin}
+\begin{alertblock}{Important}
+We \textbf{do not collect} this problem set, and you \textbf{do not need to do all exercises}.\\
+We will cover the solutions in class and provide written solutions afterwards for your study.\\
+The goal is to give you more material to prepare for the exam.
+\end{alertblock}
 
 \vspace{0.8em}
 
@@ -55,6 +69,21 @@ where $|\theta|<1$ and $\phi\neq 0$.
 \begin{enumerate}
     \item[(a)] Show that the vector of first differences $[\Delta y_{1t}, \Delta y_{2t}]'$ is a non-invertible MA(1) process.
     \item[(b)] Are there any observationally equivalent, invertible representations? Why or why not?
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[Measurement error in MA(1)]
+Let $y_t$, $t = 1, \ldots, T$, be a time series described by an MA(1) process:
+\[
+y_t = \mu + \varepsilon_t + \theta \varepsilon_{t-1}, \quad \varepsilon_t \sim \text{IID}(0, \sigma_\varepsilon^2).
+\]
+Suppose that $y_t$ is observed with \textbf{additive measurement noise}, i.e., $x_t = y_t + u_t$, where $u_t \sim \text{IID}(0, \sigma_u^2)$ and $\E(\varepsilon_t u_s) = 0$ for all $t, s$.
+\begin{enumerate}
+    \item[(a)] Compute the mean and variance of $x_t$.
+    \item[(b)] Compute the autocovariances of $x_t$.
+    \item[(c)] Which ARMA$(p,q)$ process best describes $x_t$?
 \end{enumerate}
 \end{problem}
 
@@ -88,6 +117,20 @@ where $\varepsilon_t$ is white noise and $\theta_0 = 1$. Show that all finite-or
 
 \vspace{0.6em}
 
+\begin{problem}[Sum of two AR(1) processes]
+Let $\{y_t\}$ and $\{z_t\}$, $t = 1, \ldots, T$, be two stochastic processes:
+\[
+y_t = \phi_1 y_{t-1} + \varepsilon_t, \quad z_t = \phi_2 z_{t-1} + u_t,
+\]
+where $\varepsilon_t \sim \text{IID}(0, \sigma_\varepsilon^2)$, $u_t \sim \text{IID}(0, \sigma_u^2)$, and $\E(\varepsilon_t u_s) = 0$ for all $t, s$.
+\begin{enumerate}
+    \item[(a)] Show that if $\phi_1 = \phi_2$, then $x_t = y_t + z_t$ is an AR(1) process.
+    \item[(b)] Show that if $\phi_1 \neq \phi_2$, then $x_t = y_t + z_t$ is an ARMA$(2, q)$ process with $q \leq 1$.
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
 \begin{problem}[MA(2): invertibility and observational equivalence]
 Consider a second-order moving average process
 \[
@@ -97,6 +140,64 @@ where the innovation $\varepsilon_t$ is iid $N(0,\sigma^2)$.
 \begin{enumerate}
     \item[(a)] State conditions on $\theta_1,\theta_2$ for the process to be invertible.
     \item[(b)] Characterize the family of observationally equivalent, non-invertible representations.
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[Sum of independent AR(1) processes]
+Consider two independent AR(1) processes $x_t$ and $y_t$ defined by:
+\[
+(1 - \rho_1 L)x_t = u_t, \; |\rho_1| < 1 \quad \text{and} \quad (1 - \rho_2 L)y_t = v_t, \; |\rho_2| < 1
+\]
+where $\E(u_t) = \E(v_t) = 0$, $\E(u_t v_\tau) = 0$ for all $t, \tau$,
+$\E(u_t u_\tau) = \sigma_u^2$ if $t = \tau$ (0 otherwise), and $\E(v_t v_\tau) = \sigma_v^2$ if $t = \tau$.
+Let $z_t = x_t + y_t$.
+\begin{enumerate}
+    \item[(a)] Compute $\E(x_{t+1}|\mathcal{F}_t)$, $\E(y_{t+1}|\mathcal{F}_t)$, $\E(z_{t+1}|\mathcal{F}_t)$, and the forecast error variance $V_D$.
+    \item[(b)] Show that $z_t$ is ARMA(2,1) and find $\theta$.
+    \item[(c)] Give conditions for $z_t$ to be AR(2). Show that if $\rho_1, \rho_2$ have the same sign, then it cannot be AR(2).
+    \item[(d)] Show that $\theta \neq \pm 1$.
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[Partial adjustment vs.\ adaptive expectations]
+The desired level $y_t^*$ is related to $x_t$ by $y_t^* = \beta x_t$. Assume $x_t$ is covariance-stationary. A fraction $\gamma$ of the disequilibrium is removed through partial adjustment:
+\[
+y_t - y_{t-1} = \gamma(y_t^* - y_{t-1}) + e_t, \quad e_t \sim N(0, \sigma_e^2), \; 0 < \gamma < 1.
+\]
+Compare with the adaptive expectations model:
+\[
+y_t = \beta x_{t+1}^e + v_t, \quad v_t \sim N(0, \sigma_v^2),
+\]
+\[
+x_{t+1}^e - x_t^e = \lambda(x_t - x_t^e), \quad 0 < \lambda < 1.
+\]
+\begin{enumerate}
+    \item[(a)] Compare the two models (their reduced forms and error terms).
+    \item[(b)] Show that OLS of $y_t$ on $y_{t-1}$ and $x_t$ is consistent for the partial adjustment model, but inconsistent for the adaptive expectations model.
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[Vector model: inflation, output gap, and policy]
+Consider the macroeconomic model
+\begin{align*}
+(1): & \quad \pi_t = \lambda y_t + \pi_t^e + u_{1t}, \quad 0 < \lambda < 1, \\
+(2): & \quad y_t = \gamma(i_{t-1} - \pi_t^e) + u_{2t}, \quad -1 < \gamma < 0, \\
+(3): & \quad \pi_t^e = \pi_{t-1}, \\
+(4): & \quad i_t = i^* + \rho(\pi_t - \pi^*), \quad \rho \geq 0,
+\end{align*}
+where $\pi_t$ is inflation, $y_t$ is the output gap, $i_t$ is the nominal interest rate, and $(u_{1t}, u_{2t})' \sim N(0, \Sigma)$.
+\begin{enumerate}
+    \item[(a)] Show that $\pi_t$ follows an ARMA$(p,q)$. Relate the coefficients to the structural parameters.
+    \item[(b)] Consider $\rho = 0, 1, 2$. What can be said about inflation and monetary policy?
+    \item[(c)] Compute $\hat{\pi}_{t+j|t} = \E[\pi_{t+j}|\mathcal{F}_t]$ and $\Var(\pi_{t+j} - \hat{\pi}_{t+j|t})$.
+    \item[(d)] Let $\mathbf{x}_t = (\pi_t, y_t)'$. Find $\mathbb{D}(\mathbf{x}_t|\mathbf{x}_{t-1})$ and $\E(\pi_t|y_t, \mathbf{x}_{t-1})$.
+    \item[(e)] What would change if $\pi_t^e = \alpha\pi_{t-1} + (1-\alpha)\pi_{t-1}^e$?
 \end{enumerate}
 \end{problem}
 
