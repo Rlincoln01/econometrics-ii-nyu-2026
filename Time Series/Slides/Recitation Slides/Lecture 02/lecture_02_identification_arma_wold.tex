@@ -9,6 +9,7 @@
 
 % Custom colors (MIT-inspired)
 \definecolor{mitred}{RGB}{163,31,52}
+\definecolor{mitOrange}{RGB}{227,114,34}
 \definecolor{darkblue}{RGB}{0,40,85}
 \definecolor{lightgray}{RGB}{245,245,245}
 \definecolor{darkgray}{RGB}{64,64,64}
@@ -328,16 +329,13 @@
 
 % ----------------------------------------------------------------------------
 \begin{frame}{Causality and Invertibility: General Definitions}
-    Let $\{Y_t\}$ be a stationary process and $\{Z_t\}$ an input/shock process. Define filtrations:
-    \[
-    \mathcal{F}^Z_t = \sigma(Z_t, Z_{t-1}, \ldots), \qquad \mathcal{F}^Y_t = \sigma(Y_t, Y_{t-1}, \ldots)
-    \]
+    Let $\{Y_t\}$ be a stationary process and $\{Z_t\}$ an input/shock process.
     
     \begin{definition}[Causality]
         $\{Y_t\}$ is \textbf{causal with respect to} $\{Z_t\}$ if $Y_t$ is $\mathcal{F}^Z_t$-measurable for all $t$.
     \end{definition}
     
-    \textbf{Interpretation}: $Y_t$ depends only on \textbf{current and past} values of $Z$ --- no future inputs needed.
+    % \textbf{Interpretation}: $Y_t$ depends only on \textbf{current and past} values of $Z$ --- no future inputs needed.
     
     \vspace{0.3em}
     
@@ -345,52 +343,63 @@
         $\{Y_t\}$ is \textbf{invertible with respect to} $\{Z_t\}$ if $Z_t$ is $\mathcal{F}^Y_t$-measurable for all $t$.
     \end{definition}
     
-    \textbf{Interpretation}: The shocks $Z_t$ can be \textbf{recovered from current and past observables} $Y_t$.
+    % \textbf{Interpretation}: The shocks $Z_t$ can be \textbf{recovered from current and past observables} $Y_t$.
     
     \vspace{0.3em}
+
+    \textbf{Interpretations}:
+    \begin{itemize}
+        \item $Y_t$ depends only on \textbf{current and past} values of $Z$ --- no future inputs needed.
+        \item The shocks $Z_t$ can be \textbf{recovered from current and past observables} $Y_t$.
+    \end{itemize}
     
-    \begin{alertblock}{Important Caveat}
-        These are \textbf{not intrinsic properties} of a stationary process --- you must specify the representation (input/shock process). Stationarity guarantees a causal Wold MA($\infty$) w.r.t.\ Wold innovations, but does \textbf{not} imply a given structural shock is recoverable.
-    \end{alertblock}
+    % \begin{alertblock}{Important Caveat}
+    %     These are \textbf{not intrinsic properties} of a stationary process --- you must specify the representation (input/shock process). Stationarity guarantees a causal Wold MA($\infty$) w.r.t.\ Wold innovations, but does \textbf{not} imply a given structural shock is recoverable.
+    % \end{alertblock}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{VARMA Case: Sufficient Conditions}
-    Consider a VARMA process: $\Phi(L) Y_t = \Theta(L) Z_t$, where $Z_t \sim \text{WN}(0, \Sigma)$.
+\begin{frame}{VARMA: Causality}
+    \begin{definition}
+        A VARMA process $\{y_t\}$ is said to be \textbf{causal} with respect to $\{z_t\}$ if
+        \[
+        y_t \in \Span(z_\tau, \; -\infty < \tau \leq t)
+        \]
+    \end{definition}
     
-    \vspace{0.3em}
+    \begin{itemize}
+        \item In words: can write $y_t$ as function of \textcolor{mitOrange}{current and lagged white noise realizations}, $z_{t-\ell}$
+        
+        \vspace{0.5em}
+        
+        \item Sufficient condition is that \textcolor{mitOrange}{$\Phi(L)$ has 1-sided inverse}, giving VMA($\infty$) representation
+        
+        \vspace{0.3em}
+        
+        $\Rightarrow$ Our structural macro models yield VMA representations and so in particular always give causal VARMA processes for the observables $y_t$
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{VARMA: Invertibility}
+    \begin{definition}
+        A VARMA process $\{y_t\}$ is said to be \textbf{invertible} with respect to $\{z_t\}$ if
+        \[
+        z_t \in \Span(y_\tau, \; -\infty < \tau \leq t)
+        \]
+    \end{definition}
     
-    \begin{block}{Sufficient Condition for Causality}
-        $\{Y_t\}$ is \textbf{causal} w.r.t.\ $\{Z_t\}$ if $\det \Phi(z) \neq 0$ for all $|z| \leq 1$.
+    \begin{itemize}
+        \item Can obtain the white noise realizations $z_t$ as a function of \textcolor{mitOrange}{current and lagged values of the process itself}, $y_{t-\ell}$
         
-        \vspace{0.2em}
+        \vspace{0.5em}
         
-        $\Rightarrow$ Roots of $\det \Phi(z) = 0$ lie \textbf{outside the unit circle}.
+        \item Sufficient condition is that \textcolor{mitOrange}{$\Theta(L)$ has 1-sided inverse}, giving a VAR($\infty$) representation
         
-        \vspace{0.2em}
+        \vspace{0.3em}
         
-        This yields the VMA($\infty$) representation: $Y_t = \Phi(L)^{-1}\Theta(L) Z_t = \Psi(L) Z_t$ with $\Psi(L)$ one-sided.
-    \end{block}
-    
-    \vspace{0.3em}
-    
-    \begin{block}{Sufficient Condition for Invertibility}
-        $\{Y_t\}$ is \textbf{invertible} w.r.t.\ $\{Z_t\}$ if $\det \Theta(z) \neq 0$ for all $|z| \leq 1$.
-        
-        \vspace{0.2em}
-        
-        $\Rightarrow$ Roots of $\det \Theta(z) = 0$ lie \textbf{outside the unit circle}.
-        
-        \vspace{0.2em}
-        
-        This yields the VAR($\infty$) representation: $\Pi(L) Y_t = Z_t$ with $\Pi(L)$ one-sided.
-    \end{block}
-    
-    \vspace{0.3em}
-    
-    \begin{alertblock}{Warning (Wolf, 2022)}
-        Invertibility is \textbf{far from guaranteed} in structural models! E.g., 5 shocks but only 2 observables $\Rightarrow$ cannot possibly be invertible.
-    \end{alertblock}
+        $\Rightarrow$ This property is far from guaranteed in our structural models. E.g.\ if we have 5 shocks in $z$ but only 2 observables in $y$, then the process can't possibly be invertible.
+    \end{itemize}
 \end{frame}
 
 % ----------------------------------------------------------------------------
