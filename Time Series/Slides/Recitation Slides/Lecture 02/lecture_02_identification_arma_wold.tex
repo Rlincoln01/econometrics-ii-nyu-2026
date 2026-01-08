@@ -115,7 +115,7 @@
 % OUTLINE
 % ============================================================================
 \begin{frame}{Today's Roadmap}
-    \textbf{Hour 1: Theory} (~25-30 minutes per topic)
+    \textbf{Part 1: Theory} 
     \begin{enumerate}
         \item \textbf{Identification in Time Series}
         \begin{itemize}
@@ -134,10 +134,9 @@
     \end{enumerate}
     
     \vspace{0.5em}
-    \textbf{Hour 2: Exercises}
+    \textbf{Part 2: Exercises}
     \begin{itemize}
-        \item Tim's Practice Problems (Ex. 2, 3)
-        \item Medeiros ARMA Exercises (1, 2, 3, 6) + Vector Processes (Ex. 4)
+        \item Pset 1 (Problems 1--8): Tim + Medeiros practice problems
     \end{itemize}
 \end{frame}
 
@@ -1004,8 +1003,8 @@
 % ----------------------------------------------------------------------------
 % TIM'S EXERCISES
 % ----------------------------------------------------------------------------
-\begin{frame}{Tim's Practice Problems: Exercise 2 (MA($q$) properties)}
-    \footnotesize
+\begin{frame}{Pset 1 --- Problem 3: Finite MA($q$) properties}
+    % \footnotesize
     \begin{block}{Problem}
         A finite-order MA($q$) process can be expressed as
         \[
@@ -1023,7 +1022,7 @@
     \textbf{Idea}: expand products using WN orthogonality ($\E[\varepsilon_t\varepsilon_s]=0$ for $t\neq s$).
 \end{frame}
 
-\begin{frame}{Exercise 2 (MA($q$)): Solution}
+\begin{frame}{Pset 1 --- Problem 3: Solution}
     \footnotesize
     Let $\E[\varepsilon_t]=0$, $\Var(\varepsilon_t)=\sigma_\varepsilon^2$, and $\E[\varepsilon_t\varepsilon_s]=0$ for $t\neq s$.
     
@@ -1048,14 +1047,14 @@
         \sum_{k=-\infty}^{\infty}|\rho_k|<\infty.
         \]
     \end{enumerate}
-    \begin{block}{Key takeaway}
-        Finite MA $\Rightarrow$ always covariance stationary and has \textbf{short memory}: ACF cuts off after $q$.
-    \end{block}
+    % \begin{block}{Key takeaway}
+    %     Finite MA $\Rightarrow$ always covariance stationary and has \textbf{short memory}: ACF cuts off after $q$.
+    % \end{block}
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Tim's Practice Problems: Exercise 2 (MA(2) invertibility)}
-    \footnotesize
+\begin{frame}{Pset 1 --- Problem 5: MA(2) invertibility \& observational equivalence}
+    % \footnotesize
     \begin{block}{Problem}
         Consider a second-order moving-average process
         \[
@@ -1069,7 +1068,7 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Exercise 2 (MA(2)): Solution}
+\begin{frame}{Pset 1 --- Problem 5: Solution}
     \footnotesize
     Write $x_t=\Theta(L)\varepsilon_t$ with $\Theta(L)=1+\theta_1L+\theta_2L^2$.
     
@@ -1098,8 +1097,8 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Tim's Practice Problems: Exercise 3 (nonstationary bivariate)}
-    \footnotesize
+\begin{frame}{Pset 1 --- Problem 1: Nonstationary bivariate system}
+    % \footnotesize
     \begin{block}{Problem}
         Consider the non-stationary processes
         \[
@@ -1115,7 +1114,7 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Exercise 3: Solution}
+\begin{frame}{Pset 1 --- Problem 1: Solution}
     \footnotesize
     First differences:
     \[
@@ -1152,7 +1151,7 @@
 % ----------------------------------------------------------------------------
 % MEDEIROS EXERCISES - ARMA
 % ----------------------------------------------------------------------------
-\begin{frame}{Medeiros ARMA: Exercise 1 --- Statement}
+\begin{frame}{Pset 1 --- Problem 2: Measurement error in MA(1)}
     \begin{block}{Problem}
         Let $y_t$, $t = 1, \ldots, T$, be a time series described by an MA(1) process:
         \[
@@ -1171,7 +1170,7 @@
     \end{enumerate}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 1 --- Solution (a)}
+\begin{frame}{Pset 1 --- Problem 2: Solution (a)}
     \textbf{(a) Mean and Variance of $x_t$}:
     
     \vspace{0.5em}
@@ -1194,7 +1193,7 @@
     \end{align*}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 1 --- Solution (b)}
+\begin{frame}{Pset 1 --- Problem 2: Solution (b)}
     \textbf{(b) Autocovariances of $x_t$}:
     
     \vspace{0.5em}
@@ -1225,7 +1224,7 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 1 --- Solution (c)}
+\begin{frame}{Pset 1 --- Problem 2: Solution (c)}
     \textbf{(c) Which ARMA$(p,q)$ describes $x_t$?}
     
     \vspace{0.5em}
@@ -1257,7 +1256,7 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Medeiros ARMA: Exercise 2 --- Statement}
+\begin{frame}{Pset 1 --- Problem 4: Sum of two AR(1) processes}
     \begin{block}{Problem}
         Let $\{y_t\}$ and $\{z_t\}$, $t = 1, \ldots, T$, be two stochastic processes:
         \[
@@ -1275,7 +1274,7 @@
     \end{enumerate}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 2 --- Solution (a)}
+\begin{frame}{Pset 1 --- Problem 4: Solution (a)}
     \textbf{(a) Case $\phi_1 = \phi_2 = \phi$}:
     
     \vspace{0.5em}
@@ -1304,7 +1303,7 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 2 --- Solution (b) Part 1}
+\begin{frame}{Pset 1 --- Problem 4: Solution (b) Part 1}
     \textbf{(b) Case $\phi_1 \neq \phi_2$}:
     
     \vspace{0.3em}
@@ -1332,7 +1331,7 @@
     \]
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 2 --- Solution (b) Part 2}
+\begin{frame}{Pset 1 --- Problem 4: Solution (b) Part 2}
     \textbf{Expanding}:
     \[
     [1 - (\phi_1 + \phi_2)L + \phi_1\phi_2 L^2]x_t = \varepsilon_t - \phi_2\varepsilon_{t-1} + u_t - \phi_1 u_{t-1}
@@ -1363,7 +1362,7 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Medeiros ARMA: Exercise 3 --- Statement}
+\begin{frame}{Pset 1 --- Problem 6: Sum of independent AR(1) processes}
     \begin{block}{Problem}
         Consider two independent AR(1) processes $x_t$ and $y_t$ defined by:
         \[
@@ -1387,7 +1386,7 @@
     \end{enumerate}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (a)}
+\begin{frame}{Pset 1 --- Problem 6: Solution (a)}
     \textbf{(a) Conditional forecasts}:
     
     \vspace{0.3em}
@@ -1417,7 +1416,7 @@
     \]
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (b) Part 1}
+\begin{frame}{Pset 1 --- Problem 6: Solution (b) Part 1}
     \textbf{(b) Showing that $z_t$ is ARMA(2,1)}:
     
     \vspace{0.3em}
@@ -1445,7 +1444,7 @@
     \]
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (b) Part 2}
+\begin{frame}{Pset 1 --- Problem 6: Solution (b) Part 2}
     \textbf{Solving for $\theta$}:
     
     \vspace{0.3em}
@@ -1472,7 +1471,7 @@
     \end{alertblock}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (c)}
+\begin{frame}{Pset 1 --- Problem 6: Solution (c)}
     \textbf{(c) Conditions for $z_t$ to be AR(2)}:
     
     \vspace{0.3em}
@@ -1499,7 +1498,7 @@
     \end{alertblock}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (d)}
+\begin{frame}{Pset 1 --- Problem 6: Solution (d)}
     \textbf{(d) Showing that $\theta \neq \pm 1$}:
     
     \vspace{0.5em}
@@ -1531,7 +1530,7 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 3 --- Solution (e)}
+\begin{frame}{Pset 1 --- Problem 6: Solution (e)}
     \textbf{(e) Forecasting using the ARMA(2,1)}:
     
     \vspace{0.3em}
@@ -1561,7 +1560,7 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Medeiros ARMA: Exercise 6 --- Statement}
+\begin{frame}{Pset 1 --- Problem 7: Partial adjustment vs.\ adaptive expectations}
     \begin{block}{Partial Adjustment Model}
         The desired level $y_t^*$ is related to $x_t$ by: $y_t^* = \beta x_t$.
         
@@ -1584,7 +1583,7 @@
     \textbf{Tasks}: (a) Compare the models. (b) Show that OLS of $y_t$ on $y_{t-1}$ and $x_t$ is consistent for the model (1)-(2), but inconsistent for (3)-(4).
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 6 --- Solution (a)}
+\begin{frame}{Pset 1 --- Problem 7: Solution (a)}
     \textbf{(a) Comparing the two models}:
     
     \vspace{0.3em}
@@ -1608,7 +1607,7 @@
     Using the Koyck transformation: $y_t = \beta\lambda x_t + (1-\lambda)y_{t-1} + v_t - (1-\lambda)v_{t-1}$
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 6 --- Solution (a) Cont.}
+\begin{frame}{Pset 1 --- Problem 7: Solution (a) Cont.}
     \textbf{Reduced-form representation of both models}:
     
     \vspace{0.5em}
@@ -1634,7 +1633,7 @@
     \end{alertblock}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 6 --- Solution (b)}
+\begin{frame}{Pset 1 --- Problem 7: Solution (b)}
     \textbf{(b) OLS consistency}:
     
     \vspace{0.3em}
@@ -1664,7 +1663,7 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Medeiros ARMA: Exercise 6 --- Solution (c)}
+\begin{frame}{Pset 1 --- Problem 7: Solution (c)}
     \textbf{(c) How to check which model is appropriate?}
     
     \vspace{0.5em}
@@ -1704,7 +1703,7 @@
 % ----------------------------------------------------------------------------
 % MEDEIROS - VECTOR PROCESSES (Exercise 4)
 % ----------------------------------------------------------------------------
-\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Statement}
+\begin{frame}{Pset 1 --- Problem 8: Vector model (inflation, output gap, policy)}
     \begin{block}{Macroeconomic Model}
         \begin{align*}
         (1): & \quad \pi_t = \lambda y_t + \pi_t^e + u_{1t}, \quad 0 < \lambda < 1 \\
@@ -1720,7 +1719,7 @@
     \textbf{Interpretation}: (1) Phillips curve, (2) IS, (3) adaptive expectations, (4) Taylor rule.
 \end{frame}
 
-\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Statement (cont.)}
+\begin{frame}{Pset 1 --- Problem 8: Tasks (cont.)}
     \textbf{Tasks}:
     \begin{enumerate}[(a)]
         \item Show that $\pi_t$ follows an ARMA$(p,q)$. Relate the coefficients to the structural parameters.
@@ -1735,7 +1734,7 @@
     \end{enumerate}
 \end{frame}
 
-\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (a) Part 1}
+\begin{frame}{Pset 1 --- Problem 8: Solution (a) Part 1}
     \textbf{(a) Deriving the ARMA process for $\pi_t$}:
     
     \vspace{0.3em}
@@ -1758,7 +1757,7 @@
     where $c = \lambda\gamma(i^* - \rho\pi^*)$ is a constant.
 \end{frame}
 
-\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (a) Part 2}
+\begin{frame}{Pset 1 --- Problem 8: Solution (a) Part 2}
     \textbf{Result}: $\pi_t$ follows an \textbf{AR(1)} process:
     \[
     \boxed{\pi_t = c + \phi \pi_{t-1} + \varepsilon_t}
@@ -1782,7 +1781,7 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (b)}
+\begin{frame}{Pset 1 --- Problem 8: Solution (b)}
     \textbf{(b) Analysis for different values of $\rho$}:
     
     \vspace{0.3em}
@@ -1812,7 +1811,7 @@
     \end{alertblock}
 \end{frame}
 
-\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (c)}
+\begin{frame}{Pset 1 --- Problem 8: Solution (c)}
     \textbf{(c) Forecasts and forecast error variance}:
     
     \vspace{0.3em}
@@ -1842,7 +1841,7 @@
     \]
 \end{frame}
 
-\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (d)}
+\begin{frame}{Pset 1 --- Problem 8: Solution (d)}
     \textbf{(d) Conditional distribution of $\mathbf{x}_t = (\pi_t, y_t)'$}:
     
     \vspace{0.3em}
@@ -1869,7 +1868,7 @@
     \]
 \end{frame}
 
-\begin{frame}{Medeiros Vector Processes: Exercise 4 --- Solution (e)}
+\begin{frame}{Pset 1 --- Problem 8: Solution (e)}
     \textbf{(e) Generalized adaptive expectations}: $\pi_t^e = \alpha\pi_{t-1} + (1-\alpha)\pi_{t-1}^e$
     
     \vspace{0.3em}
