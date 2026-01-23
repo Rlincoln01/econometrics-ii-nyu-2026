@@ -94,7 +94,7 @@
 
 % Title information
 \title{Time Series Fundamentals}
-\subtitle{TA Session 1: Introduction to Stochastic Processes}
+\subtitle{Recitation Session 1: Introduction to Stochastic Processes}
 \author{Rafael Lincoln}
 \institute{Econometrics II -- NYU PhD Program}
 \date{Spring 2026}
@@ -113,22 +113,22 @@
 % ============================================================================
 \begin{frame}{Today's Roadmap}
     \begin{enumerate}
-        \item \textbf{Introduction: Why Time Series?}
+        \item \hyperlink{part-intro}{\textbf{Introduction: Why Time Series?}}
         \begin{itemize}
             \item Objectives: Dynamic relationships \& Forecasting
             \item Structural vs. Reduced-form models
             \item Stylized facts
         \end{itemize}
         \vspace{0.5em}
-        \item \textbf{Introduction to Stochastic Processes}
+        \item \hyperlink{part-stochastic}{\textbf{Introduction to Stochastic Processes}}
         \begin{itemize}
-            \item Formal definitions: Filtrations, measurability
-            \item Models: DGP, correct specification
-            \item Key restrictions: Stationarity
-            \item Linear operators (lag \& difference)
+            \item \hyperlink{part-stochastic}{Formal definitions: Filtrations, measurability}
+            \item \hyperlink{part-models}{Models: DGP, correct specification}
+            \item \hyperlink{part-models}{Key restrictions: Stationarity}
+            \item \hyperlink{part-ops}{Linear operators (lag \& difference)}
         \end{itemize}
         \vspace{0.5em}
-        \item \textbf{Examples from Macroeconomics}
+        \item \hyperlink{part-examples}{\textbf{Examples from Macroeconomics}}
         \begin{itemize}
             \item Monetary policy transmission
             \item Samuelson's multiplier-accelerator
@@ -140,7 +140,7 @@
 % ============================================================================
 % PART I: INTRODUCTION
 % ============================================================================
-\begin{frame}[plain]
+\begin{frame}[plain,label=part-intro]
     \begin{center}
         {\Large \textbf{Part I: Introduction}}\\[1em]
         {\large Why Time Series?}
@@ -338,7 +338,7 @@
 % ============================================================================
 % PART II: STOCHASTIC PROCESSES
 % ============================================================================
-\begin{frame}[plain]
+\begin{frame}[plain,label=part-stochastic]
     \begin{center}
         {\Large \textbf{Part II (a): Stochastic Processes}}\\[1em]
         {\large  Formal Definitions}
@@ -371,7 +371,7 @@
 % ----------------------------------------------------------------------------
 \begin{frame}{Measurable Functions}
     \begin{definition}[Measurable Function]
-        A function $f: \Omega \to \widetilde{\Omega}$ between measure spaces $(\Omega, \F)$ and $(\widetilde{\Omega}, \widetilde{\F})$ is $\F/\widetilde{\F}$-\textbf{measurable} if it preserves measurability:
+        A function $f: \Omega \to \widetilde{\Omega}$ between measure spaces $(\Omega, \F)$ and $(\widetilde{\Omega}, \widetilde{\F})$ is $\F/\widetilde{\F}$-\textbf{measurable} if its inverse preserves measurability:
         \[
         \forall B \in \widetilde{\F}, \quad f^{-1}(B) \in \F
         \]
@@ -508,7 +508,7 @@ The five time series in the figure are realizations of the same stochastic proce
 % ============================================================================
 % PART II.2: MODELS FOR STOCHASTIC PROCESSES
 % ============================================================================
-\begin{frame}[plain]
+\begin{frame}[plain,label=part-models]
     \begin{center}
         {\Large \textbf{Part II (b): Models for Stochastic Processes}}\\[1em]
         {\large DGP, Stationarity, and Structural/Reduced-Form Models}
@@ -799,7 +799,7 @@ The five time series in the figure are realizations of the same stochastic proce
 % ============================================================================
 % PART II.4: LINEAR OPERATORS
 % ============================================================================
-\begin{frame}[plain]
+\begin{frame}[plain,label=part-ops]
     \begin{center}
         {\Large \textbf{Part II (c): Operations on Stochastic Processes}}\\[1em]
         {\large Linear Operators}
@@ -915,7 +915,7 @@ The five time series in the figure are realizations of the same stochastic proce
 % ============================================================================
 % PART III: EXAMPLES
 % ============================================================================
-\begin{frame}[plain]
+\begin{frame}[plain,label=part-examples]
     \begin{center}
         {\Large \textbf{Part III: Examples}}\\[1em]
         {\large Applications to Macroeconomics}
@@ -1151,32 +1151,32 @@ The five time series in the figure are realizations of the same stochastic proce
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{Preview: What's Next}
-    \textbf{Section 7.4}: Reduced-Form Models in Detail
-    \begin{itemize}
-        \item AR($p$): Definition, stationarity, estimation
-        \item MA($q$): Definition, invertibility
-        \item ARMA($p,q$): Combining both
-    \end{itemize}
+% \begin{frame}{Preview: What's Next}
+%     \textbf{Section 7.4}: Reduced-Form Models in Detail
+%     \begin{itemize}
+%         \item AR($p$): Definition, stationarity, estimation
+%         \item MA($q$): Definition, invertibility
+%         \item ARMA($p,q$): Combining both
+%     \end{itemize}
     
-    \vspace{0.5em}
+%     \vspace{0.5em}
     
-    \textbf{Section 7.5}: Vector Autoregressions
-    \begin{itemize}
-        \item VAR($p$) estimation and inference
-        \item Impulse response functions
-        \item Structural identification
-    \end{itemize}
+%     \textbf{Section 7.5}: Vector Autoregressions
+%     \begin{itemize}
+%         \item VAR($p$) estimation and inference
+%         \item Impulse response functions
+%         \item Structural identification
+%     \end{itemize}
     
-    \vspace{0.5em}
+%     \vspace{0.5em}
     
-    \textbf{Section 7.6}: Estimation Methods
-    \begin{itemize}
-        \item OLS for AR models
-        \item Maximum likelihood
-        \item GMM for Euler equations
-    \end{itemize}
-\end{frame}
+%     \textbf{Section 7.6}: Estimation Methods
+%     \begin{itemize}
+%         \item OLS for AR models
+%         \item Maximum likelihood
+%         \item GMM for Euler equations
+%     \end{itemize}
+% \end{frame}
 
 % ============================================================================
 % APPENDIX
@@ -1195,7 +1195,7 @@ The five time series in the figure are realizations of the same stochastic proce
 \begin{frame}[plain]
     \begin{center}
         {\Large \textbf{Appendix: Ergodicity \& Mixing}}\\[1em]
-        {\large Section 7.2.2 (cont.)}
+        % {\large Section 7.2.2 (cont.)}
     \end{center}
 \end{frame}
 
@@ -1377,7 +1377,7 @@ The five time series in the figure are realizations of the same stochastic proce
 \begin{frame}[plain]
     \begin{center}
         {\Large \textbf{Appendix: Martingales}}\\[1em]
-        {\large Section 7.2.4}
+        % {\large Section 7.2.4}
     \end{center}
 \end{frame}
 
@@ -1576,7 +1576,7 @@ The five time series in the figure are realizations of the same stochastic proce
     
     \textbf{Course Materials}:
     \begin{itemize}
-        \item Lecture Notes: Sections 7.1--7.3
+        \item Tim's Slides + My Notes
         \item Cochrane (2005): \textit{Time Series for Macroeconomics and Finance}
     \end{itemize}
     
