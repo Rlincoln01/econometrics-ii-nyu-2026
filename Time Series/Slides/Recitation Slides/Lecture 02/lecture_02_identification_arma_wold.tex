@@ -97,7 +97,7 @@
 
 % Title information
 \title{Identification, ARMA Models, and Wold Decomposition}
-\subtitle{TA Session 2: Reduced-Form Time Series Analysis}
+\subtitle{Recitation Session 2: Reduced-Form Time Series Analysis}
 \author{Rafael Lincoln}
 \institute{Econometrics II -- NYU PhD Program}
 \date{Spring 2026}
@@ -136,7 +136,7 @@
     \vspace{0.5em}
     \textbf{Part 2: Exercises}
     \begin{itemize}
-        \item Pset 1 (Problems 1--8): Tim + Medeiros practice problems
+        \item Pset 1 (Problems 1--8)
     \end{itemize}
 \end{frame}
 
@@ -657,7 +657,7 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-\begin{frame}{MA($q$): Invertibility}
+\begin{frame}{MA($q$): Invertibility}\label{slide:invertibility_definition}
     \begin{definition}[Invertibility]
         An MA($q$) process is \textbf{invertible} if $u_t$ lies in the space spanned by current and past observables: $u_t \in \Span(y_\tau, -\infty < \tau \leq t)$.
     \end{definition}
@@ -677,7 +677,9 @@
     
     \vspace{0.3em}
     
-    \textbf{Practical importance}: Invertibility allows expressing $u_t$ as function of observables --- essential for estimation!
+    \textbf{Practical importance}: Invertibility allows expressing $u_t$ as function of observables --- essential for estimation! \hfill \hyperlink{slide:pset1_prob1_solution}{\beamerbutton{Example: Pset 1, Problem 1}}
+    
+    
 \end{frame}
 
 % ----------------------------------------------------------------------------
@@ -867,7 +869,7 @@
         where:
         \begin{enumerate}
             \item $\Psi(L)$ is \textbf{square-summable}
-            \item $u_t = y_t - \E^*[y_t \mid \{y_\tau\}_{-\infty < \tau \leq t-1}]$ (one-step-ahead forecast errors)
+            \item $u_t = y_t - \E^*[y_t \mid\mathcal{F}^Y_{t-1}]$ (one-step-ahead forecast errors)
             \item $\{y_t\}$ is \textbf{invertible} with respect to $u_t$
             \item $\{d_t\}$ is a \textbf{purely deterministic} process
         \end{enumerate}
@@ -1001,101 +1003,7 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
-% TIM'S EXERCISES
-% ----------------------------------------------------------------------------
-\begin{frame}{Pset 1 --- Problem 3: Finite MA($q$) properties}
-    % \footnotesize
-    \begin{block}{Problem}
-        A finite-order MA($q$) process can be expressed as
-        \[
-        y_t = \sum_{j=0}^{q}\theta_j \varepsilon_{t-j}, \qquad \varepsilon_t \text{ is white noise, } \theta_0 = 1.
-        \]
-        Show that all finite-order moving-average processes:
-        \begin{enumerate}[(a)]
-            \item are covariance stationary;
-            \item have autocovariances that truncate at lag $q$ (i.e., $\gamma_k \neq 0$ for $k\le q$ and $\gamma_k=0$ for $k>q$);
-            \item have absolutely summable autocovariances/autocorrelations.
-        \end{enumerate}
-    \end{block}
-    
-    \vspace{0.3em}
-    \textbf{Idea}: expand products using WN orthogonality ($\E[\varepsilon_t\varepsilon_s]=0$ for $t\neq s$).
-\end{frame}
-
-\begin{frame}{Pset 1 --- Problem 3: Solution}
-    \footnotesize
-    Let $\E[\varepsilon_t]=0$, $\Var(\varepsilon_t)=\sigma_\varepsilon^2$, and $\E[\varepsilon_t\varepsilon_s]=0$ for $t\neq s$.
-    
-    \vspace{0.3em}
-    \begin{enumerate}[(a)]
-        \item \textbf{Covariance stationarity}: $\E[y_t]=\sum_{j=0}^q \theta_j \E[\varepsilon_{t-j}]=0$ (constant).
-        
-        Variance:
-        \[
-        \gamma_0=\Var(y_t)=\sigma_\varepsilon^2\sum_{j=0}^q \theta_j^2 < \infty .
-        \]
-        \item \textbf{Autocovariance truncation}: for $k\ge 0$,
-        \[
-        \gamma_k=\Cov(y_t,y_{t-k})
-        =\sigma_\varepsilon^2\sum_{j=0}^{q-k}\theta_{j+k}\theta_j,
-        \]
-        because only terms with matching innovation indices survive. If $k>q$, the sum is empty $\Rightarrow \gamma_k=0$.
-        \item \textbf{Absolute summability}: since $\gamma_k=0$ for $|k|>q$,
-        \[
-        \sum_{k=-\infty}^{\infty}|\gamma_k|=\sum_{k=-q}^{q}|\gamma_k|<\infty
-        \quad\Rightarrow\quad
-        \sum_{k=-\infty}^{\infty}|\rho_k|<\infty.
-        \]
-    \end{enumerate}
-    % \begin{block}{Key takeaway}
-    %     Finite MA $\Rightarrow$ always covariance stationary and has \textbf{short memory}: ACF cuts off after $q$.
-    % \end{block}
-\end{frame}
-
-% ----------------------------------------------------------------------------
-\begin{frame}{Pset 1 --- Problem 5: MA(2) invertibility \& observational equivalence}
-    % \footnotesize
-    \begin{block}{Problem}
-        Consider a second-order moving-average process
-        \[
-        x_t=\varepsilon_t+\theta_1\varepsilon_{t-1}+\theta_2\varepsilon_{t-2},
-        \qquad \varepsilon_t \overset{iid}{\sim}N(0,\sigma^2).
-        \]
-        \begin{enumerate}[(a)]
-            \item State conditions on $(\theta_1,\theta_2)$ for the process to be \textbf{invertible}.
-            \item Characterize the family of \textbf{observationally equivalent}, non-invertible MA(2) representations.
-        \end{enumerate}
-    \end{block}
-\end{frame}
-
-\begin{frame}{Pset 1 --- Problem 5: Solution}
-    \footnotesize
-    Write $x_t=\Theta(L)\varepsilon_t$ with $\Theta(L)=1+\theta_1L+\theta_2L^2$.
-    
-    \vspace{0.3em}
-    \begin{enumerate}[(a)]
-        \item \textbf{Invertibility} $\iff$ all roots of $\Theta(z)=0$ satisfy $|z|>1$.
-        
-        Equivalently, factor $\Theta(L)=(1-\lambda_1L)(1-\lambda_2L)$ with
-        $\lambda_1+\lambda_2=-\theta_1$, $\lambda_1\lambda_2=\theta_2$.
-        Then invertibility $\iff |\lambda_1|<1$ and $|\lambda_2|<1$ (roots outside unit circle).
-        
-        \item \textbf{Observationally equivalent non-invertible family (root flipping)}:
-        
-        If $\Theta(L)=\prod_{i=1}^2(1-\lambda_iL)$, pick any subset $S\subseteq\{1,2\}$ and define
-        \[
-        \widetilde\Theta(L)=\prod_{i\in S}(1-\lambda_i^{-1}L)\prod_{i\notin S}(1-\lambda_iL),
-        \]
-        i.e., \emph{replace} any factor with $|\lambda_i|<1$ by its reciprocal (moving the corresponding root \emph{inside} the unit circle).
-        
-        With suitably rescaled white noise $\tilde\varepsilon_t$ (variance scaled by $\prod_{i\in S}\lambda_i^2$), the process
-        $x_t=\widetilde\Theta(L)\tilde\varepsilon_t$ has the \textbf{same second moments} as the original MA(2), hence is observationally equivalent.
-    \end{enumerate}
-    \begin{block}{Key takeaway}
-        For MA models, \textbf{second moments cannot distinguish} between invertible and root-flipped non-invertible representations.
-    \end{block}
-\end{frame}
-
+% EXERCISES (Pset 1) -- Ordered
 % ----------------------------------------------------------------------------
 \begin{frame}{Pset 1 --- Problem 1: Nonstationary bivariate system}
     % \footnotesize
@@ -1114,24 +1022,37 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Pset 1 --- Problem 1: Solution}
+\begin{frame}{Pset 1 --- Problem 1: Solution (VMA(1) form)}\label{slide:pset1_prob1_solution}
     \footnotesize
     First differences:
     \[
     \Delta y_{1t}=\varepsilon_{1t}+\theta\varepsilon_{1,t-1},\qquad
     \Delta y_{2t}=\phi\Delta y_{1t}+(\varepsilon_{2t}-\varepsilon_{2,t-1}).
     \]
-    Define $u_t=(\varepsilon_{1t},\varepsilon_{2t})'$ and write
+    Define $u_t=(\varepsilon_{1t},\varepsilon_{2t})'$ and rearrange the system as
+    \[
+    \underbrace{\begin{pmatrix}1&0\\ -\phi&1\end{pmatrix}}_{\Omega}\Delta y_t
+    =
+    \underbrace{\begin{pmatrix}1&0\\ 0&1\end{pmatrix}}_{\Pi_0}u_t
+    +
+    \underbrace{\begin{pmatrix}\theta&0\\ 0&-1\end{pmatrix}}_{\Pi_1}u_{t-1}.
+    \]
+    Premultiplying by $\Omega^{-1}=\begin{pmatrix}1&0\\ \phi&1\end{pmatrix}$ gives the VMA(1) form:
     \[
     \Delta y_t
     =
-    \underbrace{\begin{pmatrix}1&0\\ \phi&1\end{pmatrix}}_{A_0}u_t
+    \underbrace{\Omega^{-1}\Pi_0}_{A_0=\begin{pmatrix}1&0\\ \phi&1\end{pmatrix}}u_t
     +
-    \underbrace{\begin{pmatrix}\theta&0\\ \phi\theta&-1\end{pmatrix}}_{A_1}u_{t-1}
+    \underbrace{\Omega^{-1}\Pi_1}_{A_1=\begin{pmatrix}\theta&0\\ \phi\theta&-1\end{pmatrix}}u_{t-1}
     \;=\;
     (A_0+A_1L)u_t,
     \]
     so it is a VMA(1).
+\end{frame}
+
+\begin{frame}{Pset 1 --- Problem 1: Solution (Non-invertibility)}
+    \footnotesize
+    \hfill \hyperlink{slide:invertibility_definition}{\beamerbutton{Back: Invertibility}}
     
     \vspace{0.3em}
     \textbf{Non-invertibility}: check the determinant
@@ -1143,6 +1064,9 @@
     
     \vspace{0.3em}
     \textbf{(b)} No observationally equivalent \emph{invertible} MA(1) representation within the usual class: the problematic root is exactly at $z=1$ and cannot be ``flipped'' outside the unit circle.
+    
+    \vspace{0.3em}
+    \textbf{Contrast with MA root-flipping}: in the MA(1) example earlier, a non-invertible root \emph{inside} the unit circle can be flipped outside by mapping $\theta \leftrightarrow 1/\theta$ (and rescaling the innovation variance), yielding an observationally equivalent \emph{invertible} representation. Here the offending root is exactly at $z=1$, and $1/z = 1$ --- so there is \textbf{no distinct flipped representation} to restore invertibility.
     \begin{block}{Key takeaway}
         Non-invertibility can be \textbf{structural} (unit-circle root), not just a choice of MA parameterization.
     \end{block}
@@ -1188,7 +1112,8 @@
     
     \textbf{Variance}: Since $\varepsilon_t$, $\varepsilon_{t-1}$, and $u_t$ are mutually uncorrelated:
     \begin{align*}
-    \gamma_0 &= \Var(x_t) = \Var(\varepsilon_t) + \theta^2 \Var(\varepsilon_{t-1}) + \Var(u_t) \\
+    \gamma_0 &= \Var(x_t) = \Var(y_t) + \Var(u_t) \\
+    & =  \Var(\varepsilon_t) + \theta^2 \Var(\varepsilon_{t-1}) + \Var(u_t) \\
     &= \sigma_\varepsilon^2 + \theta^2 \sigma_\varepsilon^2 + \sigma_u^2 = \boxed{(1 + \theta^2)\sigma_\varepsilon^2 + \sigma_u^2}
     \end{align*}
 \end{frame}
@@ -1253,6 +1178,56 @@
     \begin{alertblock}{Conclusion}
         $x_t$ is an \textbf{MA(1)} process, but with parameters different from the original MA(1)! Measurement noise ``hides'' the true structural parameters $(\theta, \sigma_\varepsilon^2)$.
     \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Pset 1 --- Problem 3: Finite MA($q$) properties}
+    % \footnotesize
+    \begin{block}{Problem}
+        A finite-order MA($q$) process can be expressed as
+        \[
+        y_t = \sum_{j=0}^{q}\theta_j \varepsilon_{t-j}, \qquad \varepsilon_t \text{ is white noise, } \theta_0 = 1.
+        \]
+        Show that all finite-order moving-average processes:
+        \begin{enumerate}[(a)]
+            \item are covariance stationary;
+            \item have autocovariances that truncate at lag $q$ (i.e., $\gamma_k \neq 0$ for $k\le q$ and $\gamma_k=0$ for $k>q$);
+            \item have absolutely summable autocovariances/autocorrelations.
+        \end{enumerate}
+    \end{block}
+    
+    \vspace{0.3em}
+    \textbf{Idea}: expand products using WN orthogonality ($\E[\varepsilon_t\varepsilon_s]=0$ for $t\neq s$).
+\end{frame}
+
+\begin{frame}{Pset 1 --- Problem 3: Solution}
+    \footnotesize
+    Let $\E[\varepsilon_t]=0$, $\Var(\varepsilon_t)=\sigma_\varepsilon^2$, and $\E[\varepsilon_t\varepsilon_s]=0$ for $t\neq s$.
+    
+    \vspace{0.3em}
+    \begin{enumerate}[(a)]
+        \item \textbf{Covariance stationarity}: $\E[y_t]=\sum_{j=0}^q \theta_j \E[\varepsilon_{t-j}]=0$ (constant).
+        
+        Variance:
+        \[
+        \gamma_0=\Var(y_t)=\sigma_\varepsilon^2\sum_{j=0}^q \theta_j^2 < \infty .
+        \]
+        \item \textbf{Autocovariance truncation}: for $k\ge 0$,
+        \[
+        \gamma_k=\Cov(y_t,y_{t-k})
+        =\sigma_\varepsilon^2\sum_{j=0}^{q-k}\theta_{j+k}\theta_j,
+        \]
+        because only terms with matching innovation indices survive. If $k>q$, the sum is empty $\Rightarrow \gamma_k=0$.
+        \item \textbf{Absolute summability}: since $\gamma_k=0$ for $|k|>q$,
+        \[
+        \sum_{k=-\infty}^{\infty}|\gamma_k|=\sum_{k=-q}^{q}|\gamma_k|<\infty
+        \quad\Rightarrow\quad
+        \sum_{k=-\infty}^{\infty}|\rho_k|<\infty.
+        \]
+    \end{enumerate}
+    % \begin{block}{Key takeaway}
+    %     Finite MA $\Rightarrow$ always covariance stationary and has \textbf{short memory}: ACF cuts off after $q$.
+    % \end{block}
 \end{frame}
 
 % ----------------------------------------------------------------------------
@@ -1362,6 +1337,62 @@
 \end{frame}
 
 % ----------------------------------------------------------------------------
+\begin{frame}{Pset 1 --- Problem 5: MA(2) invertibility \& observational equivalence}
+    % \footnotesize
+    \begin{block}{Problem}
+        Consider a second-order moving-average process
+        \[
+        x_t=\varepsilon_t+\theta_1\varepsilon_{t-1}+\theta_2\varepsilon_{t-2},
+        \qquad \varepsilon_t \overset{iid}{\sim}N(0,\sigma^2).
+        \]
+        \begin{enumerate}[(a)]
+            \item State conditions on $(\theta_1,\theta_2)$ for the process to be \textbf{invertible}.
+            \item Characterize the family of \textbf{observationally equivalent}, non-invertible MA(2) representations.
+        \end{enumerate}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Pset 1 --- Problem 5: Solution (a) Invertibility}
+    \footnotesize
+    Write $x_t=\Theta(L)\varepsilon_t$ with $\Theta(L)=1+\theta_1L+\theta_2L^2$.
+    
+    \vspace{0.3em}
+    \textbf{Invertibility} $\iff$ all roots of $\Theta(z)=0$ satisfy $|z|>1$.
+    
+    \vspace{0.3em}
+    Equivalently, factor
+    \[
+    \Theta(L)=(1-\lambda_1L)(1-\lambda_2L),
+    \qquad
+    \lambda_1+\lambda_2=-\theta_1,\;\;\lambda_1\lambda_2=\theta_2.
+    \]
+    Then invertibility $\iff |\lambda_1|<1$ and $|\lambda_2|<1$ (roots outside the unit circle).
+\end{frame}
+
+\begin{frame}{Pset 1 --- Problem 5: Solution (b) Observational equivalence + roots}
+    \footnotesize
+    \textbf{OE comes from second moments}: $\Gamma_x(h)=\Gamma_{\tilde x}(h)\;\forall h$
+    $\iff$ $\Omega_x(z)=\Omega_{\tilde x}(z)$.
+    
+    \vspace{0.2em}
+    \textbf{MA($q$)}: if $x_t=\Theta(L)\varepsilon_t$ with $\Var(\varepsilon_t)=\sigma^2$, then
+    \[
+    \Omega_x(z)=\Theta(z)\Theta(z^{-1})\,\sigma^2
+    \quad\Rightarrow\quad
+    \Theta(z)\Theta(z^{-1})\,\sigma^2=\widetilde\Theta(z)\widetilde\Theta(z^{-1})\,\tilde\sigma^2.
+    \]
+    
+    \vspace{0.3em}
+    \textbf{MA(2) case-by-case} (write $\Theta(L)=(1-\lambda_1L)(1-\lambda_2L)$):
+    \begin{itemize}
+        \item \textbf{No flip}: $\widetilde\Theta(L)=(1-\lambda_1L)(1-\lambda_2L)$,\;\; $\tilde\sigma^2=\sigma^2$.
+        \item \textbf{Flip root 1}: $\widetilde\Theta(L)=(1-\lambda_1^{-1}L)(1-\lambda_2L)$,\;\; $\tilde\sigma^2=\lambda_1^{2}\sigma^2$.
+        \item \textbf{Flip root 2}: $\widetilde\Theta(L)=(1-\lambda_1L)(1-\lambda_2^{-1}L)$,\;\; $\tilde\sigma^2=\lambda_2^{2}\sigma^2$.
+        \item \textbf{Flip both}: $\widetilde\Theta(L)=(1-\lambda_1^{-1}L)(1-\lambda_2^{-1}L)$,\;\; $\tilde\sigma^2=(\lambda_1\lambda_2)^{2}\sigma^2=\theta_2^2\sigma^2$.
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
 \begin{frame}{Pset 1 --- Problem 6: Sum of independent AR(1) processes}
     \begin{block}{Problem}
         Consider two independent AR(1) processes $x_t$ and $y_t$ defined by:
@@ -1370,13 +1401,8 @@
         \]
         where $\E(u_t) = \E(v_t) = 0$, $\E(u_t v_\tau) = 0$ for all $t, \tau$,\\
         $\E(u_t u_\tau) = \sigma_u^2$ if $t = \tau$ (0 otherwise), $\E(v_t v_\tau) = \sigma_v^2$ if $t = \tau$.
-        
-        \vspace{0.3em}
         Let $z_t = x_t + y_t$.
     \end{block}
-    
-    \vspace{0.3em}
-    
     \textbf{Tasks}:
     \begin{enumerate}[(a)]
         \item Compute $\E(x_{t+1}|\mathcal{F}_t)$, $\E(y_{t+1}|\mathcal{F}_t)$, $\E(z_{t+1}|\mathcal{F}_t)$, and the forecast error variance $V_D$.
@@ -1396,7 +1422,7 @@
     \E(x_{t+1}|\mathcal{F}_t) = \rho_1 x_t, \quad \E(y_{t+1}|\mathcal{F}_t) = \rho_2 y_t
     \]
     
-    Para $z_t = x_t + y_t$:
+    For $z_t = x_t + y_t$:
     \[
     \E(z_{t+1}|\mathcal{F}_t) = \rho_1 x_t + \rho_2 y_t
     \]
@@ -1416,7 +1442,7 @@
     \]
 \end{frame}
 
-\begin{frame}{Pset 1 --- Problem 6: Solution (b) Part 1}
+\begin{frame}{Pset 1 --- Problem 6: Solution (b) Part 1 --- Innovation}
     \textbf{(b) Showing that $z_t$ is ARMA(2,1)}:
     
     \vspace{0.3em}
@@ -1430,12 +1456,23 @@
     
     \vspace{0.3em}
     
-    \textbf{Identification via autocovariances}: For an MA(1), $\eta_t = (1+\theta L)\varepsilon_t$:
+    \textbf{Define the innovation $\eta_t$}: The right-hand side is
+    \[
+    \eta_t \;\equiv\; (1-\rho_2 L)u_t + (1-\rho_1 L)v_t
+    \;=\; u_t+v_t-\rho_2 u_{t-1}-\rho_1 v_{t-1}.
+    \]
+    Since $\eta_t$ is MA(1), it admits the representation $\eta_t=(1+\theta L)\varepsilon_t$ for some white noise $\varepsilon_t$.
+\end{frame}
+
+\begin{frame}{Pset 1 --- Problem 6: Solution (b) Part 2 --- Autocovariances}
+    \textbf{Identification via autocovariances}: For $\eta_t = (1+\theta L)\varepsilon_t$:
     \[
     \gamma_0^\eta = (1+\theta^2)\sigma_\varepsilon^2, \quad \gamma_1^\eta = \theta\sigma_\varepsilon^2
     \]
     
-    From the previous exercise, the right-hand side has:
+    \vspace{0.3em}
+    
+    From the expression $\eta_t = u_t+v_t-\rho_2 u_{t-1}-\rho_1 v_{t-1}$:
     \[
     \gamma_0^\eta = (1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2
     \]
@@ -1444,12 +1481,8 @@
     \]
 \end{frame}
 
-\begin{frame}{Pset 1 --- Problem 6: Solution (b) Part 2}
-    \textbf{Solving for $\theta$}:
-    
-    \vspace{0.3em}
-    
-    The lag-1 autocorrelation of an MA(1) is:
+\begin{frame}{Pset 1 --- Problem 6: Solution (b) Part 3}
+    \textbf{Solving for $\theta$}: The lag-1 autocorrelation of an MA(1) is:
     \[
     \rho_1^{\text{MA}} = \frac{\gamma_1}{\gamma_0} = \frac{\theta}{1+\theta^2}
     \]
@@ -1459,12 +1492,16 @@
     \frac{\theta}{1+\theta^2} = \frac{-\rho_2\sigma_u^2 - \rho_1\sigma_v^2}{(1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2}
     \]
     
-    \vspace{0.3em}
+    \vspace{0.2em}
     
-    This is a quadratic equation in $\theta$:
-    \[
-    \theta^2 \cdot (\text{numerador}) - \theta \cdot (\text{denominador}) + (\text{numerador}) = 0
-    \]
+    {\small
+    \begin{itemize}
+        \item Matching autocorrelations uses $\rho_1=\gamma_1/\gamma_0$, so the unknown scale $\sigma_\varepsilon^2$ cancels out.
+        \item It gives one equation in one unknown ($\theta$), hence a (generally two-root) identification of the MA(1) parameter.
+    \end{itemize}
+    }
+    
+    This implies a quadratic equation in $\theta$.
     
     \begin{alertblock}{Two roots!}
         There are two solutions, $\theta$ and $1/\theta$, corresponding to observationally equivalent representations (invertible vs.\ non-invertible).
@@ -1499,30 +1536,23 @@
 \end{frame}
 
 \begin{frame}{Pset 1 --- Problem 6: Solution (d)}
-    \textbf{(d) Showing that $\theta \neq \pm 1$}:
-    
-    \vspace{0.5em}
-    
-    Suppose $\theta = 1$. Then $\rho_1^{\text{MA}} = \frac{1}{1+1} = \frac{1}{2}$.
-    
-    \vspace{0.3em}
-    
-    For this to occur, we would need:
+    \textbf{(d) Showing that $\theta \neq \pm 1$}: Suppose $\theta = 1$. Then $\rho_1^{\text{MA}} = \frac{1}{1+1} = \frac{1}{2}$. For this to occur, we would need:
     \[
     \frac{-\rho_2\sigma_u^2 - \rho_1\sigma_v^2}{(1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2} = \frac{1}{2}
     \]
     
     \vspace{0.3em}
     
-    Since $|\rho_1|, |\rho_2| < 1$, the denominator $(1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2 > 2\sigma_u^2 + 2\sigma_v^2$ (using $\rho^2 < 1$).
-    
-    The numerator has absolute value $|\rho_2\sigma_u^2 + \rho_1\sigma_v^2| < \sigma_u^2 + \sigma_v^2$.
-    
-    \vspace{0.3em}
-    
-    Therefore, the absolute value of the ratio is:
+    Key inequality: for any real $x$, $2|x|\le 1+x^2$, with strict inequality when $|x|<1$.
+    Since $|\rho_1|,|\rho_2|<1$ and $\sigma_u^2,\sigma_v^2>0$,
     \[
-    \left|\rho_1^{\text{MA}}\right| < \frac{\sigma_u^2 + \sigma_v^2}{2(\sigma_u^2 + \sigma_v^2)} = \frac{1}{2}
+    2\big(|\rho_2|\sigma_u^2+|\rho_1|\sigma_v^2\big)
+    < (1+\rho_2^2)\sigma_u^2+(1+\rho_1^2)\sigma_v^2.
+    \]
+    But $|\rho_2\sigma_u^2+\rho_1\sigma_v^2|\le |\rho_2|\sigma_u^2+|\rho_1|\sigma_v^2$, hence
+    \[
+    \left|\frac{-\rho_2\sigma_u^2-\rho_1\sigma_v^2}{(1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2}\right|
+    < \frac{1}{2}.
     \]
     
     \begin{block}{Conclusion}
@@ -1530,41 +1560,35 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Pset 1 --- Problem 6: Solution (e)}
-    \textbf{(e) Forecasting using the ARMA(2,1)}:
+% \begin{frame}{Pset 1 --- Problem 6: Solution (e)}
+%     \textbf{(e) Forecasting using the ARMA(2,1)}: From the model $[1 - (\rho_1+\rho_2)L + \rho_1\rho_2 L^2]z_t = (1+\theta L)\varepsilon_t$:
+%     \[
+%     z_t = (\rho_1+\rho_2)z_{t-1} - \rho_1\rho_2 z_{t-2} + \varepsilon_t + \theta\varepsilon_{t-1}
+%     \]
     
-    \vspace{0.3em}
+%     \textbf{Forecast}:
+%     \[
+%     \E(z_{T+1}|\mathcal{F}_T) = (\rho_1+\rho_2)z_T - \rho_1\rho_2 z_{T-1} + \theta\varepsilon_T
+%     \]
     
-    Do modelo $[1 - (\rho_1+\rho_2)L + \rho_1\rho_2 L^2]z_t = (1+\theta L)\varepsilon_t$:
-    \[
-    z_t = (\rho_1+\rho_2)z_{t-1} - \rho_1\rho_2 z_{t-2} + \varepsilon_t + \theta\varepsilon_{t-1}
-    \]
+%     \textbf{Error}: $e_{T+1} = z_{T+1} - \E(z_{T+1}|\mathcal{F}_T) = \varepsilon_{T+1}$
     
-    \textbf{Forecast}:
-    \[
-    \E(z_{T+1}|\mathcal{F}_T) = (\rho_1+\rho_2)z_T - \rho_1\rho_2 z_{T-1} + \theta\varepsilon_T
-    \]
+%     \textbf{Error variance} $V_A$:
+%     \[
+%     V_A = \Var(\varepsilon_{T+1}) = \sigma_\varepsilon^2
+%     \]
     
-    \textbf{Error}: $e_{T+1} = z_{T+1} - \E(z_{T+1}|\mathcal{F}_T) = \varepsilon_{T+1}$
+%     \vspace{0.3em}
     
-    \textbf{Error variance} $V_A$:
-    \[
-    V_A = \Var(\varepsilon_{T+1}) = \sigma_\varepsilon^2
-    \]
+%     \textbf{Comparing $V_A - V_D$}: $V_A = \sigma_\varepsilon^2$ and $V_D = \sigma_u^2 + \sigma_v^2$.
     
-    \vspace{0.3em}
-    
-    \textbf{Comparing $V_A - V_D$}: $V_A = \sigma_\varepsilon^2$ and $V_D = \sigma_u^2 + \sigma_v^2$.
-    
-    Since $(1+\theta^2)\sigma_\varepsilon^2 = (1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2$, and $\theta^2 < 1$, $\rho_i^2 < 1$, we have $V_A \approx V_D$ (depending on the specific parameter values).
-\end{frame}
+%     Since $(1+\theta^2)\sigma_\varepsilon^2 = (1+\rho_2^2)\sigma_u^2 + (1+\rho_1^2)\sigma_v^2$, and $\theta^2 < 1$, $\rho_i^2 < 1$, we have $V_A \approx V_D$ (depending on the specific parameter values).
+% \end{frame}
 
 % ----------------------------------------------------------------------------
 \begin{frame}{Pset 1 --- Problem 7: Partial adjustment vs.\ adaptive expectations}
     \begin{block}{Partial Adjustment Model}
-        The desired level $y_t^*$ is related to $x_t$ by: $y_t^* = \beta x_t$.
-        
-        $x_t$ is covariance-stationary. A fraction $\gamma$ of the disequilibrium is removed through partial adjustment:
+        The desired level $y_t^*$ is related to the level of $x_t$ by: $y_t^* = \beta x_t$. $x_t$ is covariance-stationary. However, only a fraction $\gamma$ of the disequilibrium between the desired level and the actual level is removed through partial adjustment:
         \[
         y_t - y_{t-1} = \gamma(y_t^* - y_{t-1}) + e_t, \quad e_t \sim N(0, \sigma_e^2), \; 0 < \gamma < 1
         \]
@@ -1591,7 +1615,7 @@
     \textbf{Partial Adjustment Model}: Substituting $y_t^* = \beta x_t$:
     \begin{align*}
     y_t - y_{t-1} &= \gamma(\beta x_t - y_{t-1}) + e_t \\
-    y_t &= \gamma\beta x_t + (1-\gamma)y_{t-1} + e_t
+    \implies y_t &= \gamma\beta x_t + (1-\gamma)y_{t-1} + e_t
     \end{align*}
     
     \textbf{Adaptive Expectations Model}: Solving for $x_{t+1}^e$:
@@ -1604,7 +1628,7 @@
     y_t = \beta\lambda \sum_{j=0}^{\infty}(1-\lambda)^j x_{t-j} + v_t
     \]
     
-    Using the Koyck transformation: $y_t = \beta\lambda x_t + (1-\lambda)y_{t-1} + v_t - (1-\lambda)v_{t-1}$
+    which we can rewrite as: $y_t = \beta\lambda x_t + (1-\lambda)y_{t-1} + v_t - (1-\lambda)v_{t-1}$
 \end{frame}
 
 \begin{frame}{Pset 1 --- Problem 7: Solution (a) Cont.}
@@ -1645,7 +1669,7 @@
     \textbf{Partial Adjustment Model}: $u_t = e_t$ is white noise.
     \begin{itemize}
         \item $\Cov(y_{t-1}, e_t) = 0$ (error is uncorrelated with past variables)
-        \item $\Cov(x_t, e_t) = 0$ (exogeneidade estrita)
+        \item $\Cov(x_t, e_t) = 0$ (strict exogeneity)
         \item $\Rightarrow$ OLS is \textbf{consistent} $\checkmark$
     \end{itemize}
     
@@ -1654,7 +1678,7 @@
     \textbf{Adaptive Expectations Model}: $u_t = \eta_t = v_t - (1-\lambda)v_{t-1}$
     \begin{itemize}
         \item $y_{t-1}$ depends on $v_{t-1}$ (through the recursive equation)
-        \item $\Cov(y_{t-1}, \eta_t) = \Cov(y_{t-1}, -(1-\lambda)v_{t-1}) \neq 0$
+        \item $\Cov(y_{t-1}, \eta_t) = \Cov(y_{t-1}, v_t -(1-\lambda)v_{t-1}) \neq 0$
         \item $\Rightarrow$ OLS is \textbf{inconsistent} $\times$
     \end{itemize}
     
@@ -1696,7 +1720,7 @@
     \vspace{0.3em}
     
     \begin{alertblock}{Caution}
-        If the correct model is adaptive expectations, use appropriate estimation methods (GMM, NLLS, or MLE) instead of OLS.
+        If the correct model is adaptive expectations, use appropriate estimation methods (such as GMM, IV, etc.) instead of OLS.
     \end{alertblock}
 \end{frame}
 
@@ -1704,7 +1728,9 @@
 % MEDEIROS - VECTOR PROCESSES (Exercise 4)
 % ----------------------------------------------------------------------------
 \begin{frame}{Pset 1 --- Problem 8: Vector model (inflation, output gap, policy)}
+    
     \begin{block}{Macroeconomic Model}
+        Consider the 3 equation new-keynesian model of monetary policy transmission:
         \begin{align*}
         (1): & \quad \pi_t = \lambda y_t + \pi_t^e + u_{1t}, \quad 0 < \lambda < 1 \\
         (2): & \quad y_t = \gamma(i_{t-1} - \pi_t^e) + u_{2,t}, \quad -1 < \gamma < 0 \\
@@ -1724,7 +1750,8 @@
     \begin{enumerate}[(a)]
         \item Show that $\pi_t$ follows an ARMA$(p,q)$. Relate the coefficients to the structural parameters.
         
-        \item Consider $\rho = 0, 1, 2$. What can be said about inflation and monetary policy? Simulate 200 observations in MATLAB.
+        \item Consider $\rho = 0, 1, 2$. What can be said about inflation and monetary policy? 
+        % Simulate 200 observations in MATLAB.
         
         \item Compute $\hat{\pi}_{t+j|t} = \E[\pi_{t+j}|\mathcal{F}_t]$ and $\Var(\pi_{t+j} - \hat{\pi}_{t+j|t})$.
         
@@ -1739,7 +1766,7 @@
     
     \vspace{0.3em}
     
-    \textbf{Step 1}: Substitute (3) and (4) into (2):
+    \textbf{Step 1}: Use (3) to replace $\pi_t^e$ in (2), and use (4) (lagged) to replace $i_{t-1}$ in (2):
     \begin{align*}
     y_t &= \gamma(i_{t-1} - \pi_{t-1}) + u_{2t} \\
     &= \gamma(i^* + \rho(\pi_{t-1} - \pi^*) - \pi_{t-1}) + u_{2t} \\
@@ -1880,11 +1907,7 @@
     
     \vspace{0.3em}
     
-    \textbf{Effect on the model}: inflation now depends on the entire past history, not only on $\pi_{t-1}$.
-    
-    \vspace{0.3em}
-    
-    Using the Koyck transformation:
+    \textbf{Effect on the model}: inflation now depends on the entire past history, not only on $\pi_{t-1}$. Rewrite the above equation as:
     \[
     \pi_t^e = \alpha\pi_{t-1} + (1-\alpha)\pi_{t-1}^e
     \]
@@ -1916,7 +1939,7 @@
     \vspace{1em}
     
     \begin{alertblock}{For Next Session}
-        Review these exercises and attempt additional problems from the appendix for extra practice.
+        Review the exercises we did not do in class due to time constraints
     \end{alertblock}
 \end{frame}
 
@@ -1972,16 +1995,13 @@
     
     \textbf{Figure 1}: Sensitivity of $\phi_1$ to Taylor Rule coefficient $\rho$
     
-    \vspace{0.5em}
+    % \vspace{0.5em}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\textwidth]{figures/param_combination.png}
+    \end{figure}
     
-    % PLACEHOLDER: Include figure from metrics bible
-    % \includegraphics[width=0.8\textwidth]{Figures/param_combination.png}
-    
-    \begin{center}
-        \textit{[Figure: param\_combination.png from metrics bible]}
-    \end{center}
-    
-    \vspace{0.5em}
+    \vspace{-0.5em}
     
     Under the simple monetary policy model with $\lambda = 0.5$, $\gamma = -0.5$:
     \begin{itemize}
@@ -1998,13 +2018,11 @@
     
     \vspace{0.5em}
     
-    % PLACEHOLDER: Include figure from metrics bible
-    % \includegraphics[width=0.45\textwidth]{Figures/acf_pi_1.png}
-    % \includegraphics[width=0.45\textwidth]{Figures/acf_pi_2.png}
-    
-    \begin{center}
-        \textit{[Figure: acf\_pi\_1.png, acf\_pi\_2.png from metrics bible]}
-    \end{center}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.45\textwidth]{figures/acf_pi_1.png}
+        \includegraphics[width=0.45\textwidth]{figures/acf_pi_2.png}
+    \end{figure}
     
     \vspace{0.5em}
     
