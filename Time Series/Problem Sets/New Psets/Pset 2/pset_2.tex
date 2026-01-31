@@ -1,0 +1,215 @@
+\documentclass[12pt]{article}
+ 
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,scrextend}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\pagestyle{fancy}
+\setlength{\headheight}{28pt}
+
+% Red "alertblock"-style boxes (Beamer-like)
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\newtcolorbox{alertblock}[1]{%
+  colback=red!5!white,
+  colframe=red!70!black,
+  fonttitle=\bfseries,
+  title=#1,
+  sharp corners,
+  boxrule=0.9pt,
+  left=1.2mm,right=1.2mm,top=1mm,bottom=1mm
+}
+
+% Common shortcuts (kept close to template)
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\imp}{\Rightarrow}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+
+\usepackage{datetime}
+
+% Date (update as needed)
+\newdate{date}{06}{02}{2026}
+
+\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue,
+citecolor=blue, urlcolor=blue]{hyperref}
+
+\newtheorem*{definition}{Definition}
+\newtheorem{problem}{Problem}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+ 
+\lhead{TA: Rafael Lincoln \\ Prof. Tim Cogley}
+\rhead{Econometrics II (Time Series) \\ For: \displaydate{date}}
+
+\section*{Problem Set 2 --- State space, trends, and policy regime change}
+
+\begin{alertblock}{Important}
+We \textbf{do not collect} this problem set, and you \textbf{do not need to do all exercises}.
+We will cover the solutions in class and provide written solutions afterwards for your study.
+The goal is to give you more material to prepare for the exam.
+\end{alertblock}
+
+\vspace{0.8em}
+
+\begin{problem}[Long-run risk: state-space and likelihood]
+Consider a version of Bansal and Yaron's (2004) \textit{long-run risk} model,
+\begin{align*}
+x_t &= \rho x_{t-1} + \sigma_\varepsilon \varepsilon_t,\\
+g_t &= x_t + \sigma_\eta \eta_t,
+\end{align*}
+where $(\varepsilon_t,\eta_t)'$ is an i.i.d.\ standard normal random vector. The free parameters are
+\[
+\theta = [\rho,\sigma_\varepsilon,\sigma_\eta]'.
+\]
+\begin{enumerate}
+    \item[(a)] Derive a VAR representation for $(x_t,g_t)'$. What condition on $\theta$ is necessary for covariance stationarity?
+    \item[(b)] Assuming that the stationarity condition is satisfied and that $x_t$ and $g_t$ are both observable, explain how you would estimate $\theta$ by maximum likelihood.
+    \item[(c)] Now assume that $g_t$ is observable but $x_t$ is not. Assuming stationarity, explain how you would estimate $\theta$ by maximum likelihood.
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[Beveridge--Nelson stochastic trend via a VAR(2)]
+Beveridge and Nelson (1981) define a stochastic trend $\tau_t$ as the level to which a series $x_t$ is expected to converge in the long run,
+\[
+\tau_t \;=\; x_t + E_t \sum_{j=1}^{\infty}(\Delta x_{t+j}-\mu_x),
+\]
+where $\mu_x$ is the unconditional mean of $\Delta x_t$. Suppose that $y_t=[\Delta x_t,w_t']'$, where $w_t$ is a vector of variables that might be helpful for predicting $\Delta x_t$. Assume that $y_t$ is covariance stationary and for simplicity that its unconditional mean is zero. Furthermore, suppose that $y_t$ is well approximated by a VAR(2) representation with homoskedastic gaussian innovations.
+\begin{enumerate}
+    \item[(a)] Explain how you choose variables to include in $w_t$.
+    \item[(b)] How would you estimate the VAR parameters by MLE?
+    \item[(c)] Derive an expression for the trend $\tau_t$ in terms of the VAR parameters and current and lagged values of $y_t$.
+    \item[(d)] How would you approximate the asymptotic distribution of the coefficients mapping current and lagged values of $y_t$ into $\tau_t$?
+    \item[(e)] Prove that $\tau_t$ is a random walk (with drift if $\mu_{\Delta x}\neq 0$).
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[Clarida--Gal\'{\i}--Gertler (1999)]\label{ex:NK_to_AR1_policybreak}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/ffs_inf.png}
+    \caption{Federal funds rate and inflation (see Clarida, Gal\'{\i}, and Gertler, 1999).}
+\end{figure}
+
+\noindent A common interpretation of U.S.\ monetary history is that policy became more aggressive against inflation from the Burns/Miller era to the Volcker era. In a structural New Keynesian (NK) model, changes in the Taylor-rule parameter can alter the reduced-form persistence of inflation, which is closely related to the Lucas critique. Consider the 3-equation NK model:
+\begin{align}
+\text{(IS)}\qquad 
+x_t &= \E_t x_{t+1}-\frac{1}{\sigma}\Big(i_t-\E_t \pi_{t+1}-r_t^n\Big), \label{eq:IS}\\
+\text{(NKPC)}\qquad 
+\pi_t &= \beta\,\E_t \pi_{t+1}+\kappa x_t+u_t, \label{eq:NKPC}\\
+\text{(Taylor)}\qquad 
+i_t &= r_t^n+\phi_\pi \pi_t, \qquad \phi_\pi>0, \label{eq:TR}
+\end{align}
+where $x_t$ is the output gap, $\pi_t$ inflation, $i_t$ the nominal interest rate, and $u_t$ a cost-push shock. The discount factor satisfies
+\[
+\beta=\frac{1}{1+\rho},\qquad \rho>0.
+\]
+Assume throughout:
+\begin{enumerate}[label=(A\arabic*)]
+\item $r_t^n=r^n$ is constant;
+\item $\E_t x_{t+1}=0$;
+\item $\E_t \pi_{t+1}=\pi_{t-1}$;
+\item $u_t$ is i.i.d.\ with $\E[u_t]=0$ and $\Var(u_t)=\sigma_u^2$.
+\end{enumerate}
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Derive the reduced-form AR(1) for inflation and relate it to policy.}
+Eliminate $x_t$ and $i_t$ in \eqref{eq:IS}--\eqref{eq:TR} and show that inflation can be written as an AR(1):
+\[
+\pi_t = a(\phi_\pi,\kappa,\rho)\,\pi_{t-1}+\varepsilon_t,
+\]
+for some innovation $\varepsilon_t$. Give explicit expressions for $a(\phi_\pi,\kappa,\rho)$ and $\varepsilon_t$.
+Then determine the sign of $\partial a/\partial \phi_\pi$ and interpret it (one sentence).
+
+\item \textbf{Burns vs.\ Volcker: structural hypothesis stated as a reduced-form restriction.}
+Let $T_b$ be a break date (e.g.\ 1979:Q3). Assume $(\beta,\kappa,\sigma,\sigma_u^2,r^n)$ are constant over time, but policy may change:
+\[
+\phi_\pi=
+\begin{cases}
+\phi_{\pi,1}, & t\le T_b,\\
+\phi_{\pi,2}, & t> T_b.
+\end{cases}
+\]
+Using your mapping from part (a), translate ``policy changed from Burns to Volcker'' into a null and alternative hypothesis in terms of the reduced-form persistence parameters $a_1$ and $a_2$.
+
+\item \textbf{Reduced-form likelihood test with dependent data.}
+Assume the reduced form holds with a break in the AR(1) coefficient:
+\[
+\pi_t = c + a_1\pi_{t-1}+\varepsilon_t,\quad t\le T_b,
+\qquad
+\pi_t = c + a_2\pi_{t-1}+\varepsilon_t,\quad t> T_b,
+\]
+with
+\[
+\varepsilon_t\mid\mathcal{F}_{t-1}\sim\mathcal{N}(0,\sigma^2),\qquad 
+\mathcal{F}_{t-1}=\sigma(\pi_{t-1},\pi_{t-2},\ldots).
+\]
+\begin{enumerate}[label=(\roman*)]
+\item Write the conditional log-likelihood $\ell_n(\theta)$ conditioning on $\pi_0$,\\
+where $\theta=(c,a_1,a_2,\sigma^2)$.
+\item Describe an LR test of $H_0:a_1=a_2$ and state its asymptotic null distribution.
+\end{enumerate}
+
+\item \textbf{Wald and LM versions of the same restriction.}
+Let $r(\theta)=a_1-a_2$.
+\begin{enumerate}[label=(\roman*)]
+\item Write the Wald statistic for testing $r(\theta)=0$ using the unrestricted MLE.
+\item Write the LM statistic in the standard score--information form evaluated at the restricted MLE (no need to simplify fully).
+\end{enumerate}
+
+\item \textbf{Interpretation.}
+If you estimate $\hat a_2 < \hat a_1$ and reject $H_0:a_1=a_2$, interpret the result in terms of $\phi_{\pi,2}$ vs.\ $\phi_{\pi,1}$ and monetary policy aggressiveness.
+
+\item \textbf{Lucas critique (short).}
+Explain why an AR(1) estimated under the Burns regime may fail to forecast inflation under the Volcker regime. In your answer, identify which objects are ``structural'' and which are ``reduced-form'' in this problem.
+\end{enumerate}
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[Kalman filter with correlated state and measurement innovations]
+Consider a state-space model with correlated state and measurement innovations,
+\[
+S_t = AS_{t-1}+B\varepsilon_{1t},
+\qquad
+X_t = CS_t + D\varepsilon_{2t},
+\]
+where $X_t$ is an $m\times 1$ vector of observables and $S_t$ is a $n\times 1$ vector that may include latent variables. The innovations $\varepsilon_{1t}$ and $\varepsilon_{2t}$ have dimensions $p\times 1$ and $q\times 1$, respectively, and are i.i.d.\ normal with mean zero and covariance matrix
+\[
+E\left(
+\begin{bmatrix}
+\varepsilon_{1t}\\
+\varepsilon_{2t}
+\end{bmatrix}
+[\varepsilon'_{1t},\varepsilon'_{2t}]
+\right)
+=
+\begin{bmatrix}
+Q & F\\
+F' & R
+\end{bmatrix}.
+\]
+Derive the Kalman filter for this model.
+\end{problem}
+
+\vspace{0.6em}
+
+\begin{problem}[ARMA(2,2) $\rightarrow$ state space]
+Suppose $y_t$ has an ARMA(2,2) representation
+\[
+(1-\rho_1 L-\rho_2 L^2)y_t = (1+\theta_1 L+\theta_2 L^2)\varepsilon_t,
+\]
+where $\varepsilon_t$ is i.i.d.\ $N(0,\sigma^2)$. Put this into state-space form and verify your solution.
+\end{problem}
+
+\end{document}
+
