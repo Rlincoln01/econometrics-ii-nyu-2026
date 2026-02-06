@@ -40,6 +40,7 @@ Time Series/Problem Sets/**/*.pdf
 # Exception: track our own TA recitation compiled slides
 !Time Series/Slides/Recitation Slides/Lecture 01/lecture_01_time_series_fundamentals.pdf
 !Time Series/Slides/Recitation Slides/Lecture 02/lecture_02_identification_arma_wold.pdf
+!Time Series/Slides/Recitation Slides/Lecture 03/lecture_03_pset2_solutions.pdf
 !Time Series/Problem Sets/New Psets/Pset 1/pset_1.pdf
 
 # If you later add Panel Data slides/psets as PDFs, keep them untracked by default
