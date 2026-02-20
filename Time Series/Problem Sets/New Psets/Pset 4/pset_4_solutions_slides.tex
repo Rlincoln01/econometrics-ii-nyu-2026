@@ -1,0 +1,789 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% Theme and color setup
+\usetheme{default}
+\usecolortheme{default}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Custom colors (MIT-inspired)
+\definecolor{mitred}{RGB}{163,31,52}
+\definecolor{darkblue}{RGB}{0,40,85}
+\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{darkgray}{RGB}{64,64,64}
+
+% Set main colors
+\setbeamercolor{frametitle}{fg=white,bg=darkblue}
+\setbeamercolor{title}{fg=darkblue}
+\setbeamercolor{author}{fg=black}
+\setbeamercolor{institute}{fg=black}
+\setbeamercolor{date}{fg=black}
+\setbeamercolor{structure}{fg=darkblue}
+\setbeamercolor{normal text}{fg=black}
+\setbeamercolor{itemize item}{fg=mitred}
+\setbeamercolor{itemize subitem}{fg=darkblue}
+\setbeamercolor{enumerate item}{fg=darkblue}
+
+% Frame title band
+\newlength{\titlebandht}
+\setlength{\titlebandht}{4ex}
+
+\setbeamertemplate{frametitle}{
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,ht=\titlebandht,dp=1.1ex,leftskip=1.2em,rightskip=1.2em]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+    \ifx\insertframesubtitle\@empty\relax\else\\[-0.2ex]
+      \usebeamerfont{framesubtitle}\insertframesubtitle
+    \fi
+  \end{beamercolorbox}
+  \vspace{0.6em}
+}
+
+% Font settings
+\usefonttheme{professionalfonts}
+\usefonttheme{serif}
+
+% Footline with page numbers
+\setbeamertemplate{footline}{
+    \hfill\insertframenumber\hspace{2em}\vspace{0.5em}
+}
+
+% Packages
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{hyperref}
+
+% Custom commands for math
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Corr}{\text{Corr}}
+\newcommand{\rank}{\mathrm{rank}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\plim}{plim}
+
+% Block colors
+\setbeamercolor{block title}{bg=lightgray,fg=darkblue}
+\setbeamercolor{block body}{bg=lightgray!50}
+
+% Alert block colors
+\setbeamercolor{block title alerted}{bg=mitred!15,fg=mitred}
+\setbeamercolor{block body alerted}{bg=mitred!5}
+
+% Title information
+\title{Problem Set 4: Solutions}
+\subtitle{SVARs: Short-Run and Long-Run Identification, and VECMs}
+\author{Rafael Lincoln}
+\institute{Econometrics II -- NYU PhD Program}
+\date{Spring 2026}
+
+\begin{document}
+
+% ============================================================================
+% TITLE SLIDE
+% ============================================================================
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+% ============================================================================
+% OUTLINE
+% ============================================================================
+\begin{frame}{Today's Roadmap}
+    \textbf{Problem Set 4 Solutions}
+    \begin{enumerate}
+        \item \textbf{Introduction: The Identification Problem in Macroeconometrics}
+        \begin{itemize}
+            \item SVMA representation, fundamental non-identification, rotation parameterization
+        \end{itemize}
+        \vspace{0.3em}
+        \item \textbf{Problem 1: Gal\'{\i} (1999) --- Long-Run and Short-Run Restrictions}
+        \begin{itemize}
+            \item Long-run productivity restriction, CEE, identification analysis, computational procedure
+        \end{itemize}
+        \vspace{0.3em}
+        \item \textbf{Problem 2: SVECM --- Cointegration and Common Trends}
+        \begin{itemize}
+            \item Granger representation, structural long-run impact, noninvertibility of $\Delta x_t$, SVECM vs VAR in levels
+        \end{itemize}
+        \vspace{0.3em}
+        \item \textbf{Problem 3: CFP Critique --- Cholesky Under Misspecification}
+        \begin{itemize}
+            \item Identified shocks as mixtures, sufficient condition for sign reversal, robustness
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+% ============================================================================
+% INTRODUCTION: THE IDENTIFICATION PROBLEM
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Introduction}}\\[1em]
+        {\large The Identification Problem in Macroeconometrics}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Motivation}
+    \textbf{Objects of interest.} Most Macroeconomic Models can be expressed under SVMA representation:
+    \[
+    y_t = \sum_{\ell=0}^{\infty} \Theta_\ell\, \varepsilon_{t-\ell}, \qquad \varepsilon_t \sim WN(0, I_n).
+    \]
+    \begin{itemize}
+        \item From $\{\Theta_\ell\}$ we get: \textbf{IRFs}, \textbf{FVDs}, \textbf{Historical Decompositions}
+        \item These are the key objects for policy analysis and testing macro models
+    \end{itemize}
+
+    \vspace{0.5em}
+
+    \textbf{How can we learn $\{\Theta_\ell\}$ from data?} Three broad approaches:
+    \begin{enumerate}
+        \item \textbf{Semi-structural, time series}: use time-series properties of $y_t$ + identifying assumptions for \textit{families} of models \textcolor{mitred}{$\leftarrow$ our focus today}
+        \item \textbf{Semi-structural, cross-sectional}: microeconometric causal designs
+        \item \textbf{Full structural}: specify and estimate a DSGE model
+    \end{enumerate}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{The Fundamental Identification Problem}
+    \begin{block}{Proposition (Non-identification from second moments)}
+        Under standard assumptions, we can find $\{\Theta_\ell^*\}$ and $\{\varepsilon_t^*\}$ such that $\Theta_\ell \neq \Theta_\ell^*$ for some $\ell$, $\varepsilon_t^* \sim WN(0, I_n)$, and for all $h$:
+        \[
+        \Gamma_h = \Cov\!\left(\sum_{\ell=0}^\infty \Theta_\ell \varepsilon_{t-\ell},\; \sum_{\ell=0}^\infty \Theta_\ell \varepsilon_{t-\ell-h}\right) = \sum_{\ell=0}^\infty \Theta_\ell^*\,(\Theta_{\ell+h}^*)'.
+        \]
+    \end{block}
+
+    \vspace{0.3em}
+    \textbf{Proof sketch.} Take any orthogonal $Q$ ($QQ'=I_n$, $Q\neq I$). Set $\Theta_\ell^* = \Theta_\ell Q$ and $\varepsilon_t^* = Q'\varepsilon_t$. Then:
+    \[
+    \sum_\ell \Theta_\ell \Theta_{\ell+h}' = \sum_\ell \Theta_\ell QQ' \Theta_{\ell+h}' = \sum_\ell (\Theta_\ell Q)(\Theta_{\ell+h} Q)' = \sum_\ell \Theta_\ell^* (\Theta_{\ell+h}^*)'.
+    \]
+    \textcolor{mitred}{$\Rightarrow$ We can always rotate the shocks and preserve the entire serial correlation structure.} 
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Shocks vs.\ Prediction Errors}
+    \textbf{The Wold representation} (reducible-form):
+    \[
+    y_t = \mu + \sum_{\ell=0}^\infty B_\ell\, u_{t-\ell}, \qquad u_t \sim WN(0, \Sigma_u).
+    \]
+    \textbf{Under invertibility} (shocks are linear combinations of present and past data):
+    \[
+    u_t = H\varepsilon_t \implies \Sigma_u = HH', \quad B_\ell = \Theta_\ell H^{-1}.
+    \]
+    \begin{itemize}
+        \item We can estimate $\{B_\ell\}$ and $\Sigma_u$ from data
+        \item \textbf{But} this is not enough to recover $\{\Theta_\ell\}$
+    \end{itemize}
+
+    \vspace{0.4em}
+    \textbf{The rotation parameterization.} Write $H = \text{Ch}(\Sigma_u)\cdot Q$ where $\text{Ch}(\Sigma_u)$ is the Cholesky square root:
+    \[
+    \Sigma_u = HH' \iff H = \text{Ch}(\Sigma_u)\,Q, \quad QQ' = I_n.
+    \]
+    \textcolor{mitred}{\textbf{Task:} impose restrictions on $\{\Theta_\ell\}$ to pin down a unique $Q$.}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Identification Strategies}
+    \textbf{Order condition.} $H$ has $n^2$ parameters but $\Sigma_u = HH'$ provides only $\tfrac{n(n+1)}{2}$ restrictions $\Rightarrow$ need $\tfrac{n(n-1)}{2}$ additional restrictions.
+
+    \vspace{0.4em}
+    \textbf{Two broad families:}
+    \begin{enumerate}
+        \item \textbf{Invertibility + restrictions} (classical VAR literature):
+        \begin{itemize}
+            \item Zero (short-run or long-run), sign, statistical
+        \end{itemize}
+        \item \textbf{Without invertibility} (recent):
+        \begin{itemize}
+            \item Proxy/Narrative SVARs, macro IVs
+        \end{itemize}
+    \end{enumerate}
+
+    \vspace{0.4em}
+    \textbf{This problem set covers:}
+    \begin{itemize}
+        \item \textbf{Problem 1}: Long-run zeros (Gal\'{\i} 1999) + short-run zeros (CEE 2005)
+        \item \textbf{Problem 2}: Long-run restrictions in cointegrated systems (SVECM)
+        \item \textbf{Problem 3}: \textcolor{mitred}{Critique} --- what goes wrong with Cholesky (CFP 2009)
+    \end{itemize}
+\end{frame}
+
+% ============================================================================
+% PROBLEM 1: GALÍ (1999)
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Problem 1: Hybrid Identification}}\\[1em]
+        {\large Gal\'{\i} (1999) Long-Run + CEE (2005) Short-Run Restriction}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 1: Setup}
+    \begin{block}{VAR and Structural Form}
+        \vspace{-0.3em}
+        \[
+        y_t = (\Delta a_t,\; n_t,\; \pi_t,\; i_t)', \qquad y_t = \sum_{j=1}^p A_j y_{t-j} + u_t, \quad \E[u_t u_t'] = \Sigma_u.
+        \]
+        Structural form: $u_t = B_0^{-1} w_t$, $\E[w_t w_t'] = I_4$, $w_t = (\varepsilon_t^a, \varepsilon_t^d, \varepsilon_t^\pi, \varepsilon_t^m)'$.
+
+        Structural MA: $y_t = \sum_{h=0}^\infty \Theta_h w_{t-h}$, $\;\Theta_0 = B_0^{-1}$.
+
+        Long-run multiplier: $\Theta(1) = \sum_{h=0}^\infty \Theta_h = \Phi(1)\,B_0^{-1}$.
+    \end{block}
+
+    \vspace{0.3em}
+    \textbf{Variables:}
+    \begin{itemize}
+        \item $\Delta a_t$: productivity growth \quad $n_t$: hours worked
+        \item $\pi_t$: inflation \quad $i_t$: interest rate
+        \item $\varepsilon_t^a$: technology \; $\varepsilon_t^d$: demand \; $\varepsilon_t^\pi$: cost-push \; $\varepsilon_t^m$: monetary
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 1(a): Gal\'{\i}'s Long-Run Restriction --- Derivation}
+    \textbf{Gal\'{\i}'s assumption:} Only the technology shock $\varepsilon_t^a$ has a permanent effect on the \textit{level} of productivity $a_t$.
+
+    \vspace{0.3em}
+    \textbf{Mapping VAR growth rates to levels.} Since $a_T = a_{-1} + \sum_{t=0}^T \Delta a_t$, substitute the structural MA for $\Delta a_t$:
+    \begin{align*}
+        \frac{\partial a_T}{\partial \varepsilon_0^j}
+        &= \sum_{t=0}^T \sum_{h=0}^\infty [\Theta_h]_{1,j}\,\mathbf{1}\{t - h = 0\}
+        = \sum_{t=0}^T [\Theta_t]_{1,j}.
+    \end{align*}
+    Taking $T \to \infty$:
+    \[
+    \lim_{T\to\infty} \frac{\partial a_T}{\partial \varepsilon_0^j} = \sum_{t=0}^\infty [\Theta_t]_{1,j} = [\Theta(1)]_{1,j}.
+    \]
+    \textcolor{mitred}{The long-run effect on productivity \textit{levels} equals the $(1,j)$ entry of $\Theta(1)$.}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 1(a): Gal\'{\i}'s Long-Run Restriction --- Result}
+    \begin{alertblock}{Identifying restriction}
+        Only $\varepsilon_t^a$ ($j=1$) has a long-run effect on productivity levels. For $j \in \{2,3,4\}$:
+        \[
+        [\Theta(1)]_{1,2} = [\Theta(1)]_{1,3} = [\Theta(1)]_{1,4} = 0.
+        \]
+        Equivalently: $[\Theta(1)]_{1,\cdot} = \begin{pmatrix} * & 0 & 0 & 0 \end{pmatrix}$.
+    \end{alertblock}
+
+    \vspace{0.3em}
+    \textbf{Connection to reduced form.} Since $\Theta(1) = \Phi(1)\,B_0^{-1} = A(1)^{-1} B_0^{-1}$:
+    \[
+    [\Theta(1)]_{1,j} = 0 \iff \text{first row of } A(1)^{-1}B_0^{-1} \text{ has zeros in cols 2,3,4.}
+    \]
+
+    \vspace{0.2em}
+    \textbf{Three long-run restrictions} on the product $A(1)^{-1} B_0^{-1}$.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 1(b): CEE Short-Run Restriction}
+    \textbf{Christiano--Eichenbaum--Evans (2005):} Productivity growth does not respond contemporaneously to a monetary policy shock:
+    \[
+    \frac{\partial(\Delta a_t)}{\partial \varepsilon_t^m}\bigg|_t = 0.
+    \]
+    The contemporaneous response equals the impact matrix entry:
+    \[
+    \frac{\partial(\Delta a_t)}{\partial \varepsilon_t^m}\bigg|_t = [B_0^{-1}]_{1,4} = 0.
+    \]
+
+    \begin{alertblock}{Short-run restriction}
+        $[B_0^{-1}]_{1,4} = 0$: the $(1,4)$ entry of the impact matrix is zero.
+    \end{alertblock}
+
+    \textbf{Interpretation:} Within the period, a monetary shock cannot affect productivity growth (no contemporaneous supply-side channel).
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 1(c): Identification Analysis}
+    \textbf{Degrees of freedom.} $B_0^{-1}$ is $4\times 4$ (16 elements). Normalization $B_0^{-1}(B_0^{-1})' = \Sigma_u$ gives $\frac{4\times 5}{2} = 10$ restrictions. \textbf{Remaining d.o.f.:} $16 - 10 = 6$.
+
+    \vspace{0.3em}
+    \textbf{Restrictions available:}
+    \begin{itemize}
+        \item 3 long-run restrictions from (a): $[\Theta(1)]_{1,2}=[\Theta(1)]_{1,3}=[\Theta(1)]_{1,4}=0$
+        \item 1 short-run restriction from (b): $[B_0^{-1}]_{1,4}=0$
+        \item \textbf{Total: 4 restrictions $<$ 6 d.o.f.} $\Rightarrow$ \textcolor{mitred}{under-identified by the order condition}
+    \end{itemize}
+
+    \vspace{0.3em}
+    \textbf{Rank condition.} Write $B(\theta) = \hat{L}Q(\theta)$ ($\hat{L}$ = Cholesky of $\hat\Sigma_u$, $Q(\theta)$ orthogonal). Stack restrictions as $f(\theta) = 0$:
+    \[
+    f(\theta) = \begin{pmatrix} (\hat{L}Q)_{1,4} \\ (\hat\Phi(1)\hat{L}Q)_{1,2} \\ (\hat\Phi(1)\hat{L}Q)_{1,3} \\ (\hat\Phi(1)\hat{L}Q)_{1,4} \end{pmatrix} = 0.
+    \]
+    Local identification requires $\rank\!\left(\partial f/\partial\theta'\right) = 4$ at the true $\theta_0$. \textbf{2 additional restrictions needed} for exact identification.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 1(d): Computational Procedure}
+    \textbf{Core idea:} estimate reduced form by OLS, then search over rotations $Q(\theta)$ until $f(\theta) = 0$.
+
+    \begin{enumerate}
+        \item \textbf{Estimate VAR by OLS.} Obtain $(\hat{A}_1,\ldots,\hat{A}_p)$, residuals $\hat{u}_t$, and $\hat{\Sigma}_u$.
+        \vspace{0.2em}
+        \item \textbf{Compute reduced-form long-run multiplier.}
+        \[
+        \hat{A}(1) = I - \hat{A}_1 - \cdots - \hat{A}_p, \qquad \hat\Phi(1) = \hat{A}(1)^{-1}.
+        \]
+        \vspace{-0.4em}
+        \item \textbf{Factor $\hat\Sigma_u$ and parameterize $Q$.} Compute Cholesky $\hat{L}$ ($\hat\Sigma_u = \hat{L}\hat{L}'$). Parameterize $Q(\theta)$ as Givens rotations 
+        \vspace{0.2em}
+        \item \textbf{Solve $f(\theta) = 0$.} With 2 additional restrictions: square $6\times 6$ system, use root-finder. Without: set-identified --- report range.
+        \vspace{0.2em}
+        \item \textbf{Recover structural objects.} $\hat{B}_0^{-1} = \hat{L}Q(\hat\theta)$, $\;\hat\Theta_h = \hat\Phi_h \hat{B}_0^{-1}$.
+    \end{enumerate}
+
+    % \vspace{0.2em}
+    % \textcolor{mitred}{\textit{Optional:} Blanchard--Quah as initialization --- factorize $\hat\Phi(1)\hat\Sigma_u\hat\Phi(1)'$ to get a starting rotation.}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 1(e): Hours Fall After a Technology Shock}
+    \textbf{Gal\'{\i}'s finding:} hours worked $n_t$ \textit{fall} after a positive technology shock --- contrary to standard RBC predictions.
+
+    \vspace{0.3em}
+    \textbf{Identified pattern:}
+    \begin{itemize}
+        \item $[\Theta_0]_{2,1} < 0$: hours fall on impact
+        \item Hours may remain below steady state for several periods
+        \item Long run: hours return to (or slightly above) steady state
+        \item Inflation: $[\Theta_h]_{3,1} < 0$ for small $h$ --- technology reduces marginal cost
+    \end{itemize}
+
+    \vspace{0.3em}
+    \textbf{Reconciliation with long-run restriction:}
+    \begin{itemize}
+        \item $[\Theta(1)]_{1,1} > 0$: technology permanently raises productivity (\checkmark)
+        \item Mechanism: sticky prices $\Rightarrow$ firms cannot lower prices immediately $\Rightarrow$ reduce labor input
+        \item In the long run, prices adjust, output expands, productivity remains permanently higher
+    \end{itemize}
+    \textcolor{mitred}{The long-run restriction on productivity does \textit{not} constrain the short-run response of hours.}
+\end{frame}
+
+% ============================================================================
+% PROBLEM 2: SVECM
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Problem 2: SVECM}}\\[1em]
+        {\large Permanent and Transitory Shocks in a Cointegrated System}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+% Background: Cointegration and VECMs (brief intro for students)
+% ----------------------------------------------------------------------------
+\begin{frame}{Background: Cointegration}
+    \begin{block}{Definition}
+        $x_t$ ($I(1)$, $n\times1$) is \textbf{cointegrated} if $\exists$ nonzero $\beta$ s.t.\ $\beta'x_t \sim I(0)$.
+    \end{block}
+    \pause
+    \vspace{0.4em}
+    \textbf{Why does this arise?} Macro variables grow (output, consumption, investment are all $I(1)$), but economic theory implies they share common trends --- e.g.\ balanced growth.
+    \pause
+    \vspace{0.4em}
+    \textbf{Why do we care for structural analysis?}
+    \begin{itemize}
+        \item Some shocks are \textbf{permanently non-neutral} (technology); others are \textbf{neutral in the long run} (monetary)
+        \item Cointegration rank $r$ $\Rightarrow$ exactly $n - r$ \textbf{common stochastic trends} $\Rightarrow$ at most $n-r$ permanent shocks
+        \item This directly constrains what structural identification is possible
+    \end{itemize}
+    \pause
+    \emph{We want to find a representation which is stationary and uses cointegration structure!}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Background: How to Model $I(1)$ Cointegrated Data?}
+    \vspace{-1em}
+    What is the problem with the usual VAR?
+    \pause 
+    \begin{itemize}
+        \item \textbf{VAR in levels} --- valid; consistent; does not exploit cointegration structure
+        \item \textbf{VAR in first differences} --- $\Delta x_t$ is stationary, but:
+    \end{itemize}
+    \pause
+    \begin{alertblock}{Fundamental problem (Beveridge--Nelson)}
+       If $x_t\sim I(1)$, then $\Delta x_t$ has no VAR representation (despite stationary)
+    \end{alertblock}
+    \pause
+    If we correct for non-invertibility, we get a VAR-like representation: the \textbf{VECM}.
+    \vspace{0.3em}
+    \begin{block}{VECM (follows from Granger Representation Theorem)}
+    If $x_t\sim I(1)$ with cointegration rank $r$, then $\Delta x_t$ is stationary and can be represented as:
+        \begin{equation*}
+        \Delta x_t = \underbrace{\alpha\beta' x_{t-1}}_{\text{error correction}} + \sum_{j=1}^{p-1}\Gamma_j\,\Delta x_{t-j} + u_t
+        \end{equation*}
+        where $\beta$: cointegrating vectors; and $\alpha$: adjustment (loading) coefficients
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Background: From VECM to SVECM}
+    Add structural layer $u_t = B_0^{-1}w_t$, $\E[w_tw_t']=I_n$ --- exactly as in a standard SVAR.
+
+    \vspace{0.4em}
+    \textbf{What cointegration buys for identification:}
+    \begin{itemize}
+        \item Non-stationary long-run level representation:
+        \begin{equation*}
+        x_t = C\sum_{s=1}^t u_s + C^*(L)u_t + x_0^*,
+        \end{equation*}
+        where $C$ is the \textbf{reduced-form long-run multiplier} (cumulated impact on levels)
+        \item \textbf{Structural long-run impact:} since $u_t=B_0^{-1}w_t$, the long-run impact of $w_t$ on $x_t$ is $\Upsilon = C\,B_0^{-1}$
+        \item $\rank(C)=n-r$ $\Rightarrow$ only $n-r$ \textbf{permanent shocks}; transitory shocks have \textbf{zero columns in} $\Upsilon$
+    \end{itemize}
+
+    \vspace{0.3em}
+    \textcolor{mitred}{This is the Shapiro--Watson (1988) / KPSW (1991) approach --- exactly what Problem 2 asks you to implement.}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 2: Setup}
+    \vspace{-1em}
+    \begin{block}{VECM for $x_t = (y_t, c_t, i_t)'$}
+        \vspace{-0.5em}
+        \[
+        \Delta x_t = \alpha\beta' x_{t-1} + \sum_{j=1}^{p-1}\Gamma_j \Delta x_{t-j} + u_t, \qquad \E[u_t u_t'] = \Sigma_u.
+        \]
+        $x_t$ is $I(1)$, cointegration rank $r = 1$. $\;\alpha,\beta \in \R^{3\times 1}$.
+
+        Structural shocks: $u_t = B_0^{-1}w_t$, $w_t = (\varepsilon_t^P, \varepsilon_t^T, \varepsilon_t^M)'$, $\E[w_tw_t'] = I_3$.
+    \end{block}
+    \vspace{-0.5em}
+    The VECM implies (\textbf{Granger Representation Theorem}):
+    \[
+    x_t = C\sum_{s=1}^t u_s + C^*(L)u_t + x_0^*, \qquad C = \beta_\perp\bigl(\alpha_\perp'\Gamma(1)\beta_\perp\bigr)^{-1}\alpha_\perp'.
+    \]
+    \begin{itemize}
+        \item Orthogonal Complement: $\beta^\prime \beta_\perp = 0$
+        \item $C\sum u_s$: stochastic trends (permanent component)
+        \item $C^*(L)u_t$: transitory dynamics
+        \item $\rank(C) = n - r = 2$: exactly 2 common stochastic trends
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 2(a): Common Stochastic Trends}
+    \begin{alertblock}{Result}
+        With $n = 3$ variables and cointegration rank $r = 1$:
+        \[
+        \text{Number of common stochastic trends} = n - r = 3 - 1 = 2.
+        \]
+    \end{alertblock}
+
+    \vspace{0.3em}
+    \textbf{Implication for structural identification:}
+    \begin{itemize}
+        \item Since $\rank(C) = 2$, at most \textbf{2 shocks can have permanent effects} on the levels
+        \item The third shock must be \textbf{transitory} (no long-run effect on any variable)
+        \item This is \textcolor{mitred}{not an identifying assumption} --- it is a consequence of cointegration
+        \item It provides 1 free restriction; we need 1 more for exact identification
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 2(b)--(c): Long-Run Structural Restrictions}
+    \textbf{Structural long-run impact matrix.} Substituting $u_t = B_0^{-1}w_t$ into the Granger representation:
+    \[
+    x_t = \underbrace{CB_0^{-1}\sum_{s=1}^t w_s}_{\text{permanent}} + \underbrace{C^*(L)B_0^{-1}w_t}_{\text{transitory}} + x_0^*.
+    \]
+    \[
+    \Upsilon \equiv CB_0^{-1}: \quad \text{structural long-run impact matrix on levels.}
+    \]
+
+    \begin{alertblock}{(b) Transitory shock $\varepsilon_t^T$ (Shapiro--Watson / KPSW)}
+        $[\Upsilon]_{\cdot,2} = \mathbf{0}$: no long-run effect on output, consumption, or investment.
+        \textit{Note:} $\rank(C)=2$ makes only 2 of these 3 restrictions independent.
+    \end{alertblock}
+
+    \begin{alertblock}{(c) Monetary neutrality (long run)}
+        $[\Upsilon]_{1,3} = 0$: monetary/financial shock has no long-run effect on output.
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 2(d): Short-Run Restriction and Identification}
+    \begin{alertblock}{(d) Short-run restriction (CEE-style)}
+        Monetary shock does not affect output growth contemporaneously:
+        \[
+        [B_0^{-1}]_{1,3} = 0.
+        \]
+    \end{alertblock}
+
+    \vspace{0.3em}
+    \textbf{Identification count:}
+    \begin{itemize}
+        \item $B_0^{-1}$ is $3\times 3$: $9 - 6 = 3$ d.o.f.
+        \item Restrictions: 2 independent (from (b)) + 1 (from (c)) + 1 (from (d)) = \textbf{4}
+        \item \textbf{Over-identified by the count} --- need to verify consistency
+    \end{itemize}
+
+    \vspace{0.3em}
+    \textbf{Key feasibility check.} Since $\rank(C)=2$, column 2 of $\Upsilon$ is zero iff $[B_0^{-1}]_{\cdot,2}$ lies in $\ker(C)$ (1-dimensional). This restricts column 2 of $B_0^{-1}$ to a line --- numerical verification required for specific $(\hat{C},\hat\Sigma_u)$.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 2(f): Why a VAR in First Differences Is Invalid}
+    \textbf{Wold representation of $\Delta x_t$:}
+    \[
+    \Delta x_t = \delta + \psi(L)\varepsilon_t, \qquad \psi(1) = \text{long-run multiplier matrix.}
+    \]
+
+    \begin{alertblock}{Key result (Beveridge--Nelson / Granger)}
+        Cointegration ($r=1$) $\Rightarrow$ $\rank(\psi(1)) = n - r = 2 < 3$ $\Rightarrow$ $|\psi(1)|=0$.
+
+        \medskip
+        $L=1$ is a root of $|\psi(L)|=0$ $\Rightarrow$ unit MA root $\Rightarrow$ $\psi(L)$ is \textbf{noninvertible}.
+
+        \medskip
+        \textbf{$\Delta x_t$ does not have a VAR representation.}
+    \end{alertblock}
+
+    \vspace{0.3em}
+    \textcolor{mitred}{A finite-order VAR in first differences is fundamentally invalid for a cointegrated system---one cannot ``flip'' a unit root on the unit circle.}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 2(f): SVECM vs.\ VAR in Levels}
+    \vspace{-1em}
+    \textbf{The correct comparison:} SVECM vs.\ unrestricted VAR in levels ($x_t = \sum_j A_j x_{t-j} + u_t$).
+
+    \vspace{0.3em}
+    \begin{block}{SVECM}
+        \begin{itemize}
+            \item[\textcolor{darkblue}{+}] Exploits reduced-rank structure $\alpha\beta'$ $\Rightarrow$ more efficient
+            \item[\textcolor{mitred}{--}] \textbf{Requires correct specification of $r$}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{VAR in levels}
+        \begin{itemize}
+            \item[\textcolor{darkblue}{+}] Consistent regardless of true $r$ (Stock, 1987); no rank commitment needed
+            \item[\textcolor{mitred}{--}] Less efficient; non-standard inference on individual coefficients
+        \end{itemize}
+    \end{block}
+
+    \vspace{0.3em}
+    \textbf{Failure modes (SVECM):}
+    \begin{itemize}
+        \item \textbf{$r$ overspecified} ($r=2$, true $r=1$): $\rank(C)$ too low $\Rightarrow$ $\Upsilon$ inconsistent
+        \item \textbf{$r$ underspecified} ($r=0$): reduces to VAR in $\Delta x_t$ $\Rightarrow$ invalid (noninvertible MA)
+    \end{itemize}
+\end{frame}
+
+% ============================================================================
+% PROBLEM 3: CFP CRITIQUE
+% ============================================================================
+\begin{frame}[plain]
+    \begin{center}
+        {\Large \textbf{Problem 3: The CFP Critique}}\\[1em]
+        {\large Recursive Identification Under Misspecification}
+    \end{center}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 3: Setup}
+    \begin{block}{True DGP and Econometrician's Model}
+        True DGP: $z_t = \sum_{h=0}^\infty \Psi_h \varepsilon_{t-h}$, $\;\varepsilon_t = (\varepsilon_t^a, \varepsilon_t^c, \varepsilon_t^m)'$, $\;\E[\varepsilon_t\varepsilon_t'] = I_3$.
+
+        Econometrician: estimates VAR, imposes Cholesky ordering $(y,\pi,i)$.
+
+        $u_t = B_0^{-1} w_t$ with $B_0^{-1}$ \textbf{lower triangular}.
+    \end{block}
+
+    \vspace{0.3em}
+    \textbf{Key assumption:} In the true DGP, monetary policy affects output \textit{contemporaneously}:
+    \[
+    (\Psi_0)_{1,3} \neq 0 \qquad \text{(true DGP)}.
+    \]
+    But Cholesky imposes:
+    \[
+    (B_0^{-1})_{1,3} = 0 \qquad \text{(identification assumption)}.
+    \]
+    \textcolor{mitred}{These two conditions are contradictory --- this is the source of misidentification.}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 3(a): Cholesky Zero Restrictions}
+    With ordering $(y, \pi, i)$, the lower-triangular $B_0^{-1}$ imposes:
+    \[
+    B_0^{-1} = \begin{pmatrix} b_{11} & 0 & 0 \\ b_{21} & b_{22} & 0 \\ b_{31} & b_{32} & b_{33} \end{pmatrix}.
+    \]
+
+    \vspace{0.3em}
+    \textbf{Which variables respond to which shocks (contemporaneously):}
+    \begin{center}
+    \begin{tabular}{l|ccc}
+    \toprule
+    & $w_t^1$ & $w_t^2$ & $w_t^3$ (``monetary'') \\
+    \midrule
+    $y_t$ & \checkmark & $\times$ & $\times$ \\
+    $\pi_t$ & \checkmark & \checkmark & $\times$ \\
+    $i_t$ & \checkmark & \checkmark & \checkmark \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \vspace{0.2em}
+    \textbf{Economic content:} the monetary shock affects only the interest rate on impact --- neither output nor inflation respond within the period.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 3(b): Non-Uniqueness and Cholesky}
+    \textbf{The non-uniqueness problem.} $\Sigma_u = B_0^{-1}(B_0^{-1})'$ has $\tfrac{3\cdot 4}{2}=6$ equations in 9 unknowns $\Rightarrow$ 3 d.o.f.\ remain. For any orthogonal $Q$:
+    \[
+    \tilde{B}_0^{-1} = B_0^{-1}Q \implies \tilde{B}_0^{-1}(\tilde{B}_0^{-1})' = B_0^{-1}QQ'(B_0^{-1})' = \Sigma_u.
+    \]
+    Infinitely many valid impact matrices.
+
+    \vspace{0.3em}
+    \textbf{How Cholesky selects a rotation.} Let $\Sigma_u^{1/2}$ be the lower-triangular Cholesky square root. Cholesky sets:
+    \[
+    B_0^{-1} = \Sigma_u^{1/2} \iff Q = I \quad \text{in the representation } B_0^{-1} = \Sigma_u^{1/2}Q.
+    \]
+    \begin{itemize}
+        \item This is an \textbf{economic assumption about timing}, not a statistical necessity
+        \item Different variable orderings yield different identified shocks
+        \item \textcolor{mitred}{Assuming $Q=I$ is valid \textit{only if} $B_0^{-1} = \Psi_0$ (correct identification)}
+    \end{itemize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 3(c): Identified Shock as a Mixture --- Derivation}
+    \textbf{Step 1: Reduced-form innovation = $\Psi_0\varepsilon_t$.} From the structural MA $z_t = \sum_{h\geq0}\Psi_h\varepsilon_{t-h}$, under invertibility:
+    \[
+    u_t = z_t - \mathrm{Proj}(z_t \mid \mathcal{F}^z_{t-1}) = \sum_{h\geq0}\Psi_h\varepsilon_{t-h} - \sum_{h\geq1}\Psi_h\varepsilon_{t-h} = \Psi_0\varepsilon_t.
+    \]
+
+    \textbf{Step 2: Econometrician applies Cholesky.} $w_t = B_0 u_t = B_0\Psi_0\varepsilon_t$. Define:
+    \[
+    R \equiv B_0\Psi_0, \qquad w_t = R\varepsilon_t.
+    \]
+    Under correct identification: $B_0^{-1} = \Psi_0 \Rightarrow R = I$. \textcolor{mitred}{Here $R \neq I$.}
+
+    \vspace{0.3em}
+    \textbf{Step 3: Proof that $w_t^m$ is a mixture.} If $R_{31}=R_{32}=0$, then $[B_0^{-1}]_{\cdot,3} = [\Psi_0]_{\cdot,3}$. But $[B_0^{-1}]_{1,3}=0$ (Cholesky) and $[\Psi_0]_{1,3}\neq0$ (true DGP) --- \textbf{contradiction}.
+
+    \begin{alertblock}{Result}
+        $w_t^m = R_{31}\varepsilon_t^a + R_{32}\varepsilon_t^c + R_{33}\varepsilon_t^m$, with $(R_{31},R_{32})\neq(0,0)$.
+    \end{alertblock}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 3(d): Sufficient Condition for Sign Reversal --- Step 1}
+    \textbf{IRF linearity.} By linearity of impulse responses:
+    \[
+    \text{IRF}_y^{w^m}(h) = R_{31}\cdot\text{IRF}_y^{\varepsilon^a}(h) + R_{32}\cdot\text{IRF}_y^{\varepsilon^c}(h) + R_{33}\cdot\text{IRF}_y^{\varepsilon^m}(h).
+    \]
+
+    \textbf{Evaluate at $h=0$.} Since $\text{IRF}_y^{\varepsilon^j}(0) = (\Psi_0)_{1,j}$:
+    \[
+    \text{IRF}_y^{w^m}(0) = R_{31}(\Psi_0)_{1,1} + R_{32}(\Psi_0)_{1,2} + R_{33}(\Psi_0)_{1,3}.
+    \]
+    But Cholesky forces $(B_0^{-1})_{1,3} = 0$, so $\text{IRF}_y^{w^m}(0) = 0$. Therefore:
+    \[
+    R_{33}\,(\Psi_0)_{1,3} = -\bigl[R_{31}(\Psi_0)_{1,1} + R_{32}(\Psi_0)_{1,2}\bigr]. \tag{$*$}
+    \]
+
+    \begin{block}{Remarks}
+        \begin{itemize}
+            \item $(^*)$ is \textbf{automatic} --- it holds for any $\Psi_0$, not an extra assumption
+            \item It shows: at $h=0$, the monetary term and contamination term are \textit{equal and opposite}
+            \item Sign reversal at $h=0$ is \textbf{impossible by construction}; it manifests at $h\geq1$
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 3(d): Sufficient Condition for Sign Reversal --- Step 2}
+    \begin{alertblock}{Sufficient condition (two parts)}
+        \textbf{1. Restriction on $\Psi_0$ (contemporaneous impact matrix):}
+        \[
+        (\Psi_0)_{1,3} < 0 \quad \text{(true monetary shock lowers output on impact).}
+        \]
+        Since $R_{33}>0$, constraint $(^*)$ implies $R_{31}(\Psi_0)_{1,1}+R_{32}(\Psi_0)_{1,2}>0$: the contamination enters with the \textit{opposite} sign, hidden at $h=0$ by exact cancellation.
+
+        \vspace{0.4em}
+        \textbf{2. Dynamic restriction:} $\exists\, h\geq1$ such that $(\Psi_h)_{1,3}<0$ and:
+        \[
+        R_{31}(\Psi_h)_{1,1} + R_{32}(\Psi_h)_{1,2} > |R_{33}(\Psi_h)_{1,3}|.
+        \]
+    \end{alertblock}
+
+    \vspace{0.2em}
+    \textbf{Conclusion.} Under these conditions, $\text{IRF}_y^{w^m}(h) > 0$ while $\text{IRF}_y^{\varepsilon^m}(h) < 0$: \textcolor{mitred}{the identified IRF has the wrong sign.}
+
+    % Note: $R_{3j}$ are determined by $\Psi_0$ through $\Sigma_u = \Psi_0\Psi_0'$ --- both conditions are ultimately restrictions on the true DGP.
+\end{frame}
+
+% ----------------------------------------------------------------------------
+\begin{frame}{Problem 3(e): Two Robustness Strategies}
+    \textbf{Strategy 1: Sign Restrictions} \textcolor{mitred}{(Uhlig 2005)}
+    \begin{itemize}
+        \item Replace exact zeros with \textit{inequality} constraints on IRFs:
+        \begin{itemize}
+            \item $\text{IRF}_i^{\varepsilon^m}(0) > 0$, $\;\text{IRF}_y^{\varepsilon^m}(h) < 0$, $\;\text{IRF}_\pi^{\varepsilon^m}(h) < 0$
+        \end{itemize}
+        \item \textbf{Identifies}: a \textit{set} of valid rotations $\Rightarrow$ set-identified IRFs
+        \item \textbf{Advantage}: robust to timing misspecification
+    \end{itemize}
+
+    \vspace{0.4em}
+    \textbf{Strategy 2: Proxy SVAR / External Instruments} \textcolor{mitred}{(Gertler--Karadi 2015, Romer--Romer 2004)}
+    \begin{itemize}
+        \item Use instrument $z_t$ correlated with $\varepsilon_t^m$ and uncorrelated with $(\varepsilon_t^a, \varepsilon_t^c)$
+        \item IRF identified (up to scale) via IV:
+        \[
+        \text{IRF}_y^{\varepsilon^m}(h) \propto \frac{\Cov(y_{t+h}, z_t)}{\Cov(i_t, z_t)}.
+        \]
+        \item \textbf{Advantage}: no timing assumptions; identification from external information
+    \end{itemize}
+\end{frame}
+
+% ============================================================================
+% SUMMARY
+% ============================================================================
+\begin{frame}{Summary}
+    % \begin{center}
+    % \begin{tabular}{l|l|l}
+    % \toprule
+    % \textbf{Problem} & \textbf{Key restriction} & \textbf{Identifies} \\
+    % \midrule
+    % 1: Gal\'{\i} (1999) & $[\Theta(1)]_{1,j}=0$, $j\neq1$ + $[B_0^{-1}]_{1,4}=0$ & Technology shock IRFs \\
+    % \midrule
+    % 2: SVECM & $[\Upsilon]_{\cdot,2}=0$, $[\Upsilon]_{1,3}=0$, $[B_0^{-1}]_{1,3}=0$ & Permanent vs.\ transitory \\
+    % \midrule
+    % 3: CFP & \textit{Critique} of Cholesky & Sign restrictions, Proxy SVAR \\
+    % \bottomrule
+    % \end{tabular}
+    % \end{center}
+
+    % \vspace{0.5em}
+    \textbf{Big picture:}
+    \begin{itemize}
+        \item All identification strategies are about pinning down the rotation $Q$ in $H = \text{Ch}(\Sigma_u)Q$
+        \item Short-run and long-run restrictions are two complementary tools
+        \item Misspecified restrictions (like Cholesky when $(\Psi_0)_{1,3}\neq0$) can flip the sign of IRFs
+        \item \textcolor{mitred}{Always check economic plausibility of identifying assumptions}
+    \end{itemize}
+\end{frame}
+
+\end{document}

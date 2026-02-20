@@ -1,0 +1,188 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb,scrextend}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\pagestyle{fancy}
+\setlength{\headheight}{28pt}
+
+% Red "alertblock"-style boxes (Beamer-like)
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\newtcolorbox{alertblock}[1]{%
+  colback=red!5!white,
+  colframe=red!70!black,
+  fonttitle=\bfseries,
+  title=#1,
+  sharp corners,
+  boxrule=0.9pt,
+  left=1.2mm,right=1.2mm,top=1mm,bottom=1mm
+}
+
+% Common shortcuts (kept close to template)
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\imp}{\Rightarrow}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+
+\usepackage{datetime}
+
+% Date (update as needed)
+\newdate{date}{20}{02}{2026}
+
+\usepackage[round]{natbib}
+\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue,
+citecolor=blue, urlcolor=blue]{hyperref}
+
+\newtheorem*{definition}{Definition}
+\theoremstyle{definition} % normal (non-italic) body for problems
+\newtheorem{problem}{Problem}
+\theoremstyle{plain}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+
+\lhead{TA: Rafael Lincoln \\ Prof. Tim Cogley}
+\rhead{Econometrics II (Time Series) \\ For: \displaydate{date}}
+
+\section*{Problem Set 4 --- Structural VARs: Short-Run and Long-Run Identification, and VECMs}
+
+\begin{alertblock}{Important}
+We \textbf{do not collect} this problem set, and you \textbf{do not need to do all exercises}.
+We will cover the solutions in class and provide written solutions afterwards for your study.
+The goal is to give you more material to prepare for the exam.
+\end{alertblock}
+
+\vspace{0.8em}
+
+% ============================================================================
+% PROBLEM 1: Galí (1999) + CEE hybrid identification
+% ============================================================================
+\begin{problem}[Hybrid Identification: Short and Long-Run Restrictions]
+\label{prob:svar-hybrid}
+
+This problem follows the identification strategy in \citet{Gali1999}, where technology shocks are identified by imposing that only technology has a permanent effect on labor productivity, and combines it with the short-run timing logic in \citet{ChristianoEichenbaumEvans2005}, where a monetary policy shock is identified using contemporaneous exclusion restrictions. The treatment of the reduced-form VAR and of the structural impact matrix follows standard references such as \citet{Lutkepohl2005}. Let $y_t = (\Delta a_t,\; n_t,\; \pi_t,\; i_t)'$ where $\Delta a_t$ denotes labor productivity growth (or a TFP-growth proxy), $n_t$ hours (or an activity measure), $\pi_t$ inflation, and $i_t$ a short-term policy rate. Assume $y_t$ follows a stable reduced-form VAR($p$),
+\begin{equation}
+y_t = \sum_{j=1}^p A_j y_{t-j} + u_t,
+\qquad \E[u_t u_t'] = \Sigma_u.
+\end{equation}
+Consider a structural representation
+\begin{equation}
+u_t = B_0^{-1} w_t,
+\qquad \E[w_t w_t'] = I_4,
+\end{equation}
+where $w_t = (\varepsilon_t^a,\; \varepsilon_t^d,\; \varepsilon_t^\pi,\; \varepsilon_t^m)'$ denote, respectively, a technology shock, a non-technology real (demand-type) shock, a cost-push/inflation shock, and a monetary policy shock. The structural moving-average representation of this model is $y_t = \sum_{h\ge 0} \Theta_h w_{t-h}$, and define the \emph{long-run multiplier} $\Theta(1) = \sum_{h\ge 0} \Theta_h$.
+
+\begin{enumerate}[label=(\alph*)]
+\item Write the restriction used in \citet{Gali1999} in a form that is operational in this VAR. Your restriction must express that \textbf{only} $\varepsilon_t^a$ has a long-run effect on labor productivity in levels. Be explicit about how this is written when the VAR includes $\Delta a_t$ (so that the long-run effect on the \emph{level} of productivity involves the cumulative effect of $\Delta a_t$).
+
+\item Write the short-run restriction in the spirit of \citet{ChristianoEichenbaumEvans2005}: productivity growth does not respond contemporaneously to a monetary policy shock, i.e.\
+\[
+\frac{\partial(\Delta a_t)}{\partial \varepsilon_t^m}\Big|_t = 0.
+\]
+State the corresponding zero restriction on the appropriate entry of $B_0^{-1}$ (the impact matrix).
+
+\item Determine whether the model is exactly identified by your restrictions. First perform a \textbf{restriction count} relative to the degrees of freedom in $B_0^{-1}$ under the normalization $\E[w_t w_t'] = I_4$. Then explain why the count alone is not sufficient and state, in words and with the relevant mapping, the \textbf{rank condition} you would check for local identification.
+
+\item Provide a \textbf{step-by-step computational procedure} that takes $(\widehat{A}_1,\ldots,\widehat{A}_p,\widehat{\Sigma}_u)$ as inputs and returns an estimate $\widehat{B}_0^{-1}$ under the joint restrictions. Your description must specify the reduced-form long-run covariance object constructed from $A(1)$ and $\Sigma_u$, and how the short-run restriction is enforced jointly with the long-run restriction.
+
+\item Discuss, without estimating, what pattern of responses of $n_t$ and $\pi_t$ to the identified technology shock $\varepsilon_t^a$ would be consistent with Galí's empirical finding that hours may \emph{fall} after a positive technology shock, and reconcile this with the imposed long-run effect on productivity.
+\end{enumerate}
+\end{problem}
+
+\vspace{0.8em}
+
+% ============================================================================
+% PROBLEM 2: Shapiro--Watson / KPSW / SVECM
+% ============================================================================
+\begin{problem}[Permanent and Transitory Shocks in a Cointegrated System: SVECM]
+\label{prob:svecm}
+
+This problem mirrors the permanent--transitory identification logic in \citet{ShapiroWatson1988} and \citet{KingPlosserStockWatson1991}, where a cointegrated system is used to separate permanent from transitory shocks using long-run restrictions. The structural VECM framework is as in \citet{Lutkepohl2005}. Let $x_t = (y_t,\; c_t,\; i_t)'$ denote log output, log consumption, and log investment, and suppose $x_t$ is $I(1)$ with cointegration rank $r=1$. Consider the reduced-form VECM
+\begin{equation}
+\Delta x_t = \alpha \beta' x_{t-1} + \sum_{j=1}^{p-1} \Gamma_j \Delta x_{t-j} + u_t,
+\qquad \E[u_t u_t'] = \Sigma_u,
+\end{equation}
+where $\alpha$ is $3\times 1$ and $\beta$ is $3\times 1$, so $\alpha\beta'$ is the usual loading--cointegrating matrix. Let the structural shocks satisfy $u_t = B_0^{-1} w_t$ with $\E[w_t w_t'] = I_3$, where $w_t = (\varepsilon_t^P,\; \varepsilon_t^T,\; \varepsilon_t^M)'$ are a permanent shock, a transitory shock, and a monetary/financial shock.
+Let $\Upsilon$ denote the \emph{structural long-run impact matrix on levels}: the cumulative effect of $w_t$ on $x_t$ as the horizon goes to infinity.
+
+\begin{enumerate}[label=(\alph*)]
+\item Using the fact that the cointegration rank is $r=1$, determine the number of common stochastic trends in the system and state the \textbf{maximum number} of linearly independent permanent shocks that can exist. Explain briefly why this restriction arises from cointegration rather than from identifying assumptions.
+
+\item Impose the Shapiro--Watson / KPSW-style restriction that the \textbf{transitory} shock has no long-run effect on any of the levels $y_t$, $c_t$, and $i_t$. Express this as zero restrictions on the appropriate column of $\Upsilon$, and state how many independent long-run restrictions this gives you.
+
+\item Impose an additional long-run restriction consistent with neutrality: the monetary/financial shock has no long-run effect on either $y_t$ or on $y_t - c_t$. Choose one of these two formulations, justify your choice, and write the restriction as an additional zero restriction on $\Upsilon$.
+
+\item Add one \textbf{short-run} restriction: the monetary/financial shock does not move output growth contemporaneously in the SVECM,
+\[
+\frac{\partial(\Delta y_t)}{\partial \varepsilon_t^M}\Big|_t = 0.
+\]
+Translate this into a zero restriction on $B_0^{-1}$.
+
+\item Analyze \textbf{identification} under the restrictions in parts (b)--(d). Include a restriction count for the free parameters in $B_0^{-1}$ under $\E[w_t w_t'] = I_3$, and discuss one way these restrictions can fail to be feasible because of the rank structure of the long-run impact matrix implied by cointegration.
+
+\item Explain why estimating a \textbf{VAR in first differences} $\Delta x_t = \sum_j \tilde{A}_j \Delta x_{t-j} + \tilde{u}_t$ is \emph{not} a valid alternative representation for this cointegrated system. (\emph{Hint}: what does the Beveridge--Nelson decomposition imply about the Wold representation of $\Delta x_t$ when $\psi(1)$ is singular?) Given this, compare implementing the long-run restrictions in the \textbf{SVECM directly} versus in an unrestricted \textbf{VAR in levels}. State one advantage and one disadvantage of each approach, and give a precise failure mode when the cointegration rank is misspecified in the SVECM.
+\end{enumerate}
+\end{problem}
+
+\vspace{0.8em}
+
+% ============================================================================
+% PROBLEM 3: Carlstrom--Fuerst--Paustian
+% ============================================================================
+\begin{problem}[Recursive identification under misspecification: the CFP critique]
+\label{prob:cfp}
+
+This problem is based on \citet{CarlstromFuerstPaustian2009}: if the true data-generating process is forward-looking and the econometrician imposes recursive short-run identification (e.g.\ Cholesky) that is inconsistent with the true contemporaneous transmission, then the identified ``monetary policy shock'' can be a mixture of true structural shocks and impulse responses can be severely distorted. Let the true DGP for $z_t = (y_t,\; \pi_t,\; i_t)'$ admit a structural MA representation
+\begin{equation}
+z_t = \sum_{h=0}^{\infty} \Psi_h \varepsilon_{t-h},
+\qquad \E[\varepsilon_t \varepsilon_t'] = I_3,
+\end{equation}
+where $\varepsilon_t = (\varepsilon_t^a,\; \varepsilon_t^c,\; \varepsilon_t^m)'$ denote technology, cost-push/demand, and monetary policy shocks. An econometrician estimates a reduced-form VAR($p$)
+\begin{equation}
+z_t = \sum_{j=1}^p A_j z_{t-j} + u_t,
+\qquad \E[u_t u_t'] = \Sigma_u,
+\end{equation}
+and identifies structural shocks by imposing a \textbf{Cholesky scheme} with ordering $(y,\;\pi,\;i)$, so that $u_t = B_0^{-1} w_t$ with $B_0^{-1}$ lower triangular and $\E[w_t w_t'] = I_3$, where $w_t$ is the vector of Cholesky-identified structural shocks (the econometrician's recovered ``structural'' residuals). The econometrician interprets the third entry $w_t^m$ as the monetary policy shock.
+
+\begin{enumerate}[label=(\alph*)]
+\item Write the lower-triangular structure of $B_0^{-1}$ implied by the Cholesky ordering $(y,\pi,i)$. Interpret each zero as a contemporaneous exclusion restriction: which variables are allowed to respond contemporaneously to which structural shocks under this scheme?
+
+\item Prove that, without additional identifying restrictions, the mapping from reduced-form shocks $u_t$ to structural shocks is not unique because $\Sigma_u$ only pins down $B_0^{-1}$ up to an orthogonal rotation. Then explain how the Cholesky scheme selects a particular rotation and why this is an economic assumption rather than a statistical necessity.
+
+\item Assume that in the \textbf{true} DGP, monetary policy affects output contemporaneously (e.g.\ through expectations or financial channels), so that the impact response satisfies $(\Psi_0)_{y,m} \neq 0$, while the Cholesky identification with ordering $(y,\pi,i)$ imposes $(B_0^{-1})_{y,m} = 0$. Show that, under invertibility of the relevant linear mappings, the identified ``monetary shock'' $w_t^m$ must be a nontrivial linear combination of the true shocks $(\varepsilon_t^a,\; \varepsilon_t^c,\; \varepsilon_t^m)$.
+
+\item Give a \textbf{sufficient condition} under which the impulse response of $y_t$ to the identified Cholesky monetary shock $w_t^m$ can have the \emph{opposite sign} of the impulse response of $y_t$ to the true monetary policy shock $\varepsilon_t^m$. Your condition should be stated as a restriction on the contemporaneous impact matrix and at least one additional feature of the dynamics.
+
+\item Propose \textbf{two robustness strategies} that directly address the Carlstrom--Fuerst--Paustian critique. For each, state what identifying assumption replaces the recursive contemporaneous exclusions and what object is identified as a result.
+\end{enumerate}
+\end{problem}
+
+\vspace{1.5em}
+
+\begin{thebibliography}{9}
+\bibitem[Galí, 1999]{Gali1999}
+J.\ Galí (1999). ``Technology, Employment, and the Business Cycle: Do Technology Shocks Explain Aggregate Fluctuations?'' \emph{American Economic Review}, 89(1), 249--271.
+
+\bibitem[Christiano et al., 2005]{ChristianoEichenbaumEvans2005}
+L.\ J.\ Christiano, M.\ Eichenbaum, and C.\ L.\ Evans (2005). ``Nominal Rigidities and the Dynamic Effects of a Shock to Monetary Policy.'' \emph{Journal of Political Economy}, 113(1), 1--45.
+
+\bibitem[Shapiro \& Watson, 1988]{ShapiroWatson1988}
+M.\ D.\ Shapiro and M.\ W.\ Watson (1988). ``Sources of Business Cycle Fluctuations.'' In \emph{NBER Macroeconomics Annual}, Vol.\ 3, 111--148.
+
+\bibitem[King et al., 1991]{KingPlosserStockWatson1991}
+R.\ G.\ King, C.\ I.\ Plosser, J.\ H.\ Stock, and M.\ W.\ Watson (1991). ``Stochastic Trends and Economic Fluctuations.'' \emph{American Economic Review}, 81(4), 819--840.
+
+\bibitem[Carlstrom et al., 2009]{CarlstromFuerstPaustian2009}
+C.\ T.\ Carlstrom, T.\ S.\ Fuerst, and M.\ Paustian (2009). ``Monetary Policy Shocks, Cholesky Identification, and DGE Models.'' \emph{Journal of Monetary Economics}, 56(6), 757--773.
+
+\bibitem[Lütkepohl, 2005]{Lutkepohl2005}
+H.\ Lütkepohl (2005). \emph{New Introduction to Multiple Time Series Analysis}. Springer, Berlin.
+\end{thebibliography}
+
+\end{document}
