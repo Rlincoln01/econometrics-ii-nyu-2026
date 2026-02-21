@@ -1,0 +1,181 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb,scrextend}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\pagestyle{fancy}
+\setlength{\headheight}{28pt}
+
+% Red "alertblock"-style boxes (Beamer-like)
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\newtcolorbox{alertblock}[1]{%
+  colback=red!5!white,
+  colframe=red!70!black,
+  fonttitle=\bfseries,
+  title=#1,
+  sharp corners,
+  boxrule=0.9pt,
+  left=1.2mm,right=1.2mm,top=1mm,bottom=1mm
+}
+
+% Common shortcuts (kept close to template)
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\imp}{\Rightarrow}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+\DeclareMathOperator*{\plim}{plim}
+
+\usepackage{datetime}
+
+% Date (update as needed)
+\newdate{date}{27}{03}{2026}
+
+\usepackage[round]{natbib}
+\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue,
+citecolor=blue, urlcolor=blue]{hyperref}
+
+\newtheorem*{definition}{Definition}
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\theoremstyle{plain}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+
+\lhead{TA: Rafael Lincoln \\ Prof. Tim Cogley}
+\rhead{Econometrics II (Time Series) \\ For: \displaydate{date}}
+
+\section*{Problem Set 5 --- GMM: Identification, Testing, Misspecification, and Optimal Instruments}
+
+\begin{alertblock}{Important}
+We \textbf{do not collect} this problem set, and you \textbf{do not need to do all exercises}.
+We will cover the solutions in class and provide written solutions afterwards for your study.
+The goal is to give you more material to prepare for the exam.
+\end{alertblock}
+
+\vspace{0.8em}
+
+% ============================================================================
+% PROBLEM 1: 2018 Practice Final - EHS (1988) testing subset of moments
+% ============================================================================
+\begin{problem}[Testing a subset of moment conditions: Eichenbaum--Hansen--Singleton (1988)]
+\label{prob:ehs}
+
+\citet{EichenbaumHansenSingleton1988} estimate a representative-agent model of consumption and leisure choice. The agent chooses consumption and leisure streams $(c_t, \ell_t)_{t \geq 0}$ to maximize the time- and state-separable utility function
+\[
+\E\left[ \sum_{t=0}^{\infty} \beta^t u(c_t, \ell_t; \gamma, \alpha) \right]
+\]
+subject to a budget constraint. This leads to first-order conditions that can be written as
+\[
+\E\left[ h_1\!\left( \frac{c_{t+1}}{c_t}, \frac{\ell_t}{c_t}; \beta, \gamma, \alpha \right) R_{t+1} \mid \mathcal{F}_t \right] = 1, \qquad
+\E\left[ h_2\!\left( \frac{c_{t+1}}{c_t}, \frac{\ell_t}{c_t}; \beta, \gamma, \alpha \right) R_{t+1} \mid \mathcal{F}_t \right] = 1,
+\]
+where $h_1$ and $h_2$ are known functions, $(\beta, \gamma, \alpha)$ are unknown preference parameters in some parameter space $\Theta \subset \R^3$, and $R_{t+1}$ is the return on some asset. The authors estimate the true preference parameters by GMM using the population moment conditions
+\[
+\E\left[ \begin{pmatrix} h_1(\cdot; \beta, \gamma, \alpha) R_{t+1} - 1 \\ h_2(\cdot; \beta, \gamma, \alpha) R_{t+1} - 1 \end{pmatrix} \otimes z_t \right] = 0,
+\]
+where $z_t$ is a $4 \times 1$ vector of variables in $\mathcal{F}_t$. You may assume that the data $w_1, \ldots, w_n$ are strictly stationary and ergodic (with $w_t$ containing $c_{t+1}/c_t$, $\ell_t/c_t$, $R_{t+1}$, and $z_t$), and that all usual regularity conditions hold.
+
+The presence of labor market frictions may make the moment conditions involving $h_2$ invalid, i.e.\ it may be that
+\[
+\E\left[ \bigl( h_2(\cdot; \beta_0, \gamma_0, \alpha_0) R_{t+1} - 1 \bigr) \otimes z_t \right] \neq 0.
+\]
+
+Describe how you would test whether the moment conditions involving $h_2$ are invalid. In your answer, state clearly: (i) the null and alternative hypotheses, (ii) the test statistic you would use, and (iii) its asymptotic distribution under the null.
+\end{problem}
+
+\vspace{0.8em}
+
+% ============================================================================
+% PROBLEM 2: ps4.pdf Q1 - Testing with GMM, omit 1/2 factor
+% ============================================================================
+\begin{problem}[GMM objective and test statistics]
+\label{prob:gmm-half}
+
+Suppose you omit the $\frac{1}{2}$ factor in the usual definition of the GMM objective function and instead use
+\[
+\tilde{Q}_n(\theta) = -\bar{g}_n(\theta)' \hat{W} \bar{g}_n(\theta),
+\]
+where $\bar{g}_n(\theta) = \frac{1}{n}\sum_{t=1}^n g(x_t; \theta)$. Suppose you have an optimal weighting matrix (i.e.\ $\hat{W} \xrightarrow{p} S^{-1}$).
+
+\begin{enumerate}[label=(\alph*)]
+\item State the asymptotic distribution of the Wald, LM, and QLR tests of $H_0\colon a(\theta_0) = 0$ that you would obtain using this modified objective $\tilde{Q}_n$.
+\item Explain how the conclusions of your tests could be affected by omitting the $\frac{1}{2}$ factor. You may assume that all regularity conditions hold.
+\end{enumerate}
+
+\noindent\textit{Hint:} This need not be long; inspect how the test statistics depend on the objective and how omitting the factor affects their asymptotic distribution.
+\end{problem}
+
+\vspace{0.8em}
+
+% ============================================================================
+% PROBLEM 3: ps3.pdf Q3 - Misspecified GMM
+% ============================================================================
+\begin{problem}[Misspecified GMM]
+\label{prob:misspec-gmm}
+
+Suppose you are estimating an over-identified model by GMM, but the model is misspecified: there is no $\theta \in \Theta$ such that $\E[g(x_t; \theta)] = 0$.
+
+\begin{enumerate}[label=(\alph*)]
+\item What is the pseudo-true parameter that you are in fact estimating? Show how it depends on your choice of weighting matrix.
+\item You may assume the pseudo-true parameter is unique and that your estimator is consistent for it. Mimic the proof of asymptotic normality for GMM. Where does the argument break down?
+\item Now suppose the model is ``locally'' misspecified: the degree of misspecification is of order sampling error,
+\[
+\E[g(x_t; \theta_0)] = \frac{c}{\sqrt{n}},
+\]
+where $\theta_0$ is the pseudo-true parameter and $c$ is a vector of constants. Derive the asymptotic distribution of your estimator. How does it differ from the correctly specified case?
+\item Are the usual asymptotic variance estimators valid in this case? Explain.
+\end{enumerate}
+
+\noindent\textit{Remark:} Similar local asymptotic frameworks are used when assumptions only approximately hold (e.g.\ ``weak identification''). The asymptotic distribution of $\hat{\theta}$ under global misspecification is more complicated and depends on how the weighting matrix and gradient are estimated.
+\end{problem}
+
+\vspace{0.8em}
+
+% ============================================================================
+% PROBLEM 4: Lista de exercícios Q10 - GMM (translated)
+% ============================================================================
+\begin{problem}[GMM: identification, efficient weighting, and optimal instruments]
+\label{prob:gmm-optimal}
+
+Consider estimation of a parameter vector $\beta \in \R^k$ by the Generalized Method of Moments (GMM) applied to the conditional moment condition $\E[e(z_i; \beta_0) \mid x_i] = 0$, where $e(z_i; \beta) \in \R$ is continuous and differentiable in $\beta$. Suppose $u_i = (x_i', z_i')'$ is a vector of i.i.d.\ random variables.
+
+The conditional moment above implies the unconditional moment $\E[e(z_i; \beta_0) A(x_i)] = 0$ for any vector function $A(x_i) \in \R^m$ of $x_i$. Define $g(u_i; \beta) = e(z_i; \beta) A(x_i)$. The GMM estimator is
+\[
+\hat{\beta} = \arg\min_{\beta} \; \bar{g}(\beta)' W_n \bar{g}(\beta), \qquad \bar{g}(\beta) = \frac{1}{n} \sum_{i=1}^n g(u_i; \beta),
+\]
+where $W_n$ is an $(m \times m)$ symmetric positive definite matrix. Under standard regularity conditions, $\sqrt{n}(\hat{\beta} - \beta_0) \xrightarrow{d} N(0, \Sigma)$, where the asymptotic covariance matrix is
+\[
+\Sigma = (G' W G)^{-1} G' W V W G (G' W G)^{-1},
+\]
+with $W = \plim W_n$, $G = \E\bigl[ \frac{\partial}{\partial \beta} g(u_i; \beta_0) \bigr]$ $(m \times k)$, and $V = \E\bigl[ A(x_i) e(z_i; \beta_0)^2 A(x_i)' \bigr]$ $(m \times m)$.
+
+\begin{enumerate}[label=(\alph*)]
+\item What is a sufficient condition for local identification of $\beta_0$?
+\item Find the \emph{infeasible} weighting matrix $W_n$ (the one that depends on the true $\beta_0$) that yields efficient GMM. Justify asymptotic optimality: obtain the asymptotic covariance matrix $\Sigma^\#$ for $\sqrt{n}(\hat{\beta} - \beta_0)$ under this choice and show that $\Sigma - \Sigma^\# \geq 0$ (i.e.\ $\Sigma - \Sigma^\#$ is positive semidefinite) for any other choice of $W$.
+\item The GMM estimator depends on the choice of $A(x_i)$. Find the asymptotic covariance $\Sigma^*$ when
+\[
+A(x_i)^* = \frac{D(x_i)}{\sigma^2(x_i)}, \quad \text{where} \quad D(x_i) = \E\!\left[ \frac{\partial e(z_i; \beta)}{\partial \beta} \,\bigg|\, x_i \right]_{\beta = \beta_0}, \quad \sigma^2(x_i) = \E\bigl[ e(z_i; \beta_0)^2 \mid x_i \bigr].
+\]
+\item Show that $\Sigma - \Sigma^* \geq 0$ (with strict inequality in the matrix sense when the optimal $A^*$ is not used).
+\item How would you compute $A^*(x_i)$ in practice?
+\end{enumerate}
+\end{problem}
+
+\vspace{0.8em}
+
+% ----------------------------------------------------------------------------
+\begin{thebibliography}{1}
+\bibitem[Eichenbaum et al.(1988)]{EichenbaumHansenSingleton1988}
+Eichenbaum, M., L.\ P.\ Hansen, and K.\ J.\ Singleton (1988).
+\newblock ``A time series analysis of representative agent models of consumption and leisure choice under uncertainty.''
+\newblock \emph{Quarterly Journal of Economics} 103(1), 51--78.
+\end{thebibliography}
+
+\end{document}
