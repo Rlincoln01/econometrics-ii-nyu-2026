@@ -1,0 +1,656 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{bm}
+\pagestyle{fancy}
+\setlength{\headheight}{28pt}
+
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\tcbuselibrary{skins,theorems}
+
+% Macro Bible-style remark environment (boxed)
+\tcbset{
+  boxbase/.style={
+    enhanced,breakable,
+    fonttitle=\bfseries,
+    boxrule=.5pt,arc=2pt,boxsep=5pt,
+    before skip=10pt,after skip=10pt},
+  white/.style={
+    colback=white,
+    colframe=black,
+    coltitle=white,
+    colbacktitle=black}
+}
+\newtcbtheorem[auto counter]{remark}{Remark}{boxbase,white}{rem}
+\let\TCBremark      \remark
+\let\endTCBremark   \endremark
+\renewenvironment{remark}[1][]
+  {\IfValueTF{#1}
+     {\TCBremark[]{#1}{}}
+     {\TCBremark[][]{}}}
+  {\endTCBremark}
+
+% Common shortcuts
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\rank}{\mathrm{rank}}
+\newcommand{\vect}{\mathrm{vec}}
+\newcommand{\diag}{\mathrm{diag}}
+\DeclareMathOperator*{\plim}{plim}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\usepackage{datetime}
+\newdate{date}{27}{03}{2026}
+
+\usepackage[round]{natbib}
+\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue,
+citecolor=blue, urlcolor=blue]{hyperref}
+
+\theoremstyle{definition}
+\newtheorem{solution}{Solution to Problem}
+
+\begin{document}
+
+\lhead{TA: Rafael Lincoln \\ Prof. Tim Cogley}
+\rhead{Econometrics II (Time Series) \\ Solutions: \displaydate{date}}
+
+\section*{Problem Set 5\footnote{These solutions rely partly on the past solutions of Bálint Szőke for Tim Christensen's ECON GA 2101:Econometrics II course} --- Solutions}
+\subsection*{GMM: Identification, Testing, Misspecification, and Optimal Instruments}
+
+\vspace{1em}
+
+%=============================================================================
+% SOLUTION TO PROBLEM 1
+%=============================================================================
+\begin{solution}[Testing a subset of moment conditions: Eichenbaum--Hansen--Singleton (1988)] \citet{EichenbaumHansenSingleton1988} estimate a representative-agent model of consumption and leisure choice. The agent chooses consumption and leisure streams $(c_t,\ell_t)_{t\geq 0}$ to maximize the time- and state-separable utility function
+\[
+\E\left[ \sum_{t=0}^{\infty} \beta^t u(c_t,\ell_t;\gamma,\alpha) \right]
+\]
+subject to a budget constraint. This leads to first-order conditions that can be written as
+\[
+\E\left[ h_1\!\left( \frac{c_{t+1}}{c_t}, \frac{\ell_t}{c_t}; \beta, \gamma, \alpha \right) R_{t+1} \mid \mathcal{F}_t \right] = 1, \qquad
+\E\left[ h_2\!\left( \frac{c_{t+1}}{c_t}, \frac{\ell_t}{c_t}; \beta, \gamma, \alpha \right) R_{t+1} \mid \mathcal{F}_t \right] = 1,
+\]
+where $h_1$ and $h_2$ are known functions, $(\beta,\gamma,\alpha)$ are unknown preference parameters in some parameter space $\Theta\subset\R^3$, and $R_{t+1}$ is the return on some asset. The authors estimate the true preference parameters by GMM using the population moment conditions
+\[
+\E\left[ \begin{pmatrix} h_1(\cdot;\beta,\gamma,\alpha) R_{t+1} - 1 \\ h_2(\cdot;\beta,\gamma,\alpha) R_{t+1} - 1 \end{pmatrix} \otimes z_t \right] = 0,
+\]
+where $z_t$ is a $4\times 1$ vector of variables in $\mathcal{F}_t$. You may assume that the data $w_1,\ldots,w_n$ are strictly stationary and ergodic (with $w_t$ containing $c_{t+1}/c_t$, $\ell_t/c_t$, $R_{t+1}$, and $z_t$), and that all usual regularity conditions hold.
+
+The presence of labor market frictions may make the moment conditions involving $h_2$ invalid, i.e.\ it may be that
+\[
+\E\left[ \bigl( h_2(\cdot;\beta_0,\gamma_0,\alpha_0) R_{t+1} - 1 \bigr) \otimes z_t \right] \neq 0.
+\]
+The question asks: describe how you would test whether the moment conditions involving $h_2$ are invalid; state (i) the null and alternative hypotheses, (ii) the test statistic, and (iii) its asymptotic distribution under the null.
+
+\bigskip
+
+\noindent\textbf{Solution.} First, we partition the moment conditions into two blocks:
+\[
+g(w_t;\theta) = \begin{pmatrix} g_1(w_t;\theta) \\ g_2(w_t;\theta) \end{pmatrix}, \qquad g_1\in\R^4,\quad g_2\in\R^4,
+\]
+where $g_1(w_t;\theta) = (h_1(\cdot;\theta)R_{t+1}-1)\otimes z_t$ collects the four moment conditions from the consumption Euler equation, and $g_2(w_t;\theta) = (h_2(\cdot;\theta)R_{t+1}-1)\otimes z_t$ collects the four moment conditions from the labor--leisure Euler equation. Under the null hypothesis, both blocks are valid at $\theta_0$; under the alternative, only $g_1$ is valid.
+
+\bigskip
+\paragraph{Hypotheses.}
+\begin{itemize}
+    \item $H_0$: All $m=8$ moment conditions are correctly specified, i.e.\ $\E[g(w_t;\theta_0)]=0$.
+    \item $H_1$: The moment conditions involving $h_2$ are invalid, i.e.\ $\E[g_2(w_t;\theta_0)]\neq 0$ while $\E[g_1(w_t;\theta_0)]=0$.
+\end{itemize}
+
+\bigskip
+\paragraph{Test statistic: the $C$-test (incremental $J$-test).} The idea is to compare the Hansen $J$-statistic from the full model (using all 8 moments) with the $J$-statistic from a restricted model (using only the 4 ``safe'' moments from $g_1$). If the suspect moments $g_2$ are valid, adding them should not significantly worsen the fit of the model.
+
+\medskip
+\noindent\textbf{Step 1: Full-model $J$-statistic.} Estimate $\theta$ by efficient two-step GMM using all $m=8$ moment conditions. Let $\hat{\theta}_{\text{full}}$ denote the resulting estimator, and define
+\[
+J_{\text{full}} = n\,\bar{g}_n(\hat{\theta}_{\text{full}})'\hat{S}_{\text{full}}^{-1}\bar{g}_n(\hat{\theta}_{\text{full}}),
+\]
+where $\hat{S}_{\text{full}}$ is a consistent estimator of the long-run variance $S=\Var(\sqrt{n}\,\bar{g}_n(\theta_0))$ based on the full set of moments. Under $H_0$:
+\[
+J_{\text{full}} \xrightarrow{d} \chi^2(m-p) = \chi^2(5).
+\]
+
+\noindent\textbf{Step 2: Restricted-model $J$-statistic.} Estimate $\theta$ by efficient two-step GMM using only the $m_1=4$ moment conditions from $g_1$. Let $\hat{\theta}_{\text{rest}}$ denote this estimator, and define
+\[
+J_{\text{rest}} = n\,\bar{g}_{1,n}(\hat{\theta}_{\text{rest}})'\hat{S}_{11}^{-1}\bar{g}_{1,n}(\hat{\theta}_{\text{rest}}),
+\]
+where $\hat{S}_{11}$ is the upper-left $4\times 4$ block of $\hat{S}_{\text{full}}$ (the long-run variance of the $g_1$ moments). Under $H_0$:
+\[
+J_{\text{rest}} \xrightarrow{d} \chi^2(m_1-p) = \chi^2(1).
+\]
+
+\noindent\textbf{Step 3: The $C$-statistic.} Define
+\[
+\boxed{C = J_{\text{full}} - J_{\text{rest}}.}
+\]
+Under $H_0$, both $J$-statistics are asymptotically $\chi^2$ and, by a result due to Newey (1985) and Eichenbaum, Hansen, and Singleton (1988), their difference is asymptotically independent of $J_{\text{rest}}$. The degrees of freedom of $C$ equal the number of suspect moment conditions:
+\[
+\boxed{C \xrightarrow{d} \chi^2(m_2) = \chi^2(4) \quad\text{under }H_0,}
+\]
+where $m_2=m-m_1=4$ is the number of moment conditions being tested (those involving $h_2$). We reject $H_0$ at significance level $\alpha$ if $C>\chi^2_{4,1-\alpha}$.
+\end{solution}
+
+
+\bigskip
+\paragraph{Intuition.} The $C$-test asks: \emph{how much does the $J$-statistic worsen when we add the suspect moments?} Under the null, adding valid moments should not create a significant increase in the over-identification test statistic---any increase is due to sampling variation and is asymptotically $\chi^2(4)$. Under the alternative, the suspect moments are misspecified, so forcing the GMM estimator to fit them as well will substantially inflate the $J$-statistic, producing a large value of $C$.
+
+\paragraph{Important implementation detail.} For the difference $C=J_{\text{full}}-J_{\text{rest}}$ to be guaranteed non-negative in finite samples (and for the asymptotic theory to apply cleanly), both $J$-statistics should be constructed using the \emph{same} consistent estimator of the long-run variance matrix $S$. In practice, one typically estimates $S$ once from the full model and uses the appropriate sub-blocks for the restricted $J$-statistic. This ensures that $C\geq 0$ by construction (as a difference of nested quadratic forms) and that the asymptotic independence result holds.
+
+\bigskip
+\begin{remark}[Conditional moments $\Rightarrow$ Unconditional moments]
+In the question, the Euler-equation restrictions are stated \emph{conditionally} on the period-$t$ information set:
+\[
+\E\!\left[m_{t+1}(\theta_0)\mid \mathcal{F}_t\right]=0,
+\qquad
+m_{t+1}(\theta)=\begin{pmatrix} h_1(\cdot;\theta)R_{t+1}-1 \\ h_2(\cdot;\theta)R_{t+1}-1 \end{pmatrix}.
+\]
+To obtain the \emph{unconditional} moment restrictions used in GMM, take any instrument vector $z_t$ that is measurable with respect to $\mathcal{F}_t$ (so $z_t\in\mathcal{F}_t$) and apply the law of iterated expectations:
+\[
+0
+=\E\!\left[\E\!\left[m_{t+1}(\theta_0)\mid \mathcal{F}_t\right]\otimes z_t\right]
+=\E\!\left[m_{t+1}(\theta_0)\otimes z_t\right].
+\]
+This a common trick in GMM: multiplying the conditional restriction by an $\mathcal{F}_t$-measurable instrument and then taking expectations converts it into an unconditional moment condition.
+\end{remark}
+
+\begin{remark}[Inference with the GMM $J$-test]
+The Hansen $J$-test is a \emph{joint} test of the overidentifying restrictions. Under the null hypothesis that \emph{all} moment conditions are correctly specified (and instruments are valid),
+\[
+H_0:\ \E[g(w_t;\theta_0)]=0,
+\]
+the (efficient) $J$-statistic
+\[
+J = n\,\bar g_n(\hat\theta)'\hat S^{-1}\bar g_n(\hat\theta)
+\]
+has the limiting distribution
+\[
+J \xrightarrow{d} \chi^2(m-p),
+\]
+where $m$ is the number of moment conditions and $p$ is the number of parameters. Inference is therefore: reject $H_0$ at level $\alpha$ if $J>\chi^2_{m-p,\,1-\alpha}$ (or report the corresponding $p$-value). A rejection means \emph{at least one} restriction fails (model misspecification and/or invalid instruments), but the $J$-test does not identify \emph{which} moment(s) drive the failure.
+\end{remark}
+
+
+
+\newpage
+%=============================================================================
+% SOLUTION TO PROBLEM 2
+%=============================================================================
+\begin{solution}[GMM objective and test statistics]
+Suppose you omit the $\frac{1}{2}$ factor in the usual definition of the GMM objective function and instead use
+\[
+\tilde{Q}_n(\theta) = -\bar{g}_n(\theta)'\hat{W}\bar{g}_n(\theta),
+\]
+where $\bar{g}_n(\theta) = \frac{1}{n}\sum_{t=1}^n g(x_t;\theta)$. Suppose you have an optimal weighting matrix (i.e.\ $\hat{W}\xrightarrow{p} S^{-1}$):
+\begin{enumerate}
+    \item State the asymptotic distribution of the Wald, LM, and QLR tests of $H_0\colon a(\theta_0)=0$ that you would obtain using this modified objective $\tilde{Q}_n$.
+    \item Explain how the conclusions of your tests could be affected by omitting the $\frac{1}{2}$ factor. You may assume that all regularity conditions hold.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Solution.} Since $\tilde{Q}_n(\theta) = 2\,Q_n(\theta)$ (where $Q_n(\theta)=-\frac{1}{2}\bar{g}_n(\theta)'\hat{W}\bar{g}_n(\theta)$ is the standard objective), the two objective functions differ by a positive multiplicative constant. The key observation is that \textbf{the GMM estimator is unchanged}: both $\hat{\theta}$ (unrestricted) and $\tilde{\theta}$ (restricted by $a(\theta)=0$) are invariant to positive rescaling of the objective, since $\argmin_\theta\,\tilde{Q}_n(\theta)=\argmin_\theta\,Q_n(\theta)$. However, the test statistics that depend on the \emph{value} or the \emph{derivative} of the objective are affected.
+
+\bigskip
+\paragraph{(a) Asymptotic distributions of the three tests.} Let us examine each test statistic in turn. Denote $G=\E[\partial g/\partial\theta']$, $S=\Var(\sqrt{n}\bar{g}_n(\theta_0))$, and $\Omega=G'S^{-1}G$.
+
+\medskip
+\noindent\textbf{Wald test.} The Wald statistic is
+\[
+\xi_W = n\,a(\hat\theta)'\bigl[\nabla a(\hat\theta)\,\hat\Omega^{-1}\nabla a(\hat\theta)'\bigr]^{-1}a(\hat\theta),
+\]
+where $\hat\Omega=\hat G'\hat S^{-1}\hat G$. This statistic depends only on the estimator $\hat\theta$ and its asymptotic variance---it never involves the objective function itself. Since $\hat\theta$ is invariant to the rescaling, the Wald statistic is identical whether we use $Q_n$ or $\tilde Q_n$:
+\[
+\boxed{\tilde\xi_W = \xi_W \xrightarrow{d} \chi^2(r) \quad\text{under }H_0.}
+\]
+The Wald test is completely unaffected by the missing $\frac{1}{2}$.
+
+\medskip
+\noindent\textbf{LM (Lagrange Multiplier) test.} The LM statistic uses the score of the objective evaluated at the restricted estimator:
+\[
+\xi_{LM} = n\left(\frac{\partial Q_n(\tilde\theta)}{\partial\theta}\right)'\Omega^{-1}\left(\frac{\partial Q_n(\tilde\theta)}{\partial\theta}\right).
+\]
+Since $\tilde Q_n=2Q_n$, the gradient scales by 2: $\partial\tilde Q_n/\partial\theta = 2\,\partial Q_n/\partial\theta$. Meanwhile $\tilde\Omega=\Omega$ (it depends on $G$ and $S$, not on the objective scaling). Therefore:
+\[
+\tilde\xi_{LM} = n\left(\frac{\partial\tilde Q_n(\tilde\theta)}{\partial\theta}\right)'\Omega^{-1}\left(\frac{\partial\tilde Q_n(\tilde\theta)}{\partial\theta}\right) = 4\,\xi_{LM}.
+\]
+\[
+\boxed{\tilde\xi_{LM} = 4\,\xi_{LM} \xrightarrow{d} 4\,\chi^2(r) \quad\text{under }H_0.}
+\]
+
+\medskip
+\noindent\textbf{QLR (Quasi-Likelihood Ratio) test.} The standard QLR statistic is $\xi_{QLR}=2n[Q_n(\hat\theta)-Q_n(\tilde\theta)]$. With the modified objective:
+\[
+\tilde\xi_{QLR} = 2n[\tilde Q_n(\hat\theta)-\tilde Q_n(\tilde\theta)] = 2n\cdot 2[Q_n(\hat\theta)-Q_n(\tilde\theta)] = 2\,\xi_{QLR}.
+\]
+\[
+\boxed{\tilde\xi_{QLR} = 2\,\xi_{QLR} \xrightarrow{d} 2\,\chi^2(r) \quad\text{under }H_0.}
+\]
+
+\bigskip
+\paragraph{(b) Consequences for inference.} If one naively uses the standard $\chi^2(r)$ critical values with the modified test statistics, the LM and QLR tests will \textbf{over-reject} the null hypothesis. The inflated test statistics exceed the critical value more often than they should, leading to excessively high Type~I error rates.
+
+To see this concretely for the QLR test: under $H_0$, the probability of not rejecting is
+\[
+\Pr\!\left(\tilde\xi_{QLR}<\chi^2_{r,\alpha}\right) = \Pr\!\left(2\,\xi_{QLR}<\chi^2_{r,\alpha}\right) < \Pr\!\left(\xi_{QLR}<\chi^2_{r,\alpha}\right),
+\]
+so the actual rejection probability exceeds $\alpha$. The same logic applies to the LM test (with an even larger distortion, since the scaling factor is 4 rather than 2).
+
+\medskip
+\noindent\textbf{Practical fix.} One can simply divide the LM statistic by 4 and the QLR statistic by 2 to recover the correct asymptotic distributions, or equivalently use critical values from $4\,\chi^2(r)$ and $2\,\chi^2(r)$, respectively. The Wald test requires no adjustment.
+
+\medskip
+\noindent\textbf{Why the tests differ.} The Wald statistic is a function of the estimator alone---it measures how far $a(\hat\theta)$ is from zero relative to its estimated variance, and is therefore immune to how the objective is scaled. The LM statistic is a function of the \emph{score} (first derivative) of the objective, so it inherits the factor of 2 in the gradient (and its square inherits the factor of 4). The QLR statistic is a function of the \emph{difference in objective values}, so it inherits the factor of 2 directly. The lesson is straightforward: the $\frac{1}{2}$ in the standard GMM objective is not merely a convention---it is chosen so that the QLR and LM statistics have the same $\chi^2(r)$ limiting distribution as the Wald, preserving their asymptotic equivalence under $H_0$.
+\end{solution}
+
+
+
+\newpage
+%=============================================================================
+% SOLUTION TO PROBLEM 3
+%=============================================================================
+\begin{solution}[Misspecified GMM] Suppose you are estimating an over-identified model by GMM, but the model is misspecified: there is no $\theta\in\Theta$ such that $\E[g(x_t;\theta)]=0$. 
+\begin{enumerate}
+    \item What is the pseudo-true parameter that you are in fact estimating? Show how it depends on your choice of weighting matrix.
+    \item You may assume the pseudo-true parameter is unique and that your estimator is consistent for it. Mimic the proof of asymptotic normality for GMM. Where does the argument break down?
+    \item Now suppose the model is ``locally'' misspecified: the degree of misspecification is of order sampling error, $\E[g(x_t;\theta_0)]=c/\sqrt{n}$, where $\theta_0$ is the pseudo-true parameter and $c$ is a vector of constants. Derive the asymptotic distribution of your estimator. How does it differ from the correctly specified case?
+    \item Are the usual asymptotic variance estimators valid in this case? Explain.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Solution.} Let $\bar{g}_n(\theta)=\frac{1}{n}\sum_{t=1}^n g(x_t;\theta)$ and let $\hat{W}\xrightarrow{p}W$ be a positive definite weighting matrix.
+
+\bigskip
+\paragraph{(a) The pseudo-true parameter.} The GMM estimator maximizes (equivalently, minimizes in absolute value) the sample criterion
+\[
+Q_n(\theta) = -\tfrac{1}{2}\bar{g}_n(\theta)'\hat{W}\bar{g}_n(\theta).
+\]
+By a uniform law of large numbers, $Q_n(\theta)\xrightarrow{p}Q(\theta)$ where the population criterion is
+\[
+Q(\theta) = -\tfrac{1}{2}\E[g(x_t;\theta)]'W\,\E[g(x_t;\theta)].
+\]
+The \textbf{pseudo-true parameter} $\theta_0$ is defined as the maximizer of $Q(\theta)$ over $\Theta$:
+\[
+\theta_0 = \argmax_{\theta\in\Theta}\; Q(\theta).
+\]
+The corresponding first-order condition is
+\[
+0 = \frac{\partial Q(\theta_0)}{\partial\theta} = -G(\theta_0)'W\,\E[g(x_t;\theta_0)],
+\]
+where $G(\theta)=\E[\partial g(x_t;\theta)/\partial\theta']$ is the $m\times p$ Jacobian. Writing $\bar{g}(\theta)=\E[g(x_t;\theta)]$ for short, this reads
+\[
+\boxed{G(\theta_0)'W\,\bar{g}(\theta_0) = 0.}
+\]
+
+Under correct specification, $\bar{g}(\theta_0)=0$, so this FOC is satisfied trivially and $\theta_0$ does not depend on $W$. Under misspecification, $\bar{g}(\theta_0)=c$ for some $c\neq 0$. The FOC becomes $G(\theta_0)'Wc=0$, and different choices of $W$ will lead to different solutions. \textbf{The pseudo-true parameter depends on the weighting matrix.} Intuitively, $\theta_0$ is the parameter value that makes the moment conditions ``as close to zero as possible'' in the metric defined by $W$---and different metrics yield different notions of ``closest.''
+
+\bigskip
+\paragraph{(b) Where asymptotic normality breaks down.} Assume $\theta_0$ is unique and $\hat\theta\xrightarrow{p}\theta_0$. To derive the limiting distribution, we mimic the standard proof. The sample FOC is $\partial Q_n(\hat\theta)/\partial\theta\approx 0$, which gives
+\[
+0 \approx -G_n(\hat\theta)'\hat{W}\bar{g}_n(\hat\theta).
+\]
+Taking a mean-value expansion of $\bar{g}_n(\hat\theta)$ around $\theta_0$:
+\[
+\bar{g}_n(\hat\theta) = \bar{g}_n(\theta_0) + G_n(\tilde\theta)(\hat\theta-\theta_0),
+\]
+where $\tilde\theta$ lies between $\hat\theta$ and $\theta_0$ (entry-by-entry). Substituting:
+\[
+G_n(\hat\theta)'\hat{W}\,G_n(\tilde\theta)\sqrt{n}(\hat\theta-\theta_0) = -G_n(\hat\theta)'\hat{W}\sqrt{n}\,\bar{g}_n(\theta_0) + o_p(1).
+\]
+Under the usual regularity conditions (consistency, interior $\theta_0$, differentiability, dominated Hessian), the left-hand side converges to $(G'WG)\sqrt{n}(\hat\theta-\theta_0)$ plus negligible terms. The question is: \emph{what happens to $\sqrt{n}\,\bar{g}_n(\theta_0)$?}
+
+Under correct specification, $\E[\bar{g}_n(\theta_0)]=0$ and the CLT gives $\sqrt{n}\,\bar{g}_n(\theta_0)\xrightarrow{d}N(0,S)$. Under misspecification, $\E[\bar{g}_n(\theta_0)]=\bar{g}(\theta_0)=c\neq 0$, so
+\[
+\sqrt{n}\,\E[\bar{g}_n(\theta_0)] = \sqrt{n}\,c \to \infty.
+\]
+\textbf{The argument breaks down because the leading term on the right-hand side diverges.} The CLT still applies to the centered quantity $\sqrt{n}[\bar{g}_n(\theta_0)-c]$, but the uncentered version $\sqrt{n}\,\bar{g}_n(\theta_0)$ is dominated by the deterministic drift $\sqrt{n}\,c$, which grows without bound. One cannot factor out a well-behaved normal limit and invert $(G'WG)$ to get a standard asymptotic distribution.
+
+\bigskip
+\paragraph{(c) Local misspecification.} Now suppose the misspecification is ``small''---of order sampling error:
+\[
+\E[g(x_t;\theta_0)] = \frac{c}{\sqrt{n}},
+\]
+where $c$ is a fixed vector of constants and $\theta_0$ is the pseudo-true parameter. This local misspecification framework is attractive because it nests correct specification ($c=0$) and allows us to study what happens when the model is ``almost right'' in a precise asymptotic sense. Returning to the expansion from part (b), we now analyze $\sqrt{n}\,\bar{g}_n(\theta_0)$. Decompose it as
+\[
+\sqrt{n}\,\bar{g}_n(\theta_0) = \sqrt{n}\bigl[\bar{g}_n(\theta_0)-\E[\bar{g}_n(\theta_0)]\bigr] + \sqrt{n}\,\E[\bar{g}_n(\theta_0)].
+\]
+The first term converges by the CLT: $\sqrt{n}[\bar{g}_n(\theta_0)-\E[\bar{g}_n(\theta_0)]]\xrightarrow{d}N(0,S)$. The second term is deterministic: $\sqrt{n}\,\E[\bar{g}_n(\theta_0)]=\sqrt{n}\cdot c/\sqrt{n}=c$. Therefore:
+\[
+\sqrt{n}\,\bar{g}_n(\theta_0) \xrightarrow{d} N(c,\;S).
+\]
+The crucial difference from part (b) is that the drift $c$ is now a \emph{finite constant} rather than a divergent sequence---the misspecification is exactly calibrated to produce a non-zero but bounded shift in the limit distribution.
+
+Substituting into the expansion and applying Slutsky's theorem:
+\begin{align*}
+\sqrt{n}(\hat\theta-\theta_0) &= -(G'WG)^{-1}G'W\sqrt{n}\,\bar{g}_n(\theta_0) + o_p(1) \\
+&\xrightarrow{d} -(G'WG)^{-1}G'W \cdot N(c,S).
+\end{align*}
+Since a linear transformation of a normal random vector is normal:
+\[
+\boxed{\sqrt{n}(\hat\theta-\theta_0) \xrightarrow{d} N\!\left((G'WG)^{-1}G'Wc,\;\;(G'WG)^{-1}G'WSWG(G'WG)^{-1}\right).}
+\]
+
+The \textbf{variance} is identical to the correctly specified case (the usual GMM sandwich). The \textbf{mean} is now non-zero: there is an asymptotic bias of $(G'WG)^{-1}G'Wc$, which depends on both the degree of misspecification $c$ and the weighting matrix $W$. Under correct specification ($c=0$), the bias vanishes and we recover the standard result. In essence, local misspecification shifts the center of the limiting distribution without changing its spread.
+
+\bigskip
+\paragraph{(d) Validity of the usual variance estimators.} The standard variance estimator is
+\[
+\hat{S} = \frac{1}{n}\sum_{t=1}^n g(x_t;\hat\theta)\,g(x_t;\hat\theta)'.
+\]
+Under local misspecification, $\E[g(x_t;\theta_0)]=c/\sqrt{n}$. To check consistency of $\hat S$, we decompose the population second moment using the variance--bias identity:
+\begin{align*}
+\E\!\bigl[g(x_t;\theta_0)\,g(x_t;\theta_0)'\bigr]
+&= \Var\!\bigl(g(x_t;\theta_0)\bigr) + \E\!\bigl[g(x_t;\theta_0)\bigr]\E\!\bigl[g(x_t;\theta_0)\bigr]' \\[4pt]
+&= S + \frac{c}{\sqrt{n}}\cdot\frac{c'}{\sqrt{n}} \\[4pt]
+&= S + \frac{cc'}{n}.
+\end{align*}
+The first line is simply $\E[XX'] = \Var(X)+\E[X]\E[X]'$ applied entry-by-entry. In the second line we substituted $\Var(g)=S$ (the long-run variance, which does not depend on $n$) and $\E[g]=c/\sqrt{n}$. Therefore:
+\[
+\E\bigl[g(x_t;\theta_0)g(x_t;\theta_0)'\bigr] = S + \frac{cc'}{n} \;\xrightarrow{n\to\infty}\; S.
+\]
+The squared-bias term $cc'/n\to 0$, so the population second moment converges to $S$ as $n\to\infty$. By a standard LLN argument, $\hat{S}\xrightarrow{p}S$, and the \textbf{usual variance estimator remains consistent}. In finite samples, however, $\E[g(x_t;\theta_0)]\neq 0$, so the sample second moment includes a (small) squared-bias component. One can improve finite-sample performance by using a demeaned estimator:
+\[
+\hat{S}_{\text{dm}} = \frac{1}{n}\sum_{t=1}^n \bigl[g(x_t;\hat\theta)-\bar{g}_n(\hat\theta)\bigr]\bigl[g(x_t;\hat\theta)-\bar{g}_n(\hat\theta)\bigr]',
+\]
+which subtracts the sample mean of the moments. Since $\bar{g}_n(\hat\theta)=O_p(n^{-1/2})$ under local misspecification, both estimators are asymptotically equivalent, but $\hat{S}_{\text{dm}}$ may be more accurate at moderate sample sizes.
+
+\medskip
+\noindent\textbf{Global vs.\ local misspecification: a comparison.} Under \emph{global} misspecification---meaning $\E[g(x_t;\theta_0)]=c\neq 0$ with $c$ fixed and not shrinking---the situation is far worse. The estimator $\sqrt{n}(\hat\theta-\theta_0)$ does not converge to a normal distribution (part~(b)), and the usual variance estimator~$\hat{S}$ is inconsistent for $\Var(g)$ because the squared-bias component $cc'$ does not vanish.
+
+The local misspecification framework avoids these pathologies by making the bias small enough to be ``absorbed'' by the CLT. It is the same asymptotic device used in the weak instruments literature \citep{StaigerStock1997}, where the first-stage coefficient is local-to-zero: $\pi=C/\sqrt{n}$.
+
+\end{solution}
+
+\begin{remark}[Correct specification, global identification, and local identification]
+    Throughout this problem set the \textbf{setting} is as follows. We observe an i.i.d.\ (or stationary ergodic) sequence $\{x_t\}$ taking values in $\mathbb{R}^{d_x}$. We have a \emph{moment function}
+    \[
+    g:\mathbb{R}^{d_x}\times\Theta\;\longrightarrow\;\mathbb{R}^m,
+    \qquad \Theta\subseteq\mathbb{R}^p,
+    \]
+    where $m\geq p$ (we need at least as many moment conditions as parameters). The GMM estimator exploits the \emph{sample analog} of the population moment condition $\E[g(x_t;\theta_0)]=0$.
+    
+    \medskip\noindent\textbf{Correct specification.} The model is \emph{correctly specified} if there exists $\theta_0\in\Theta$ such that
+    \[
+    \E[g(x_t;\theta_0)] = 0.
+    \]
+    When this fails for every $\theta\in\Theta$ the model is \emph{misspecified} (see Problem~3).
+    
+    \medskip\noindent\textbf{Global identification.} Under correct specification, $\theta_0$ is \emph{globally identified} if it is the \emph{unique} solution to the population moment condition:
+    \[
+    \E[g(x_t;\theta)]=0 \quad\Longleftrightarrow\quad \theta=\theta_0,
+    \qquad\text{i.e.}\quad \E[g(x_t;\theta)]\neq 0\;\;\forall\,\theta\in\Theta,\,\theta\neq\theta_0.
+    \]
+    Global identification guarantees that the population criterion $Q(\theta)=-\tfrac{1}{2}\E[g(x_t;\theta)]'W\,\E[g(x_t;\theta)]$ is uniquely maximized at $\theta_0$. It is generally \emph{difficult to verify} in nonlinear models because it requires checking all $\theta\in\Theta$.
+    
+    \medskip\noindent\textbf{Local identification.} $\theta_0$ is \emph{locally identified} if it is the unique solution in some neighborhood $\mathcal{U}$ of $\theta_0$. A sufficient condition (first-order) comes from linearizing the moment function around $\theta_0$:
+    \[
+    \E[g(x_t;\theta)] \approx \E[g(x_t;\theta_0)] + G(\theta_0)(\theta-\theta_0) = G(\theta_0)(\theta-\theta_0),
+    \]
+    where $G(\theta_0)=\E\!\left[\tfrac{\partial g(x_t;\theta_0)}{\partial\theta'}\right]\in\mathbb{R}^{m\times p}$ is the Jacobian. For $G(\theta_0)(\theta-\theta_0)=0$ to imply $\theta=\theta_0$, the null space of $G(\theta_0)$ must be trivial, i.e.\
+    \[
+    \operatorname{rank}(G(\theta_0)) = p.
+    \]
+    This is the \textbf{rank condition} for local identification (see Problem~4a). It requires $m\geq p$ (order condition) \emph{and} that the $m$ moments collectively provide $p$ linearly independent directions of information about $\theta$.
+    
+    \medskip\noindent\textbf{How the three concepts relate.}
+    \begin{itemize}[leftmargin=1.8em]
+      \item Correct specification is a prerequisite: without it, $\theta_0$ is replaced by a pseudo-true parameter that depends on $W$ (Problem~3a).
+      \item Global $\Rightarrow$ local identification, but \emph{not} vice versa. A model can be locally identified at $\theta_0$ yet have multiple global solutions.
+      \item Without local identification ($\operatorname{rank}(G)<p$), the GMM criterion is flat in at least one direction near $\theta_0$: the estimator is not $\sqrt{n}$-consistent and standard asymptotic theory breaks down.
+      \item GMM identification is \emph{weaker} than maximum-likelihood identification: two distinct parameters $\theta\neq\theta'$ may satisfy $\E[g(x_t;\theta)]=\E[g(x_t;\theta')]=0$ yet generate different distributions for $x_t$, so MLE would distinguish them while GMM would not (``limited information'' estimation).
+    \end{itemize}
+    \end{remark}
+
+\begin{remark}[Two-step optimally-weighted GMM]
+In practice the efficient weighting matrix $W=S^{-1}$ is unknown because $S=\Var(\sqrt{n}\,\bar g_n(\theta_0))$ depends on the unknown $\theta_0$. The standard solution is the \textbf{two-step} procedure.
+
+\medskip\noindent\textbf{Step 1 (first-step estimator).} Maximize the GMM criterion using the identity weighting matrix $\hat W = I$:
+\[
+\tilde\theta \;=\; \argmin_{\theta\in\Theta}\;\bar g_n(\theta)'\,I\,\bar g_n(\theta).
+\]
+$\tilde\theta$ is consistent for $\theta_0$ (as long as the model is identified), but not efficient.
+
+\medskip\noindent\textbf{Step 2 (optimal weight, second-step estimator).} Use $\tilde\theta$ to construct a consistent estimate of $S$:
+\[
+\hat W \;=\; \left(\frac{1}{n}\sum_{t=1}^n g(x_t;\tilde\theta)\,g(x_t;\tilde\theta)'\right)^{-1}.
+\]
+Then re-estimate by maximizing the criterion with this data-dependent weight:
+\[
+\hat\theta \;=\; \argmin_{\theta\in\Theta}\;\bar g_n(\theta)'\,\hat W\,\bar g_n(\theta).
+\]
+Because $\hat W\xrightarrow{p}S^{-1}$, the two-step estimator $\hat\theta$ is \textbf{asymptotically efficient} among all GMM estimators that use the same moment conditions, with asymptotic variance $(G'S^{-1}G)^{-1}$.
+
+\medskip\noindent\textbf{Why not iterate?} One can continue re-estimating $\hat W$ with the updated $\hat\theta$ (the \emph{continuously-updated GMM}, CU-GMM, of Hansen, Heaton, and Yaron 1996). CU-GMM shares the same first-order asymptotic distribution as two-step GMM but can have better higher-order properties in some settings.
+\end{remark}
+
+
+\newpage
+%=============================================================================
+% SOLUTION TO PROBLEM 4
+%=============================================================================
+\begin{solution}[GMM: identification, efficient weighting, and optimal instruments]
+Consider estimation of a parameter vector $\beta\in\R^k$ by GMM applied to the conditional moment condition $\E[e(z_i;\beta_0)\mid x_i]=0$, where $e(z_i;\beta)\in\R$ is continuous and differentiable in $\beta$. Suppose $u_i=(x_i',z_i')'$ is i.i.d. The conditional moment implies the unconditional moment $\E[e(z_i;\beta_0)A(x_i)]=0$ for any vector function $A(x_i)\in\R^m$ of $x_i$. Define $g(u_i;\beta)=e(z_i;\beta)A(x_i)$. The GMM estimator is $\hat{\beta}=\argmin_\beta\,\bar{g}(\beta)'W_n\bar{g}(\beta)$ with $\bar{g}(\beta)=\frac{1}{n}\sum_{i=1}^n g(u_i;\beta)$, where $W_n$ is an $(m\times m)$ symmetric positive definite matrix. Under standard regularity conditions, $\sqrt{n}(\hat{\beta}-\beta_0)\xrightarrow{d}N(0,\Sigma)$ with
+\[
+\Sigma = (G'WG)^{-1}G'WVWG(G'WG)^{-1},
+\]
+where $W=\plim W_n$, $G=\E[\frac{\partial}{\partial\beta}g(u_i;\beta_0)]$ $(m\times k)$, and $V=\E[A(x_i)e(z_i;\beta_0)^2A(x_i)']$ $(m\times m)$. The question asks: 
+\begin{enumerate}
+    \item a sufficient condition for local identification of $\beta_0$;
+    \item the infeasible $W_n$ that yields efficient GMM and a proof that $\Sigma-\Sigma^\#\geq 0$;
+    \item the asymptotic covariance $\Sigma^*$ when $A(x_i)^*=D(x_i)/\sigma^2(x_i)$ with $D(x_i)=\E[\partial e/\partial\beta\mid x_i]_{\beta_0}$ and $\sigma^2(x_i)=\E[e(z_i;\beta_0)^2\mid x_i]$;
+    \item a proof that $\Sigma-\Sigma^*\geq 0$;
+    \item how to compute $A^*(x_i)$ in practice.
+\end{enumerate}
+\medskip
+\noindent\textbf{Solution.}
+\paragraph{(a) Local identification.} The population GMM first-order condition is $G'W\,\E[g(u_i;\beta)]=0$. For this to locally pin down $\beta_0$, the Jacobian~$G$ must have full column rank. Since $G$ is $m\times k$ ($m\geq k$ is needed), the sufficient condition is
+\[
+\boxed{\rank(G)=k.}
+\]
+This is the \textbf{rank condition} for local identification. It requires $m\geq k$ (the order condition: at least as many moment conditions as parameters) together with the requirement that the $m$ moment conditions provide $k$ linearly independent pieces of information about $\beta$. If $\rank(G)<k$, then some directions in parameter space are locally unidentified: small perturbations of $\beta$ along the null space of $G$ leave the moment conditions nearly unchanged, and the GMM objective becomes flat.
+
+\bigskip
+\paragraph{(b) Efficient (infeasible) weighting matrix.} Recall the sandwich formula
+\[
+\Sigma=(G'WG)^{-1}G'WVWG(G'WG)^{-1}.
+\]
+We look for the $W$ that minimizes $\Sigma$ in the positive-semidefinite ordering.
+
+\medskip
+\noindent\textbf{Claim:} The efficient weighting matrix is $W=V^{-1}$, yielding $\Sigma^\#=(G'V^{-1}G)^{-1}$.
+
+\medskip
+\noindent\textbf{Verification.} Setting $W=V^{-1}$ in the sandwich formula:
+\begin{align*}
+\Sigma^\# &= (G'V^{-1}G)^{-1}G'V^{-1}\underbrace{V}_{=V}V^{-1}G(G'V^{-1}G)^{-1} \\
+&= (G'V^{-1}G)^{-1}\underbrace{G'V^{-1}G(G'V^{-1}G)^{-1}}_{=I_k} \\
+&= (G'V^{-1}G)^{-1}.
+\end{align*}
+The sandwich collapses because the ``bread'' and ``meat'' simplify. This is a manifestation of the general principle that efficient GMM uses the inverse of the moment covariance as the weighting matrix.
+
+\medskip
+\noindent\textbf{Proof of optimality: $\Sigma-\Sigma^\#\geq 0$ for any $W$.} Define
+\[
+M = (G'WG)^{-1}G'W - (G'V^{-1}G)^{-1}G'V^{-1}.
+\]
+Note that $MG=I_k-I_k=0$ (both terms, when post-multiplied by $G$, give $I_k$). Now write:
+\begin{align*}
+\Sigma - \Sigma^\# &= (G'WG)^{-1}G'WVWG(G'WG)^{-1} - (G'V^{-1}G)^{-1}.
+\end{align*}
+Adding and subtracting cross terms and using $MG=0$, one can verify that
+\[
+\Sigma - \Sigma^\# = M\,V\,M'.
+\]
+Since $V$ is positive definite (it is a second-moment matrix of the non-degenerate random vector $e\cdot A$), $M\,V\,M'\geq 0$ in the positive-semidefinite sense. Therefore:
+\[
+\boxed{\Sigma - \Sigma^\# = M\,V\,M' \geq 0 \quad\text{for any }W.}
+\]
+Any choice of weighting matrix other than $V^{-1}$ incurs ``excess variance'' $M\,V\,M'$. This weighting matrix is infeasible because $V=\E[A(x_i)e(z_i;\beta_0)^2 A(x_i)']$ depends on the unknown $\beta_0$. In practice, one uses a two-step procedure: first estimate $\hat\beta_1$ with an arbitrary $W$ (e.g., $W=I_m$), then construct $\hat{V}=\frac{1}{n}\sum_i A(x_i)e(z_i;\hat\beta_1)^2 A(x_i)'$, and re-estimate with $\hat{W}=\hat{V}^{-1}$.
+
+\bigskip
+\paragraph{(c) Asymptotic covariance with optimal instruments.} The choice of instruments $A(x_i)$ determines $G$ and $V$, and hence the efficiency bound. The claim is that the choice
+\[
+A^*(x_i) = \frac{D(x_i)}{\sigma^2(x_i)}, \qquad D(x_i)=\E\!\left[\frac{\partial e(z_i;\beta)}{\partial\beta}\,\bigg|\,x_i\right]_{\!\beta=\beta_0}\!\!\!\!\!\!\!, \qquad \sigma^2(x_i)=\E[e(z_i;\beta_0)^2\mid x_i],
+\]
+yields the smallest possible asymptotic variance among all choices of $A$.
+
+\medskip
+\noindent\textbf{Computing $G^*$ and $V^*$.} With $A^*(x_i)=D(x_i)/\sigma^2(x_i)$, define $g^*(u_i;\beta)=e(z_i;\beta)A^*(x_i)$. The Jacobian is:
+\begin{align*}
+G^* &= \E\!\left[\frac{\partial g^*(u_i;\beta_0)}{\partial\beta'}\right] = \E\!\left[A^*(x_i)\frac{\partial e(z_i;\beta_0)}{\partial\beta'}\right].
+\end{align*}
+Using the law of iterated expectations (condition on $x_i$ first):
+\begin{align*}
+G^* &= \E\!\left[\frac{D(x_i)}{\sigma^2(x_i)}\,\E\!\left[\frac{\partial e}{\partial\beta'}\,\bigg|\,x_i\right]\right] = \E\!\left[\frac{D(x_i)\,D(x_i)'}{\sigma^2(x_i)}\right].
+\end{align*}
+The moment covariance matrix is:
+\begin{align*}
+V^* &= \E\!\left[A^*(x_i)\,e(z_i;\beta_0)^2\,A^*(x_i)'\right] \\
+&= \E\!\left[\frac{D(x_i)}{\sigma^2(x_i)}\,e(z_i;\beta_0)^2\,\frac{D(x_i)'}{\sigma^2(x_i)}\right] \\
+&\qquad\qquad\text{(note: $1/\sigma^2$ appears from each $A^*$, giving $1/\sigma^4$ total)}\\
+&= \E\!\left[\frac{D(x_i)D(x_i)'}{\sigma^4(x_i)}\,\E[e(z_i;\beta_0)^2\mid x_i]\right] \\
+&= \E\!\left[\frac{D(x_i)D(x_i)'}{\sigma^4(x_i)}\cdot\sigma^2(x_i)\right] = \E\!\left[\frac{D(x_i)D(x_i)'}{\sigma^2(x_i)}\right].
+\end{align*}
+So $G^*=V^*$. Under efficient weighting ($W=V^{*-1}$), the asymptotic variance is:
+\[
+\Sigma^* = (G^{*\prime}V^{*-1}G^*)^{-1} = (G^{*\prime}G^{*-1}G^*)^{-1} = G^{*-1} = \left(\E\!\left[\frac{D(x_i)D(x_i)'}{\sigma^2(x_i)}\right]\right)^{-1}.
+\]
+\[
+\boxed{\Sigma^* = \left(\E\!\left[\frac{D(x_i)D(x_i)'}{\sigma^2(x_i)}\right]\right)^{-1}.}
+\]
+This is the \textbf{semiparametric efficiency bound} for estimating $\beta_0$ from the conditional moment restriction $\E[e\mid x]=0$ (Chamberlain, 1987). It is the analog of the Cramér--Rao bound: no regular estimator that uses only the conditional moment restriction can have a smaller asymptotic variance.
+
+\bigskip
+\paragraph{(d) Optimality: $\Sigma-\Sigma^*\geq 0$ for any $A$.} We need to show that for \emph{any} instrument function $A(x_i)$, even after using the efficient weighting matrix $W=V^{-1}$ for that particular $A$, the resulting asymptotic variance $\Sigma=(G'V^{-1}G)^{-1}$ is no smaller than $\Sigma^*$.
+
+\medskip
+\noindent\textbf{Step 1: Express $G$ and $V$ for arbitrary $A$.} By the law of iterated expectations:
+\begin{align*}
+G &= \E\!\left[A(x_i)\frac{\partial e(z_i;\beta_0)}{\partial\beta'}\right] = \E\!\left[A(x_i)\,D(x_i)'\right], \\
+V &= \E\!\left[A(x_i)\,e(z_i;\beta_0)^2\,A(x_i)'\right] = \E\!\left[\sigma^2(x_i)\,A(x_i)\,A(x_i)'\right].
+\end{align*}
+
+\noindent\textbf{Step 2: Apply a matrix Cauchy--Schwarz inequality.} Define the $\R^{m+k}$-valued random vector
+\[
+\xi_i = \begin{pmatrix} \sigma(x_i)\,A(x_i) \\ D(x_i)/\sigma(x_i) \end{pmatrix}.
+\]
+The second-moment matrix of $\xi_i$ is positive semidefinite:
+\[
+\E[\xi_i\xi_i'] = \begin{pmatrix} V & G \\ G' & G^* \end{pmatrix} \geq 0,
+\]
+where $V=\E[\sigma^2 AA']$, $G=\E[AD']$, and $G^*=\E[DD'/\sigma^2]=V^*$. By the Schur complement condition for positive semidefiniteness:
+\[
+G^* - G'V^{-1}G \geq 0.
+\]
+\begin{remark}[Schur complement and positive semidefiniteness]
+Let $M$ be a block matrix partitioned as
+\[
+M = \begin{pmatrix} A & B \\ B' & C \end{pmatrix},
+\quad A\in\R^{m\times m},\; C\in\R^{k\times k},\; B\in\R^{m\times k}.
+\]
+If $A>0$ (positive definite), the \textbf{Schur complement} of $A$ in $M$ is
+\[
+M/A \;:=\; C - B'A^{-1}B.
+\]
+The key fact is:
+\[
+M \geq 0 \quad\Longleftrightarrow\quad A \geq 0 \;\text{ and }\; C - B'A^{-1}B \geq 0.
+\]
+That is, \emph{the whole block matrix is positive semidefinite if and only if its Schur complement is positive semidefinite} (given $A>0$). Applying this to our second-moment matrix with $A=V$, $B=G$, and $C=G^*$:
+\[
+\E[\xi_i\xi_i'] = \begin{pmatrix} V & G \\ G' & G^* \end{pmatrix} \geq 0
+\quad\Longrightarrow\quad
+G^* - G'V^{-1}G \;\geq\; 0.
+\]
+\end{remark}
+
+\noindent Since $\Sigma=(G'V^{-1}G)^{-1}$ (under efficient weighting for $A$) and $\Sigma^*=G^{*-1}$, and since $G^*-G'V^{-1}G\geq 0$ implies $(G'V^{-1}G)^{-1}\geq G^{*-1}$ by matrix inversion (both matrices are positive definite), we obtain:
+\[
+\boxed{\Sigma - \Sigma^* \geq 0 \quad\text{for any instrument function }A(x_i).}
+\]
+The inequality is strict whenever $A$ is not proportional to $A^*$, because the Schur complement is strictly positive definite unless the upper-right block ``explains'' all of $G^*$.
+
+\medskip
+\noindent\textbf{Intuition.} The optimal instrument $A^*(x_i)=D(x_i)/\sigma^2(x_i)$ concentrates information where it is most useful: observations with a large expected derivative $D(x_i)$ (high sensitivity of the residual to $\beta$) and small conditional variance $\sigma^2(x_i)$ (low noise) receive more weight. Any other choice of instruments either wastes information (under-weighting informative observations) or introduces noise (over-weighting noisy ones). This is a generalized ``signal-to-noise'' logic: $A^*$ is the conditional analog of the efficient score in maximum likelihood.
+
+\bigskip
+\paragraph{(e) Computing $A^*(x_i)$ in practice.} The optimal instruments $A^*(x_i)=D(x_i)/\sigma^2(x_i)$ are infeasible because $D(x_i)=\E[\partial e/\partial\beta'\mid x_i]_{\beta_0}$ and $\sigma^2(x_i)=\E[e(z_i;\beta_0)^2\mid x_i]$ both depend on the unknown $\beta_0$ and on conditional expectations. The standard approach, due to Newey (1990), is a three-step procedure:
+
+\medskip
+\noindent\textbf{Step 1: Preliminary estimation.} Obtain a $\sqrt{n}$-consistent estimator $\hat\beta_1$ using any set of valid instruments (e.g., $A(x_i)=x_i$) and standard two-step efficient GMM. This provides a consistent starting point.
+
+\medskip
+\noindent\textbf{Step 2: Estimate the conditional expectations nonparametrically.} Using the preliminary estimate $\hat\beta_1$, construct:
+\begin{itemize}
+    \item The residuals $\hat{e}_i = e(z_i;\hat\beta_1)$ and their derivatives $\partial e(z_i;\hat\beta_1)/\partial\beta'$.
+    \item Estimate $D(x_i)$ by regressing $\partial e(z_i;\hat\beta_1)/\partial\beta'$ on $x_i$ nonparametrically (e.g., kernel regression, local polynomials, or sieve/series regression with a polynomial or spline basis in $x_i$). Denote the fitted values $\hat{D}(x_i)$.
+    \item Estimate $\sigma^2(x_i)$ by regressing $\hat{e}_i^2$ on $x_i$ nonparametrically. Denote the fitted values $\hat\sigma^2(x_i)$.
+\end{itemize}
+
+\noindent\textbf{Step 3: Re-estimate with constructed optimal instruments.} Form
+\[
+\hat{A}^*(x_i)=\frac{\hat{D}(x_i)}{\hat\sigma^2(x_i)}
+\]
+and use these as instruments in a final round of GMM:
+\[
+\hat\beta^* = \argmin_\beta\;\bar{g}^*(\beta)'\hat{W}^*\bar{g}^*(\beta), \qquad \bar{g}^*(\beta) = \frac{1}{n}\sum_{i=1}^n e(z_i;\beta)\hat{A}^*(x_i).
+\]
+Under regularity conditions (including appropriate rates for the nonparametric estimates), Newey (1990) shows that $\hat\beta^*$ achieves the semiparametric efficiency bound $\Sigma^*$ from part (c). The key requirement is that the nonparametric estimates converge fast enough that the estimation error in $\hat{A}^*$ does not affect the first-order asymptotics of $\hat\beta^*$.
+
+\medskip
+\noindent\textbf{Practical remarks.}
+\begin{itemize}
+    \item If the conditional expectation functions $D(\cdot)$ and $\sigma^2(\cdot)$ are believed to be smooth, series regression with polynomial or spline bases works well and is simple to implement.
+    \item If the model is linear ($e(z_i;\beta)=y_i-x_i'\beta$), then $D(x_i)=-x_i$ is known and only $\sigma^2(x_i)=\E[(y_i-x_i'\beta_0)^2\mid x_i]$ needs to be estimated. The optimal instruments become $A^*(x_i)=-x_i/\sigma^2(x_i)$, which is the heteroskedasticity-efficient instrument from the GLS literature.
+    \item In time-series applications, one must also account for serial correlation in the long-run variance estimation, but the logic of optimal instruments carries over with the appropriate modifications.
+\end{itemize}
+
+\end{solution}
+
+
+
+\vspace{1.5em}
+\begin{thebibliography}{10}
+\bibitem[Chamberlain(1987)]{Chamberlain1987}
+Chamberlain, G.\ (1987).
+\newblock ``Asymptotic efficiency in estimation with conditional moment restrictions.''
+\newblock \emph{Journal of Econometrics} 34(3), 305--334.
+
+\bibitem[Eichenbaum et al.(1988)]{EichenbaumHansenSingleton1988}
+Eichenbaum, M., L.\ P.\ Hansen, and K.\ J.\ Singleton (1988).
+\newblock ``A time series analysis of representative agent models of consumption and leisure choice under uncertainty.''
+\newblock \emph{Quarterly Journal of Economics} 103(1), 51--78.
+
+\bibitem[Hansen(1982)]{Hansen1982}
+Hansen, L.\ P.\ (1982).
+\newblock ``Large sample properties of generalized method of moments estimators.''
+\newblock \emph{Econometrica} 50(4), 1029--1054.
+
+\bibitem[Newey(1985)]{Newey1985}
+Newey, W.\ K.\ (1985).
+\newblock ``Generalized method of moments specification testing.''
+\newblock \emph{Journal of Econometrics} 29(3), 229--256.
+
+\bibitem[Newey(1990)]{Newey1990}
+Newey, W.\ K.\ (1990).
+\newblock ``Efficient instrumental variables estimation of nonlinear models.''
+\newblock \emph{Econometrica} 58(4), 809--837.
+
+\bibitem[Staiger and Stock(1997)]{StaigerStock1997}
+Staiger, D.\ and J.\ H.\ Stock (1997).
+\newblock ``Instrumental variables regression with weak instruments.''
+\newblock \emph{Econometrica} 65(3), 557--586.
+\end{thebibliography}
+
+\end{document}
